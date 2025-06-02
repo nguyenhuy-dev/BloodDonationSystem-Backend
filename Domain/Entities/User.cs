@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Entities;
@@ -25,7 +26,7 @@ public partial class User
 
     public double? Area { get; set; }
 
-    public string Role { get; set; } = null!;
+    public UserRole Role { get; set; }
 
     public int BloodTypeId { get; set; }
 

@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloodDonationSystem", "BloodDonationSystem\BloodDonationSystem.csproj", "{AC81F645-094A-0566-886C-B8313E48C405}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,18 +69,6 @@ Global
 		{AC81F645-094A-0566-886C-B8313E48C405}.Release|x64.Build.0 = Release|Any CPU
 		{AC81F645-094A-0566-886C-B8313E48C405}.Release|x86.ActiveCfg = Release|Any CPU
 		{AC81F645-094A-0566-886C-B8313E48C405}.Release|x86.Build.0 = Release|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Debug|x64.Build.0 = Debug|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Debug|x86.Build.0 = Debug|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Release|x64.ActiveCfg = Release|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Release|x64.Build.0 = Release|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Release|x86.ActiveCfg = Release|Any CPU
-		{A68A9EE2-4A50-448A-A66D-98B180B0F0ED}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,10 @@
+using Application.Service.Auth;
+using Infrastructure.Repository.Auth;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Add services to the container.
 

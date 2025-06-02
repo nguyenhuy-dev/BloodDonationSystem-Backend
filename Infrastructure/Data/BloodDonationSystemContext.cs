@@ -4,7 +4,7 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace Infrastructure;
+namespace Infrastructure.Data;
 
 public partial class BloodDonationSystemContext : DbContext
 {
