@@ -10,6 +10,10 @@ namespace BloodDonationSystem
 
             builder.Services.AddControllers();
 
+            // Add Swagger
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -17,6 +21,13 @@ namespace BloodDonationSystem
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();                         // Bật Swagger middleware
+                app.UseSwaggerUI();                       // Giao diện UI
+            }
 
 
             app.MapControllers();
