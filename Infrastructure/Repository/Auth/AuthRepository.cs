@@ -17,11 +17,14 @@ namespace Infrastructure.Repository.Auth
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Phone == phone);
             if (user == null) 
             {
+                //Console.WriteLine("User error"); //Fix bug
                 return null; // User not found
             }
+
             var result = new PasswordHasher<User>().VerifyHashedPassword(user, user.HashPass, password);
             if (result == PasswordVerificationResult.Failed)
             {
+                //Console.WriteLine("Password error"); //Fix bug
                 return null; // Password failed
             }
             return user; // Successful login, return user

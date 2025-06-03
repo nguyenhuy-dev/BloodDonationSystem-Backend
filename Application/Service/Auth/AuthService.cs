@@ -10,9 +10,9 @@ namespace Application.Service.Auth
 {
     public class AuthService(IAuthRepository _repository) : IAuthService
     {
-        public async Task<LoginResponse> LoginAsync(LoginRequest request)
+        public async Task<LoginResponse> LoginAsync(string phone, string password)
         {
-            var user = await _repository.LoginAsync(request.Phone, request.Password);
+            var user = await _repository.LoginAsync(phone, password);
             if (user == null)
             {
                 return new LoginResponse // Invalid login response

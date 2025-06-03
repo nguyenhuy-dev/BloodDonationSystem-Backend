@@ -12,16 +12,16 @@ namespace BloodDonationSystem.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var response = await _authService.LoginAsync(request);
+            var response = await _authService.LoginAsync(request.Phone, request.Password);
             if (!response.IsSuccess)
             {
-                return BadRequest(response.Message);
+                return Unauthorized(response.Message);
             }
             return Ok(new
             {
                 response.IsSuccess,
                 response.Message,
-                response.Token,
+              //  response.Token,
                 response.Phone,
                 response.FirstName,
                 response.LastName

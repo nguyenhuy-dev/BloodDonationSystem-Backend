@@ -9,6 +9,6 @@ namespace Application.Service.Auth
 {
     public interface IAuthService
     {
-        Task<LoginResponse> LoginAsync(LoginRequest request);
+        Task<LoginResponse> LoginAsync(string phone, string password);
     }
 }
