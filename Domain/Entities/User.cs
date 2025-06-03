@@ -4,41 +4,27 @@ using System.Collections.Generic;
 
 namespace Domain.Entities;
 
-public partial class User
+public class User
 {
     public Guid Id { get; set; }
-
     public string FirstName { get; set; } = null!;
-
     public string LastName { get; set; } = null!;
-
     public bool Gender { get; set; }
-
-    public DateOnly Dob { get; set; }
-
+    public DateTime Dob { get; set; }
     public string Phone { get; set; } = null!;
-
     public string HashPass { get; set; } = null!;
-
-    public DateOnly? LastDonation { get; set; }
-
+    public DateTime? LastDonation { get; set; }
     public string? Address { get; set; }
-
-    public double? Area { get; set; }
-
-    public string Role { get; set; } = null!;
-
+    //public Microsoft.SqlServer.Types.SqlGeography? Longtitude { get; set; }
+    //public Microsoft.SqlServer.Types.SqlGeography? Latitude { get; set; }
+    public int RoleId { get; set; }
     public int BloodTypeId { get; set; }
 
-    public virtual ICollection<Blog> Blogs { get; set; } = new List<Blog>();
-
-    public virtual BloodType BloodType { get; set; } = null!;
-
-    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
-
-    public virtual ICollection<DonationProcessStep> DonationProcessSteps { get; set; } = new List<DonationProcessStep>();
-
-    public virtual ICollection<Event> Events { get; set; } = new List<Event>();
-
-    public virtual ICollection<Registration> Registrations { get; set; } = new List<Registration>();
+    public Role Role { get; set; }
+    public BloodType BloodType { get; set; }
+    public ICollection<Event> EventsCreated { get; set; }
+    public ICollection<Registration> Registrations { get; set; }
+    public ICollection<DonationProcessStep> ProcessSteps { get; set; }
+    public ICollection<Blog> Blogs { get; set; }
+    public ICollection<Comment> Comments { get; set; }
 }

@@ -25,7 +25,7 @@ namespace Application.Service.Auth
             {
                 IsSuccess = true,
                 Message = "Login successful.",
-                Token = null, // Cai nay de sau
+                //Token = null, // Cai nay de sau
                 Phone = user.Phone,
                 FirstName = user.FirstName,
                 LastName = user.LastName
