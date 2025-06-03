@@ -17,6 +17,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+<<<<<<< HEAD
+=======
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.5" />
+>>>>>>> 9d5abb59bea0b7858533ec5a927f35b201aa4596
   </ItemGroup>
 
   <ItemGroup>
