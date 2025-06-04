@@ -85,7 +85,13 @@ namespace Infrastructure.Data
                 .HasForeignKey(u => u.PerformedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.EventsCreated)
+                .WithOne(u => u.Creator)
+                .HasForeignKey(u => u.CreateBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
         }
     }
 }
