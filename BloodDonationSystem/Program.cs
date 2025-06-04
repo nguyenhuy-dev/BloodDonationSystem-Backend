@@ -1,13 +1,18 @@
 using Application.Service.Auth;
+using Application.Service.Donation;
 using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Repository.Auth;
+using Infrastructure.Repository.Donation;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddScoped<IDonationRepository, DonationRepository>();
+builder.Services.AddScoped<IDonationService, DonationService>();
 
 // Add services to the container.
 
