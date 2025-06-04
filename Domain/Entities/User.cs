@@ -10,8 +10,9 @@ public class User
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public bool Gender { get; set; }
-    public DateTime Dob { get; set; }
+    public DateOnly Dob { get; set; }
     public string Phone { get; set; } = null!;
+    public string Gmail { get; set; }
     public string HashPass { get; set; } = null!;
     public DateTime? LastDonation { get; set; }
     public string? Address { get; set; }
