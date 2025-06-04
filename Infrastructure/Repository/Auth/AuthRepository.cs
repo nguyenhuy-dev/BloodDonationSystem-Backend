@@ -12,6 +12,16 @@ namespace Infrastructure.Repository.Auth
 {
     public class AuthRepository (BloodDonationSystemContext _context) : IAuthRepository
     {
+        public async Task<bool> UserExistsAsync(string phone)
+        {
+            return await _context.Users.AnyAsync(u => u.Phone == phone);
+        }
+
+        public async Task<User?> GetUserByPhoneAsync(string phone)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Phone == phone);
+        }
+
         public async Task<User?> LoginAsync(string phone, string password)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Phone == phone);
@@ -29,5 +39,13 @@ namespace Infrastructure.Repository.Auth
             }
             return user; // Successful login, return user
         }
+
+        public async Task<User?> RegisterAsync(User user)
+        {
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return user; // Return the registered user
+        }
+
     }
 }

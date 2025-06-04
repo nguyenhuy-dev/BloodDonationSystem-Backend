@@ -1,4 +1,3 @@
-using Domain.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -12,7 +11,7 @@ public class User
     public bool Gender { get; set; }
     public DateOnly Dob { get; set; }
     public string Phone { get; set; } = null!;
-    public string Gmail { get; set; }
+    public string? Gmail { get; set; }
     public string HashPass { get; set; } = null!;
     public DateTime? LastDonation { get; set; }
     public string? Address { get; set; }

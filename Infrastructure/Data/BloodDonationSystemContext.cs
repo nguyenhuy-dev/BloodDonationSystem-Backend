@@ -7,10 +7,10 @@ namespace Infrastructure.Data
 {
     public class BloodDonationSystemContext : DbContext
     {
-        //public BloodDonationSystemContext(DbContextOptions<BloodDonationSystemContext> options)
-        //    : base(options)
-        //{
-        //}
+        public BloodDonationSystemContext(DbContextOptions<BloodDonationSystemContext> options)
+            : base(options)
+        {
+        }
         public DbSet<BloodType> BloodTypes { get; set; }
         public DbSet<BloodComponent> BloodComponents { get; set; }
         public DbSet<BloodTypeCompatibility> BloodTypeCompatibilities { get; set; }
@@ -54,6 +54,11 @@ namespace Infrastructure.Data
                 .HasForeignKey<Inventory>(i => i.DonationHistoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<BloodType>()
+                .HasMany(b => b.Users)
+                .WithOne(b => b.BloodType)
+                .HasForeignKey(b => b.BloodTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BloodType>()
                 .HasMany(b => b.Donors)

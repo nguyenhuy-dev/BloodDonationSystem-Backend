@@ -2,16 +2,20 @@ using Application.Service.Auth;
 using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Repository.Auth;
+using Infrastructure.Repository.Blood;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IBloodRepository, BloodRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();

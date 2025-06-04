@@ -1,14 +1,12 @@
-﻿using Application.DTO.LoginDTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DTO;
+using Application.DTO.LoginDTO;
+using Domain.Entities;
 
 namespace Application.Service.Auth
 {
     public interface IAuthService
     {
         Task<LoginResponse> LoginAsync(string phone, string password);
+        Task<User?> RegisterAsync(UserDTO userDTO);
     }
 }
