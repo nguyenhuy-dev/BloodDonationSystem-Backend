@@ -26,7 +26,7 @@ namespace BloodDonationSystem.Controllers
         public async Task<IActionResult> CheckInDonor(int id, [FromQuery] Guid staffId)
         {
             await _donationService.CheckInDonorAsync(id, staffId);
-            return Ok();
+            return Ok(new { RegistrationId = id });
         }
 
         [HttpPost("{historyId}/medical-check")]
@@ -37,9 +37,16 @@ namespace BloodDonationSystem.Controllers
         }
 
         [HttpPost("{historyId}/collect")]
-        public async Task<IActionResult> CollectBlood(int historyId, [FromQuery] float volume, [FromQuery] bool isQualified, [FromQuery] Guid staffId)
+        public async Task<IActionResult> CollectBlood(int historyId, [FromQuery] float volume, [FromQuery] Guid staffId)
         {
-            var result = await _donationService.CollectBloodAsync(historyId, volume, isQualified, staffId);
+            await _donationService.CollectBloodAsync(historyId, volume, staffId);
+            return Ok(new { HistoryId = historyId });
+        }
+
+        [HttpPost("{historyId}/blood-check")]
+        public async Task<IActionResult> CheckBloodQuality(int historyId, [FromQuery] bool isQualified, [FromQuery] Guid staffId)
+        {
+            var result = await _donationService.CheckBloodQualityAsync(historyId, isQualified, staffId);
             return Ok(result);
         }
     }

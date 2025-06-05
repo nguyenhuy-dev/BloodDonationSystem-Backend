@@ -31,8 +31,8 @@ namespace Application.Service.Donation
             };
 
             await _repo.CreateRegistrationAsync(reg);
-            var user = await _repo.GetUserByIdAsync(dto.UserId);
-            var ev = await _repo.GetEventByIdAsync(dto.EventId);
+            //var user = await _repo.GetUserByIdAsync(dto.UserId);
+            //var ev = await _repo.GetEventByIdAsync(dto.EventId);
 
             //await _email.SendDonationScheduleEmail(user.Email, ev);
             return reg.Id;
@@ -71,51 +71,64 @@ namespace Application.Service.Donation
                 PerformedAt = DateTime.UtcNow,
                 Description = healthy ? "Healthy" : "Unfit"
             });
+            await _repo.SaveAsync();
 
             if (!healthy)
             {
-                await CancelDonationAsync(histId, staffId, "Health check failed");
+                //await CancelDonationAsync(histId, staffId, "Health check failed");
                 return false;
             }
 
-            await _repo.SaveAsync();
             return true;
         }
 
-        public async Task<bool> CollectBloodAsync(int histId, float volume, bool isQualified, Guid staffId)
+        public async Task CollectBloodAsync(int histId, float volume, Guid staffId)
         {
             var hist = await _repo.GetDonationHistoryByIdAsync(histId);
             hist.Volume = volume;
+
+            await _repo.AddProcessStepAsync(new DonationProcessStep
+            {
+                StepName = "Collect Blood",
+                DonationHistoryId = histId,
+                PerformedBy = staffId,
+                PerformedAt = DateTime.UtcNow
+            });
+
+            //await _email.SendPostDonationConfirmationEmail(hist.Registration.User.Email);
+
+            await _repo.SaveAsync();
+        }
+
+        public async Task<bool> CheckBloodQualityAsync(int histId, bool isQualified, Guid staffId)
+        {
+            var hist = await _repo.GetDonationHistoryByIdAsync(histId);
             hist.BloodStatus = isQualified;
 
-            if (isQualified)
+            await _repo.AddProcessStepAsync(new DonationProcessStep
             {
-                var comp = await _repo.GetDefaultBloodComponentAsync();
-                var inv = new Inventory
-                {
-                    BloodTypeId = hist.Registration.User.BloodTypeId,
-                    BloodComponentId = comp.Id,
-                    CreateAt = DateTime.UtcNow,
-                    ExpiredDate = DateTime.UtcNow.AddDays(42),
-                    DonationHistoryId = hist.Id
-                };
-                await _repo.AddToInventoryAsync(inv);
+                StepName = "Blood Checkup",
+                DonationHistoryId = histId,
+                PerformedBy = staffId,
+                PerformedAt = DateTime.UtcNow
+            });
 
-                await _repo.AddProcessStepAsync(new DonationProcessStep
-                {
-                    StepName = "Blood Qualified",
-                    DonationHistoryId = histId,
-                    PerformedBy = staffId,
-                    PerformedAt = DateTime.UtcNow
-                });
-
-                //await _email.SendPostDonationConfirmationEmail(hist.Registration.User.Email);
-            }
-            else
+            if (!isQualified)
             {
-                await CancelDonationAsync(histId, staffId, "Blood not qualified");
+                await _repo.SaveAsync();
                 return false;
             }
+
+            var comp = await _repo.GetDefaultBloodComponentAsync();  //default là component đầu tiên: toàn phần
+            var inv = new Inventory
+            {
+                BloodTypeId = hist.Registration.User.BloodTypeId,
+                BloodComponentId = comp.Id,
+                CreateAt = DateTime.UtcNow,
+                ExpiredDate = DateTime.UtcNow.AddDays(42),
+                DonationHistoryId = hist.Id
+            };
+            await _repo.AddToInventoryAsync(inv);
 
             await _repo.SaveAsync();
             return true;

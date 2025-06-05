@@ -12,6 +12,7 @@ namespace Application.Service.Donation
         Task<int> RegisterDonationAsync(RegisterDonationDto dto);
         Task CheckInDonorAsync(int registrationId, Guid staffId);
         Task<bool> ConductMedicalCheckupAsync(int historyId, bool isHealthy, Guid staffId);
-        Task<bool> CollectBloodAsync(int historyId, float volume, bool isQualified, Guid staffId);
+        Task CollectBloodAsync(int historyId, float volume, Guid staffId);
+        Task<bool> CheckBloodQualityAsync(int historyId, bool isQualified, Guid staffId);
     }
 }
