@@ -14,18 +14,21 @@ public class User
     public string Phone { get; set; } = null!;
     public string Gmail { get; set; }
     public string HashPass { get; set; } = null!;
+    public string Token { get; set; }
     public DateTime? LastDonation { get; set; }
-    public string? Address { get; set; }
     //public Microsoft.SqlServer.Types.SqlGeography? Longtitude { get; set; }
     //public Microsoft.SqlServer.Types.SqlGeography? Latitude { get; set; }
+    public bool Status { get; set; }
     public int RoleId { get; set; }
     public int BloodTypeId { get; set; }
 
     public Role Role { get; set; }
     public BloodType BloodType { get; set; }
+    public ICollection<BloodProcedure> BloodProcedures { get; set; }
+    public ICollection<HealthProcedure> HealthProcedures { get; set; }
+    public ICollection<CollectionProcedure> CollectionProcedures { get; set; }
     public ICollection<Event> EventsCreated { get; set; }
     public ICollection<Registration> Registrations { get; set; }
-    public ICollection<DonationProcessStep> ProcessSteps { get; set; }
     public ICollection<Blog> Blogs { get; set; }
     public ICollection<Comment> Comments { get; set; }
 }
