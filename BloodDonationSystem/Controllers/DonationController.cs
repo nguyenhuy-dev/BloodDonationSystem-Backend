@@ -15,6 +15,7 @@ namespace BloodDonationSystem.Controllers
             _donationService = donationService;
         }
 
+        // Đăng ký hiến máu
         [HttpPost("register")]
         public async Task<IActionResult> RegisterDonation(RegisterDonationDto dto)
         {
@@ -22,6 +23,7 @@ namespace BloodDonationSystem.Controllers
             return Ok(new { RegistrationId = id });
         }
 
+        // Check-in
         [HttpPost("{id}/checkin")]
         public async Task<IActionResult> CheckInDonor(int id, [FromQuery] Guid staffId)
         {
@@ -29,6 +31,7 @@ namespace BloodDonationSystem.Controllers
             return Ok(new { RegistrationId = id });
         }
 
+        // Kiểm tra sức khỏe
         [HttpPost("{historyId}/medical-check")]
         public async Task<IActionResult> MedicalCheck(int historyId, [FromQuery] bool isHealthy, [FromQuery] Guid staffId)
         {
@@ -36,6 +39,7 @@ namespace BloodDonationSystem.Controllers
             return Ok(result);
         }
 
+        // Lấy máu
         [HttpPost("{historyId}/collect")]
         public async Task<IActionResult> CollectBlood(int historyId, [FromQuery] float volume, [FromQuery] Guid staffId)
         {
@@ -43,6 +47,7 @@ namespace BloodDonationSystem.Controllers
             return Ok(new { HistoryId = historyId });
         }
 
+        // Kiểm tra chất lượng máu
         [HttpPost("{historyId}/blood-check")]
         public async Task<IActionResult> CheckBloodQuality(int historyId, [FromQuery] bool isQualified, [FromQuery] Guid staffId)
         {

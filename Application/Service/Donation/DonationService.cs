@@ -20,7 +20,8 @@ namespace Application.Service.Donation
             //_email = email;
         }
 
-        public async Task<int> RegisterDonationAsync(RegisterDonationDto dto)
+        //Add 1 record vào tbl Registration
+        public async Task<int> RegisterDonationAsync(RegisterDonationDto dto)  
         {
             var reg = new Registration
             {
@@ -38,7 +39,8 @@ namespace Application.Service.Donation
             return reg.Id;
         }
 
-        public async Task CheckInDonorAsync(int regId, Guid staffId)
+        //Add 1 record vào tbl DonationHistory. Sau đó Add 1 record vào tbl DonationProcessStep
+        public async Task CheckInDonorAsync(int regId, Guid staffId)  
         {
             var hist = new DonationHistory
             {
@@ -58,6 +60,7 @@ namespace Application.Service.Donation
             await _repo.SaveAsync();
         }
 
+        //Update 1 field HealthStatus trong tbl DonationHistory. Sau đó Add 1 record vào tbl DonationProcessStep
         public async Task<bool> ConductMedicalCheckupAsync(int histId, bool healthy, Guid staffId)
         {
             var hist = await _repo.GetDonationHistoryByIdAsync(histId);
@@ -82,6 +85,7 @@ namespace Application.Service.Donation
             return true;
         }
 
+        //Update 1 field Volume trong tbl DonationHistory. Sau đó Add 1 record vào tbl DonationProcessStep
         public async Task CollectBloodAsync(int histId, float volume, Guid staffId)
         {
             var hist = await _repo.GetDonationHistoryByIdAsync(histId);
@@ -100,6 +104,7 @@ namespace Application.Service.Donation
             await _repo.SaveAsync();
         }
 
+        //Update 1 field BloodStatus trong tbl DonationHistory. Sau đó Add 1 record vào tbl DonationProcessStep
         public async Task<bool> CheckBloodQualityAsync(int histId, bool isQualified, Guid staffId)
         {
             var hist = await _repo.GetDonationHistoryByIdAsync(histId);
@@ -134,6 +139,7 @@ namespace Application.Service.Donation
             return true;
         }
 
+        //Method này để sau
         private async Task CancelDonationAsync(int histId, Guid staffId, string reason)
         {
             await _repo.AddProcessStepAsync(new DonationProcessStep

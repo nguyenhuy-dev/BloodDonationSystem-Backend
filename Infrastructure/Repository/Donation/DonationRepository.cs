@@ -38,22 +38,26 @@ namespace Infrastructure.Repository.Donation
             return history;
         }
 
+        //Get DonationHistory by Id
         public Task<DonationHistory> GetDonationHistoryByIdAsync(int id)
             => _context.DonationHistories
                 .Include(d => d.Registration)
                     .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(d => d.Id == id);
 
+        //Add 1 record vào tbl DonationProcessStep
         public Task AddProcessStepAsync(DonationProcessStep step)
         {
             _context.DonationProcessSteps.Add(step);
             return Task.CompletedTask;
         }
 
-        public Task<BloodComponent> GetDefaultBloodComponentAsync()
+        //Get BloodComponent đầu tiên trong DB: Máu toàn phần
+        public Task<BloodComponent> GetDefaultBloodComponentAsync()  
             => _context.BloodComponents.FirstAsync(); // giả định default là cái đầu tiên
 
-        public Task AddToInventoryAsync(Inventory inventory)
+        //Add 1 record cho Inventory
+        public Task AddToInventoryAsync(Inventory inventory)  
         {
             _context.Inventories.Add(inventory);
             return Task.CompletedTask;
