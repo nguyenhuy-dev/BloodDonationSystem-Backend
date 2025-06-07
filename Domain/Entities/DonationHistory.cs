@@ -7,12 +7,14 @@ public class DonationHistory
 {
     public int Id { get; set; }
     public DateTime CreateAt { get; set; }
-    public float Volume { get; set; }
-    public bool HealthStatus { get; set; }
-    public bool BloodStatus { get; set; }
+    public int HealthId { get; set; }
+    public int CollectId { get; set; }
+    public int QualifiedId { get; set; }
     public int RegistrationId { get; set; }
 
+    public HealthProcedure HealthProcedure { get; set; }
+    public CollectionProcedure CollectionProcedure { get; set; }
+    public BloodProcedure BloodProcedure { get; set; }
     public Registration Registration { get; set; }
     public Inventory Inventory { get; set; }
-    public ICollection<DonationProcessStep> ProcessSteps { get; set; }
 }

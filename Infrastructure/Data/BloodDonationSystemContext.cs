@@ -21,7 +21,9 @@ namespace Infrastructure.Data
         public DbSet<Registration> Registrations { get; set; }
         public DbSet<DonationHistory> DonationHistories { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
-        public DbSet<DonationProcessStep> DonationProcessSteps { get; set; }
+        public DbSet<BloodProcedure> BloodProcedures { get; set; }
+        public DbSet<HealthProcedure> HealthProcedures { get; set; }
+        public DbSet<CollectionProcedure> CollectionProcedures { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Comment> Comments { get; set; }
 
@@ -46,19 +48,15 @@ namespace Infrastructure.Data
             modelBuilder.Entity<Registration>()
                 .HasOne(r => r.DonationHistory)
                 .WithOne(d => d.Registration)
-                .HasForeignKey<DonationHistory>(d => d.RegistrationId);
+                .HasForeignKey<DonationHistory>(d => d.RegistrationId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<DonationHistory>()
-                .HasOne(d => d.Inventory)
+                .HasOne(dh => dh.Inventory)
                 .WithOne(i => i.DonationHistory)
                 .HasForeignKey<Inventory>(i => i.DonationHistoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<BloodType>()
-                .HasMany(b => b.Users)
-                .WithOne(b => b.BloodType)
-                .HasForeignKey(b => b.BloodTypeId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BloodType>()
                 .HasMany(b => b.Donors)
@@ -81,12 +79,24 @@ namespace Infrastructure.Data
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Registrations)
                 .WithOne(u => u.User)
-                .HasForeignKey(u => u.UserId)
+                .HasForeignKey(u => u.MemberId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<User>()
-                .HasMany(u => u.ProcessSteps)
-                .WithOne(u => u.PerformedUser)
+                .HasMany(u => u.BloodProcedures)
+                .WithOne(u => u.Performer)
+                .HasForeignKey(u => u.PerformedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.CollectionProcedures)
+                .WithOne(u => u.PerformedByUser)
+                .HasForeignKey(u => u.PerformedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.HealthProcedures)
+                .WithOne(u => u.Performer)
                 .HasForeignKey(u => u.PerformedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -95,8 +105,6 @@ namespace Infrastructure.Data
                 .WithOne(u => u.Creator)
                 .HasForeignKey(u => u.CreateBy)
                 .OnDelete(DeleteBehavior.Restrict);
-
-
         }
     }
 }

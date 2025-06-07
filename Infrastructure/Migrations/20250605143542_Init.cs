@@ -106,11 +106,13 @@ namespace Infrastructure.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gender = table.Column<bool>(type: "bit", nullable: false),
-                    Dob = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Dob = table.Column<DateOnly>(type: "date", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HashPass = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastDonation = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false),
                     BloodTypeId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -156,6 +158,68 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BloodProcedures",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    HIV = table.Column<bool>(type: "bit", nullable: false),
+                    HBV = table.Column<bool>(type: "bit", nullable: false),
+                    HCV = table.Column<bool>(type: "bit", nullable: false),
+                    Syphilis = table.Column<bool>(type: "bit", nullable: false),
+                    Hb = table.Column<float>(type: "real", nullable: false),
+                    Hct = table.Column<float>(type: "real", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    PerformedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PerformedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BloodTypeId = table.Column<int>(type: "int", nullable: false),
+                    BloodComponentId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BloodProcedures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BloodProcedures_BloodComponents_BloodComponentId",
+                        column: x => x.BloodComponentId,
+                        principalTable: "BloodComponents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BloodProcedures_BloodTypes_BloodTypeId",
+                        column: x => x.BloodTypeId,
+                        principalTable: "BloodTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BloodProcedures_Users_PerformedBy",
+                        column: x => x.PerformedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CollectionProcedures",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Volume = table.Column<float>(type: "real", nullable: false),
+                    PerformedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PerformedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CollectionProcedures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CollectionProcedures_Users_PerformedBy",
+                        column: x => x.PerformedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Events",
                 columns: table => new
                 {
@@ -168,8 +232,7 @@ namespace Infrastructure.Migrations
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EventType = table.Column<bool>(type: "bit", nullable: false),
-                    FacilityId = table.Column<int>(type: "int", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    FacilityId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -181,11 +244,36 @@ namespace Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Events_Users_CreatorId",
-                        column: x => x.CreatorId,
+                        name: "FK_Events_Users_CreateBy",
+                        column: x => x.CreateBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HealthProcedures",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Weight = table.Column<double>(type: "float", nullable: false),
+                    Height = table.Column<double>(type: "float", nullable: false),
+                    Pressure = table.Column<int>(type: "int", nullable: false),
+                    Temperature = table.Column<float>(type: "real", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    PerformedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PerformedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HealthProcedures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_HealthProcedures_Users_PerformedBy",
+                        column: x => x.PerformedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -224,7 +312,7 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsVolunteer = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MemberId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     EventId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -237,8 +325,8 @@ namespace Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Registrations_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Registrations_Users_MemberId",
+                        column: x => x.MemberId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -251,47 +339,36 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Volume = table.Column<float>(type: "real", nullable: false),
-                    HealthStatus = table.Column<bool>(type: "bit", nullable: false),
-                    BloodStatus = table.Column<bool>(type: "bit", nullable: false),
+                    HealthId = table.Column<int>(type: "int", nullable: false),
+                    CollectId = table.Column<int>(type: "int", nullable: false),
+                    QualifiedId = table.Column<int>(type: "int", nullable: false),
                     RegistrationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DonationHistories", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_DonationHistories_BloodProcedures_QualifiedId",
+                        column: x => x.QualifiedId,
+                        principalTable: "BloodProcedures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DonationHistories_CollectionProcedures_CollectId",
+                        column: x => x.CollectId,
+                        principalTable: "CollectionProcedures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DonationHistories_HealthProcedures_HealthId",
+                        column: x => x.HealthId,
+                        principalTable: "HealthProcedures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_DonationHistories_Registrations_RegistrationId",
                         column: x => x.RegistrationId,
                         principalTable: "Registrations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DonationProcessSteps",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StepName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PerformedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PerformedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DonationHistoryId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DonationProcessSteps", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DonationProcessSteps_DonationHistories_DonationHistoryId",
-                        column: x => x.DonationHistoryId,
-                        principalTable: "DonationHistories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DonationProcessSteps_Users_PerformedBy",
-                        column: x => x.PerformedBy,
-                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -337,6 +414,21 @@ namespace Infrastructure.Migrations
                 column: "AuthorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BloodProcedures_BloodComponentId",
+                table: "BloodProcedures",
+                column: "BloodComponentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BloodProcedures_BloodTypeId",
+                table: "BloodProcedures",
+                column: "BloodTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BloodProcedures_PerformedBy",
+                table: "BloodProcedures",
+                column: "PerformedBy");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BloodTypeCompatibilities_DonorTypeId",
                 table: "BloodTypeCompatibilities",
                 column: "DonorTypeId");
@@ -345,6 +437,11 @@ namespace Infrastructure.Migrations
                 name: "IX_BloodTypeCompatibilities_RecipientTypeId",
                 table: "BloodTypeCompatibilities",
                 column: "RecipientTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CollectionProcedures_PerformedBy",
+                table: "CollectionProcedures",
+                column: "PerformedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_BlogId",
@@ -357,30 +454,43 @@ namespace Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DonationHistories_CollectId",
+                table: "DonationHistories",
+                column: "CollectId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DonationHistories_HealthId",
+                table: "DonationHistories",
+                column: "HealthId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DonationHistories_QualifiedId",
+                table: "DonationHistories",
+                column: "QualifiedId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DonationHistories_RegistrationId",
                 table: "DonationHistories",
                 column: "RegistrationId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DonationProcessSteps_DonationHistoryId",
-                table: "DonationProcessSteps",
-                column: "DonationHistoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DonationProcessSteps_PerformedBy",
-                table: "DonationProcessSteps",
-                column: "PerformedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Events_CreatorId",
+                name: "IX_Events_CreateBy",
                 table: "Events",
-                column: "CreatorId");
+                column: "CreateBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_FacilityId",
                 table: "Events",
                 column: "FacilityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HealthProcedures_PerformedBy",
+                table: "HealthProcedures",
+                column: "PerformedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Inventories_BloodComponentId",
@@ -404,9 +514,9 @@ namespace Infrastructure.Migrations
                 column: "EventId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Registrations_UserId",
+                name: "IX_Registrations_MemberId",
                 table: "Registrations",
-                column: "UserId");
+                column: "MemberId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_BloodTypeId",
@@ -429,22 +539,28 @@ namespace Infrastructure.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "DonationProcessSteps");
-
-            migrationBuilder.DropTable(
                 name: "Inventories");
 
             migrationBuilder.DropTable(
                 name: "Blogs");
 
             migrationBuilder.DropTable(
-                name: "BloodComponents");
-
-            migrationBuilder.DropTable(
                 name: "DonationHistories");
 
             migrationBuilder.DropTable(
+                name: "BloodProcedures");
+
+            migrationBuilder.DropTable(
+                name: "CollectionProcedures");
+
+            migrationBuilder.DropTable(
+                name: "HealthProcedures");
+
+            migrationBuilder.DropTable(
                 name: "Registrations");
+
+            migrationBuilder.DropTable(
+                name: "BloodComponents");
 
             migrationBuilder.DropTable(
                 name: "Events");

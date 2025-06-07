@@ -8,6 +8,5 @@ public class BloodComponent
     public int Id { get; set; }
     public string Type { get; set; } = null!;
     public string Principle { get; set; } = null!;
-
-    public ICollection<Inventory> Inventories { get; set; }
+    public ICollection<BloodProcedure> BloodProcedures { get; set; }
 }
