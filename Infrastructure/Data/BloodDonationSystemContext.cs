@@ -26,6 +26,7 @@ namespace Infrastructure.Data
         public DbSet<CollectionProcedure> CollectionProcedures { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -55,6 +56,24 @@ namespace Infrastructure.Data
                 .HasOne(dh => dh.Inventory)
                 .WithOne(i => i.DonationHistory)
                 .HasForeignKey<Inventory>(i => i.DonationHistoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BloodProcedure>()
+                .HasOne(b => b.DonationHistory)
+                .WithOne(dh => dh.BloodProcedure)
+                .HasForeignKey<DonationHistory>(dh => dh.QualifiedId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<HealthProcedure>()
+                .HasOne(h => h.DonationHistory)
+                .WithOne(dh => dh.HealthProcedure)
+                .HasForeignKey<DonationHistory>(dh => dh.HealthId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CollectionProcedure>()
+                .HasOne(c => c.DonationHistory)
+                .WithOne(dh => dh.CollectionProcedure)
+                .HasForeignKey<DonationHistory>(dh => dh.CollectId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -104,6 +123,12 @@ namespace Infrastructure.Data
                 .HasMany(u => u.EventsCreated)
                 .WithOne(u => u.Creator)
                 .HasForeignKey(u => u.CreateBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.RefreshTokens)
+                .WithOne(u => u.User)
+                .HasForeignKey(u => u.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

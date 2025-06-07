@@ -108,13 +108,13 @@ namespace Infrastructure.Migrations
                     Gender = table.Column<bool>(type: "bit", nullable: false),
                     Dob = table.Column<DateOnly>(type: "date", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Gmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HashPass = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastDonation = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false),
-                    BloodTypeId = table.Column<int>(type: "int", nullable: false)
+                    BloodTypeId = table.Column<int>(type: "int", nullable: false),
+                    MyProperty = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -271,6 +271,27 @@ namespace Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_HealthProcedures_Users_PerformedBy",
                         column: x => x.PerformedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -509,6 +530,11 @@ namespace Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Registrations_EventId",
                 table: "Registrations",
                 column: "EventId");
@@ -540,6 +566,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Inventories");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "Blogs");

@@ -420,6 +420,31 @@ namespace Infrastructure.Migrations
                     b.ToTable("Inventories");
                 });
 
+            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("Domain.Entities.Registration", b =>
                 {
                     b.Property<int>("Id")
@@ -508,10 +533,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -701,6 +722,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("DonationHistory");
                 });
 
+            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Registration", b =>
                 {
                     b.HasOne("Domain.Entities.Event", "Event")
@@ -725,7 +757,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.BloodType", "BloodType")
                         .WithMany("Users")
                         .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Role", "Role")
@@ -817,6 +849,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("EventsCreated");
 
                     b.Navigation("HealthProcedures");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("Registrations");
                 });

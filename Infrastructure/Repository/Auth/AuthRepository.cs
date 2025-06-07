@@ -24,7 +24,9 @@ namespace Infrastructure.Repository.Auth
 
         public async Task<User?> LoginAsync(string phone, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Phone == phone);
+            var user = await _context.Users
+                .Include(u => u.Role) // Include Role if needed
+                .FirstOrDefaultAsync(u => u.Phone == phone);
             if (user == null) 
             {
                 //Console.WriteLine("User error"); //Fix bug
@@ -47,5 +49,19 @@ namespace Infrastructure.Repository.Auth
             return user; // Return the registered user
         }
 
+        public async Task SaveRefreshTokenAsync(RefreshToken refreshToken)
+        {
+            _context.RefreshTokens.Add(refreshToken);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<RefreshToken> GetRefreshTokenAsync(string refreshToken)
+        {
+            var token = await _context.RefreshTokens
+                .Include(u => u.User)
+                .ThenInclude(u => u.Role) // Include Role if needed
+                .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+            return token;
+        }
     }
 }

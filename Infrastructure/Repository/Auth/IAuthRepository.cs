@@ -14,5 +14,8 @@ namespace Infrastructure.Repository.Auth
 
         Task<bool> UserExistsAsync(string phone);
         Task<User?> GetUserByPhoneAsync(string phone);
+
+        Task SaveRefreshTokenAsync(RefreshToken refreshToken);
+        Task<RefreshToken> GetRefreshTokenAsync(string refreshToken);
     }
 }

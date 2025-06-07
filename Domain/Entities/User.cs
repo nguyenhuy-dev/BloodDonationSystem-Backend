@@ -13,7 +13,6 @@ public class User
     public string Phone { get; set; } = null!;
     public string? Gmail { get; set; }
     public string HashPass { get; set; } = null!;
-    public string Token { get; set; }
     public DateTime? LastDonation { get; set; }
     //public Microsoft.SqlServer.Types.SqlGeography? Longtitude { get; set; }
     //public Microsoft.SqlServer.Types.SqlGeography? Latitude { get; set; }
@@ -30,4 +29,5 @@ public class User
     public ICollection<Registration> Registrations { get; set; }
     public ICollection<Blog> Blogs { get; set; }
     public ICollection<Comment> Comments { get; set; }
+    public ICollection<RefreshToken> RefreshTokens { get; set; }
 }

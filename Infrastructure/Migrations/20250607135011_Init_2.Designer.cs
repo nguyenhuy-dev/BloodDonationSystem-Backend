@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    [Migration("20250604115436_Init_FixBloodType")]
-    partial class Init_FixBloodType
+    [Migration("20250607135011_Init_2")]
+    partial class Init_2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,6 +81,58 @@ namespace Infrastructure.Migrations
                     b.ToTable("BloodComponents");
                 });
 
+            modelBuilder.Entity("Domain.Entities.BloodProcedure", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BloodComponentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BloodTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HBV")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HCV")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HIV")
+                        .HasColumnType("bit");
+
+                    b.Property<float>("Hb")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Hct")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("PerformedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PerformedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Syphilis")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BloodComponentId");
+
+                    b.HasIndex("BloodTypeId");
+
+                    b.HasIndex("PerformedBy");
+
+                    b.ToTable("BloodProcedures");
+                });
+
             modelBuilder.Entity("Domain.Entities.BloodType", b =>
                 {
                     b.Property<int>("Id")
@@ -121,6 +173,30 @@ namespace Infrastructure.Migrations
                     b.ToTable("BloodTypeCompatibilities");
                 });
 
+            modelBuilder.Entity("Domain.Entities.CollectionProcedure", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("PerformedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PerformedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float>("Volume")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PerformedBy");
+
+                    b.ToTable("CollectionProcedures");
+                });
+
             modelBuilder.Entity("Domain.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -159,60 +235,36 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("BloodStatus")
-                        .HasColumnType("bit");
+                    b.Property<int>("CollectId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("HealthStatus")
-                        .HasColumnType("bit");
+                    b.Property<int>("HealthId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QualifiedId")
+                        .HasColumnType("int");
 
                     b.Property<int>("RegistrationId")
                         .HasColumnType("int");
 
-                    b.Property<float>("Volume")
-                        .HasColumnType("real");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CollectId")
+                        .IsUnique();
+
+                    b.HasIndex("HealthId")
+                        .IsUnique();
+
+                    b.HasIndex("QualifiedId")
+                        .IsUnique();
 
                     b.HasIndex("RegistrationId")
                         .IsUnique();
 
                     b.ToTable("DonationHistories");
-                });
-
-            modelBuilder.Entity("Domain.Entities.DonationProcessStep", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DonationHistoryId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PerformedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PerformedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("StepName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DonationHistoryId");
-
-                    b.HasIndex("PerformedBy");
-
-                    b.ToTable("DonationProcessSteps");
                 });
 
             modelBuilder.Entity("Domain.Entities.Event", b =>
@@ -300,6 +352,42 @@ namespace Infrastructure.Migrations
                     b.ToTable("Facilities");
                 });
 
+            modelBuilder.Entity("Domain.Entities.HealthProcedure", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Height")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("PerformedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PerformedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Pressure")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<float>("Temperature")
+                        .HasColumnType("real");
+
+                    b.Property<double>("Weight")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PerformedBy");
+
+                    b.ToTable("HealthProcedures");
+                });
+
             modelBuilder.Entity("Domain.Entities.Inventory", b =>
                 {
                     b.Property<int>("Id")
@@ -335,6 +423,31 @@ namespace Infrastructure.Migrations
                     b.ToTable("Inventories");
                 });
 
+            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("Domain.Entities.Registration", b =>
                 {
                     b.Property<int>("Id")
@@ -352,14 +465,14 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsVolunteer")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("MemberId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("MemberId");
 
                     b.ToTable("Registrations");
                 });
@@ -386,9 +499,6 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("BloodTypeId")
                         .HasColumnType("int");
@@ -424,6 +534,9 @@ namespace Infrastructure.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BloodTypeId");
@@ -444,6 +557,33 @@ namespace Infrastructure.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("Domain.Entities.BloodProcedure", b =>
+                {
+                    b.HasOne("Domain.Entities.BloodComponent", "BloodComponent")
+                        .WithMany("BloodProcedures")
+                        .HasForeignKey("BloodComponentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.BloodType", "BloodType")
+                        .WithMany()
+                        .HasForeignKey("BloodTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "Performer")
+                        .WithMany("BloodProcedures")
+                        .HasForeignKey("PerformedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BloodComponent");
+
+                    b.Navigation("BloodType");
+
+                    b.Navigation("Performer");
+                });
+
             modelBuilder.Entity("Domain.Entities.BloodTypeCompatibility", b =>
                 {
                     b.HasOne("Domain.Entities.BloodType", "DonorType")
@@ -461,6 +601,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("DonorType");
 
                     b.Navigation("RecipientType");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CollectionProcedure", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "PerformedByUser")
+                        .WithMany("CollectionProcedures")
+                        .HasForeignKey("PerformedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PerformedByUser");
                 });
 
             modelBuilder.Entity("Domain.Entities.Comment", b =>
@@ -484,32 +635,37 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.DonationHistory", b =>
                 {
-                    b.HasOne("Domain.Entities.Registration", "Registration")
+                    b.HasOne("Domain.Entities.CollectionProcedure", "CollectionProcedure")
                         .WithOne("DonationHistory")
-                        .HasForeignKey("Domain.Entities.DonationHistory", "RegistrationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Registration");
-                });
-
-            modelBuilder.Entity("Domain.Entities.DonationProcessStep", b =>
-                {
-                    b.HasOne("Domain.Entities.DonationHistory", "DonationHistory")
-                        .WithMany("ProcessSteps")
-                        .HasForeignKey("DonationHistoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", "PerformedUser")
-                        .WithMany("ProcessSteps")
-                        .HasForeignKey("PerformedBy")
+                        .HasForeignKey("Domain.Entities.DonationHistory", "CollectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("DonationHistory");
+                    b.HasOne("Domain.Entities.HealthProcedure", "HealthProcedure")
+                        .WithOne("DonationHistory")
+                        .HasForeignKey("Domain.Entities.DonationHistory", "HealthId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("PerformedUser");
+                    b.HasOne("Domain.Entities.BloodProcedure", "BloodProcedure")
+                        .WithOne("DonationHistory")
+                        .HasForeignKey("Domain.Entities.DonationHistory", "QualifiedId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Registration", "Registration")
+                        .WithOne("DonationHistory")
+                        .HasForeignKey("Domain.Entities.DonationHistory", "RegistrationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BloodProcedure");
+
+                    b.Navigation("CollectionProcedure");
+
+                    b.Navigation("HealthProcedure");
+
+                    b.Navigation("Registration");
                 });
 
             modelBuilder.Entity("Domain.Entities.Event", b =>
@@ -531,10 +687,21 @@ namespace Infrastructure.Migrations
                     b.Navigation("Facility");
                 });
 
+            modelBuilder.Entity("Domain.Entities.HealthProcedure", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "Performer")
+                        .WithMany("HealthProcedures")
+                        .HasForeignKey("PerformedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Performer");
+                });
+
             modelBuilder.Entity("Domain.Entities.Inventory", b =>
                 {
                     b.HasOne("Domain.Entities.BloodComponent", "BloodComponent")
-                        .WithMany("Inventories")
+                        .WithMany()
                         .HasForeignKey("BloodComponentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -558,6 +725,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("DonationHistory");
                 });
 
+            modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Registration", b =>
                 {
                     b.HasOne("Domain.Entities.Event", "Event")
@@ -568,7 +746,7 @@ namespace Infrastructure.Migrations
 
                     b.HasOne("Domain.Entities.User", "User")
                         .WithMany("Registrations")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -582,7 +760,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.BloodType", "BloodType")
                         .WithMany("Users")
                         .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Role", "Role")
@@ -603,7 +781,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.BloodComponent", b =>
                 {
-                    b.Navigation("Inventories");
+                    b.Navigation("BloodProcedures");
+                });
+
+            modelBuilder.Entity("Domain.Entities.BloodProcedure", b =>
+                {
+                    b.Navigation("DonationHistory")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Entities.BloodType", b =>
@@ -617,12 +801,16 @@ namespace Infrastructure.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("Domain.Entities.CollectionProcedure", b =>
+                {
+                    b.Navigation("DonationHistory")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Domain.Entities.DonationHistory", b =>
                 {
                     b.Navigation("Inventory")
                         .IsRequired();
-
-                    b.Navigation("ProcessSteps");
                 });
 
             modelBuilder.Entity("Domain.Entities.Event", b =>
@@ -633,6 +821,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Facility", b =>
                 {
                     b.Navigation("Events");
+                });
+
+            modelBuilder.Entity("Domain.Entities.HealthProcedure", b =>
+                {
+                    b.Navigation("DonationHistory");
                 });
 
             modelBuilder.Entity("Domain.Entities.Registration", b =>
@@ -650,11 +843,17 @@ namespace Infrastructure.Migrations
                 {
                     b.Navigation("Blogs");
 
+                    b.Navigation("BloodProcedures");
+
+                    b.Navigation("CollectionProcedures");
+
                     b.Navigation("Comments");
 
                     b.Navigation("EventsCreated");
 
-                    b.Navigation("ProcessSteps");
+                    b.Navigation("HealthProcedures");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("Registrations");
                 });
