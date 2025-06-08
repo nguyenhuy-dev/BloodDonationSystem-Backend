@@ -12,6 +12,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IBloodRepository, BloodRepository>();
+builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 

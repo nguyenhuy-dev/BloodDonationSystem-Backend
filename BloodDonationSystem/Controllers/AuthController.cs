@@ -1,4 +1,5 @@
 ﻿using Application.DTO;
+using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.Service.Auth;
 using Infrastructure.Data;
@@ -13,7 +14,8 @@ namespace BloodDonationSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(IAuthService _authService, BloodDonationSystemContext _context, IConfiguration _configuration) : ControllerBase
+    public class AuthController(IAuthService _authService, IConfiguration _configuration,
+                                IGoogleService _googleService) : ControllerBase
     {
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -44,11 +46,28 @@ namespace BloodDonationSystem.Controllers
             return Ok("Register sucessfully");
         }
 
+        [HttpPost("google")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthRequest request)
+        {
+            var payload = await _googleService.ValidateGoogleTokenAsync(request.Credential);
+            if (payload == null)
+            {
+                return BadRequest("Invalid Google token.");
+            }
+
+            var email = payload.Email;
+            var name = payload.Name;
+
+            return Ok(new GoogleAuthResponse
+            {
+                Gmail = email,
+                FirstName = name
+            });
+        }
+
         [HttpPost("RenewToken")]
         public async Task<IActionResult> RenewToken(TokenModel tokenModel)
         {
-            // 
-            
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var secretKey = _configuration["AppSettings:SecretKey"]; // Replace with your actual secret key
             var secretKeyByte = Encoding.UTF8.GetBytes(secretKey); // Replace with your actual secret key
@@ -131,16 +150,16 @@ namespace BloodDonationSystem.Controllers
             return dateTimeInterval;
         }
 
-        [HttpPost]
-        public IActionResult Test()
-        {
-            string t = "";
-            var list = _context.RefreshTokens.FirstOrDefault(r => r.UserId.ToString() == t);
+        //[HttpPost]
+        //public IActionResult Test()
+        //{
+        //    string t = "";
+        //    var list = _context.RefreshTokens.FirstOrDefault(r => r.UserId.ToString() == t);
 
-            var token = _context.RefreshTokens.Add(new Domain.Entities.RefreshToken());
-            _context.SaveChanges();
+        //    var token = _context.RefreshTokens.Add(new Domain.Entities.RefreshToken());
+        //    _context.SaveChanges();
 
-            return Ok(list); // This is just a placeholder for testing purposes.
-        }
+        //    return Ok(list); // This is just a placeholder for testing purposes.
+        //}
     }
 }
