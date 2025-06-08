@@ -12,8 +12,10 @@ namespace Infrastructure.Repository.Auth
         Task<User?> LoginAsync(string phone, string password);
         Task<User?> RegisterAsync(User user);
 
-        Task<bool> UserExistsAsync(string phone);
+        Task<bool> UserExistsByPhoneAsync(string phone);
+        Task<bool> UserExistsByEmailAsync(string email);
         Task<User?> GetUserByPhoneAsync(string phone);
+        Task<User?> GetUserByEmailAsync(string email);
 
         Task SaveRefreshTokenAsync(RefreshToken refreshToken);
         Task<RefreshToken> GetRefreshTokenAsync(string refreshToken);

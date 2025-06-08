@@ -17,6 +17,5 @@ namespace Application.DTO
         public string BloodType { get; set; }
         public DateOnly Dob { get; set; }
         public bool Gender { get; set; }
-        public string Address { get; set; }
     }
 }

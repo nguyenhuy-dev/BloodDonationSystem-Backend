@@ -12,9 +12,14 @@ namespace Infrastructure.Repository.Auth
 {
     public class AuthRepository (BloodDonationSystemContext _context) : IAuthRepository
     {
-        public async Task<bool> UserExistsAsync(string phone)
+        public async Task<bool> UserExistsByPhoneAsync(string phone)
         {
             return await _context.Users.AnyAsync(u => u.Phone == phone);
+        }
+
+        public async Task<bool> UserExistsByEmailAsync(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.Gmail == email);
         }
 
         public async Task<User?> GetUserByPhoneAsync(string phone)
@@ -62,6 +67,11 @@ namespace Infrastructure.Repository.Auth
                 .ThenInclude(u => u.Role) // Include Role if needed
                 .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
             return token;
+        }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Gmail == email);
         }
     }
 }

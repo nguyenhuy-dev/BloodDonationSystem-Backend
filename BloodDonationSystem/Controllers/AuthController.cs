@@ -2,6 +2,7 @@
 using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.Service.Auth;
+using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -58,14 +59,35 @@ namespace BloodDonationSystem.Controllers
             var email = payload.Email;
             var name = payload.Name;
 
-            return Ok(new GoogleAuthResponse
+            var user = await _authService.GetUserByEmailAsync(email);
+            if (user == null)
             {
+                var nameParts = name?.Split(' ', 2);
+                var firstName = nameParts?[0] ?? "";
+                var lastName = nameParts?.Length > 1 ? nameParts[1] : "";
+
+                user = new User
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Gmail = email,
+                    RoleId = 3, // Assuming 3 is the default role ID for a user
+                };
+                await _authService.RegisterWithGoogleAsync(user);
+            }
+
+            var token = _authService.GenerateToken(user);
+
+            return Ok(new
+            {
+                Token = token, 
                 Gmail = email,
-                FirstName = name
+                AccessToken = token.AccessToken,
+                RefreshToken = token.RefreshToken
             });
         }
 
-        [HttpPost("RenewToken")]
+        [HttpPost("renewToken")]
         public async Task<IActionResult> RenewToken(TokenModel tokenModel)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();

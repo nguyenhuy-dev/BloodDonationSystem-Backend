@@ -1,4 +1,6 @@
-﻿using Google.Apis.Auth;
+﻿using Application.DTO;
+using Domain.Entities;
+using Google.Apis.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;

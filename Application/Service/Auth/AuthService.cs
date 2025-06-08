@@ -44,7 +44,7 @@ namespace Application.Service.Auth
 
         public async Task<User?> RegisterAsync(UserDTO userDTO)
         {
-            if (await _authRepository.UserExistsAsync(userDTO.Phone))
+            if (await _authRepository.UserExistsByPhoneAsync(userDTO.Phone))
             {
                 return null; // User already exists
             }
@@ -123,6 +123,18 @@ namespace Application.Service.Auth
         {
             var token = await _authRepository.GetRefreshTokenAsync(refreshToken);
             return token;
+        }
+
+        public Task<User> GetUserByEmailAsync(string email)
+        {
+            var user = _authRepository.GetUserByEmailAsync(email);
+            return user;
+        }
+
+        public Task<User> RegisterWithGoogleAsync(User user)
+        {
+            var account = _authRepository.RegisterAsync(user);
+            return account;
         }
     }
 }
