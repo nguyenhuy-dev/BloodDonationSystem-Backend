@@ -109,12 +109,11 @@ namespace Infrastructure.Migrations
                     Dob = table.Column<DateOnly>(type: "date", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Gmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    HashPass = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HashPass = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastDonation = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    IsActived = table.Column<bool>(type: "bit", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: false),
-                    BloodTypeId = table.Column<int>(type: "int", nullable: false),
-                    MyProperty = table.Column<int>(type: "int", nullable: false)
+                    BloodTypeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

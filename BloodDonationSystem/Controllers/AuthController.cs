@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.ExceptionServices;
 using System.Text;
 
 namespace BloodDonationSystem.Controllers
@@ -71,23 +72,39 @@ namespace BloodDonationSystem.Controllers
                     FirstName = firstName,
                     LastName = lastName,
                     Gmail = email,
-                    RoleId = 3, // Assuming 3 is the default role ID for a user
+                    IsActived = false, //Cannot use yet
+                    RoleId = 3 // Assuming 3 is the default role ID for a user
                 };
                 await _authService.RegisterWithGoogleAsync(user);
             }
 
-            var token = _authService.GenerateToken(user);
-
             return Ok(new
             {
-                Token = token, 
                 Gmail = email,
-                AccessToken = token.AccessToken,
-                RefreshToken = token.RefreshToken
+                Name = name
             });
         }
 
-        [HttpPost("renewToken")]
+        [HttpPut("google-update-Login")]
+        public async Task<IActionResult> UpdateGoogleLogin([FromBody] UpdateGoogleLogin request)
+        {
+            var user = await _authService.UpdateGoogleLoginAsync(request);
+            
+            if (user == null)
+            {
+                return BadRequest("Update failed.");
+            }
+
+            var token = _authService.GenerateToken(user);
+            return Ok(new
+            {
+                Message = "Update successfully",
+                Token = token
+            });
+        }
+
+
+        [HttpPost("renew-token")]
         public async Task<IActionResult> RenewToken(TokenModel tokenModel)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -171,17 +188,5 @@ namespace BloodDonationSystem.Controllers
             dateTimeInterval.AddSeconds(utcExpireDate);
             return dateTimeInterval;
         }
-
-        //[HttpPost]
-        //public IActionResult Test()
-        //{
-        //    string t = "";
-        //    var list = _context.RefreshTokens.FirstOrDefault(r => r.UserId.ToString() == t);
-
-        //    var token = _context.RefreshTokens.Add(new Domain.Entities.RefreshToken());
-        //    _context.SaveChanges();
-
-        //    return Ok(list); // This is just a placeholder for testing purposes.
-        //}
     }
 }

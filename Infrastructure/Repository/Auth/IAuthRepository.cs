@@ -12,6 +12,8 @@ namespace Infrastructure.Repository.Auth
         Task<User?> LoginAsync(string phone, string password);
         Task<User?> RegisterAsync(User user);
 
+        Task<User> UpdateGoogleLogin(User user);
+
         Task<bool> UserExistsByPhoneAsync(string phone);
         Task<bool> UserExistsByEmailAsync(string email);
         Task<User?> GetUserByPhoneAsync(string phone);

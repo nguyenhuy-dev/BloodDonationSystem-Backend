@@ -1,4 +1,5 @@
 ﻿using Application.DTO;
+using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Domain.Entities;
 using Infrastructure.Repository.Auth;
@@ -70,6 +71,8 @@ namespace Application.Service.Auth
             return user; // Return the registered user
         }
 
+        
+
         public TokenModel GenerateToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -135,6 +138,29 @@ namespace Application.Service.Auth
         {
             var account = _authRepository.RegisterAsync(user);
             return account;
+        }
+
+        public async Task<User> UpdateGoogleLoginAsync(UpdateGoogleLogin request)
+        {
+            var existUser = await _authRepository.GetUserByEmailAsync(request.Gmail);
+            if (existUser is null)
+            {
+                return null;
+            }
+            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(request.BloodType);
+            var hashPassword = new PasswordHasher<User>();
+            existUser.HashPass = hashPassword.HashPassword(existUser, request.Password);
+
+            existUser.FirstName = request.FirstName;
+            existUser.LastName = request.LastName;
+            existUser.Phone = request.Phone;
+            existUser.BloodTypeId = bloodType.Id;
+            existUser.Dob = request.Dob;
+            existUser.Gender = request.Gender;
+            existUser.IsActived = true;
+
+            await _authRepository.UpdateGoogleLogin(existUser);
+            return existUser;
         }
     }
 }

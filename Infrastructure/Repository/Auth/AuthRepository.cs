@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository.Auth
 {
-    public class AuthRepository (BloodDonationSystemContext _context) : IAuthRepository
+    public class AuthRepository(BloodDonationSystemContext _context) : IAuthRepository
     {
         public async Task<bool> UserExistsByPhoneAsync(string phone)
         {
@@ -25,6 +25,13 @@ namespace Infrastructure.Repository.Auth
         public async Task<User?> GetUserByPhoneAsync(string phone)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Phone == phone);
+        }
+
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Gmail == email);
         }
 
         public async Task<User?> LoginAsync(string phone, string password)
@@ -69,9 +76,11 @@ namespace Infrastructure.Repository.Auth
             return token;
         }
 
-        public async Task<User?> GetUserByEmailAsync(string email)
+        public async Task<User> UpdateGoogleLogin(User user)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Gmail == email);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return user; // Return the updated user
         }
     }
 }
