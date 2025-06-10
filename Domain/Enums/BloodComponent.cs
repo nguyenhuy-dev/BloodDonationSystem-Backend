@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTO.GoogleDTO
+namespace Domain.Enums
 {
-    public class GoogleAuthRequest
+    public enum BloodComponent
     {
-        public string Credential { get; set; }
+
     }
 }
