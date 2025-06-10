@@ -105,13 +105,6 @@ namespace Infrastructure.Migrations
                     Phone = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     HashPass = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
-<<<<<<<< HEAD:Infrastructure/Migrations/20250609020406_Init.cs
-                    HashPass = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastDonation = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActived = table.Column<bool>(type: "bit", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    BloodTypeId = table.Column<int>(type: "int", nullable: false)
-========
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdateAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastDonation = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -121,7 +114,6 @@ namespace Infrastructure.Migrations
                     UpdateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     RoleId = table.Column<int>(type: "int", nullable: false),
                     BloodTypeId = table.Column<int>(type: "int", nullable: true)
->>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.cs
                 },
                 constraints: table =>
                 {

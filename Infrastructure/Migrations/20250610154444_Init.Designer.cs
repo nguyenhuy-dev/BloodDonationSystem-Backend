@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
-    [Migration("20250609021038_Init_2")]
-    partial class Init_2
-========
     [Migration("20250610154444_Init")]
     partial class Init
->>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,982 +26,967 @@ namespace Infrastructure.Migrations
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Domain.Entities.Blog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("AuthorId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("AuthorId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Content")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsActived")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActived")
+                    .HasColumnType("bit");
 
-                    b.Property<DateTime>("LastUpdate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("LastUpdate")
+                    .HasColumnType("datetime2");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
+                b.HasIndex("AuthorId");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("Blogs");
-                });
+                b.ToTable("Blogs");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodCompatibility", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
-                        .HasColumnType("int");
+                b.Property<int>("BloodTypeId")
+                    .HasColumnType("int");
 
-                    b.Property<int>("DonorTypeId")
-                        .HasColumnType("int");
+                b.Property<int>("DonorTypeId")
+                    .HasColumnType("int");
 
-                    b.Property<int>("RecipientTypeId")
-                        .HasColumnType("int");
+                b.Property<int>("RecipientTypeId")
+                    .HasColumnType("int");
 
-                    b.Property<int>("BloodComponent")
-                        .HasColumnType("int");
+                b.Property<int>("BloodComponent")
+                    .HasColumnType("int");
 
-                    b.HasKey("Id", "BloodTypeId", "DonorTypeId", "RecipientTypeId");
+                b.HasKey("Id", "BloodTypeId", "DonorTypeId", "RecipientTypeId");
 
-                    b.HasIndex("BloodTypeId");
+                b.HasIndex("BloodTypeId");
 
-                    b.HasIndex("DonorTypeId");
+                b.HasIndex("DonorTypeId");
 
-                    b.HasIndex("RecipientTypeId");
+                b.HasIndex("RecipientTypeId");
 
-                    b.ToTable("BloodCompatibilities");
-                });
+                b.ToTable("BloodCompatibilities");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodInventory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BloodComponent")
-                        .HasColumnType("int");
+                b.Property<int>("BloodComponent")
+                    .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
-                        .HasColumnType("int");
+                b.Property<int>("BloodTypeId")
+                    .HasColumnType("int");
 
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("ExpiredDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("ExpiredDate")
+                    .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsAvailable")
+                    .HasColumnType("bit");
 
-                    b.Property<int>("RegistrationId")
-                        .HasColumnType("int");
+                b.Property<int>("RegistrationId")
+                    .HasColumnType("int");
 
-                    b.Property<Guid>("RemoveBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("RemoveBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<float>("Volume")
-                        .HasColumnType("real");
+                b.Property<float>("Volume")
+                    .HasColumnType("real");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("BloodTypeId");
+                b.HasIndex("BloodTypeId");
 
-                    b.HasIndex("RegistrationId")
-                        .IsUnique();
+                b.HasIndex("RegistrationId")
+                    .IsUnique();
 
-                    b.HasIndex("RemoveBy");
+                b.HasIndex("RemoveBy");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("BloodInventories");
-                });
+                b.ToTable("BloodInventories");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodProcedure", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BloodComponent")
-                        .HasColumnType("int");
+                b.Property<int>("BloodComponent")
+                    .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
-                        .HasColumnType("int");
+                b.Property<int>("BloodTypeId")
+                    .HasColumnType("int");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsQualified")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsQualified")
+                    .HasColumnType("bit");
 
-                    b.Property<DateTime>("PerformedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("PerformedAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PerformedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("PerformedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<float>("Volume")
-                        .HasColumnType("real");
+                b.Property<float>("Volume")
+                    .HasColumnType("real");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("BloodTypeId");
+                b.HasIndex("BloodTypeId");
 
-                    b.HasIndex("PerformedBy");
+                b.HasIndex("PerformedBy");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("BloodProcedures");
-                });
+                b.ToTable("BloodProcedures");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodRegistration", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BloodProcedureId")
-                        .HasColumnType("int");
+                b.Property<int>("BloodProcedureId")
+                    .HasColumnType("int");
 
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
+                b.Property<int>("EventId")
+                    .HasColumnType("int");
 
-                    b.Property<int>("HealthId")
-                        .HasColumnType("int");
+                b.Property<int>("HealthId")
+                    .HasColumnType("int");
 
-                    b.Property<Guid>("MemberId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("MemberId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StaffId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("StaffId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                b.Property<int>("Status")
+                    .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("UpdateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<int>("VolunteerId")
-                        .HasColumnType("int");
+                b.Property<int>("VolunteerId")
+                    .HasColumnType("int");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("BloodProcedureId")
-                        .IsUnique();
+                b.HasIndex("BloodProcedureId")
+                    .IsUnique();
 
-                    b.HasIndex("EventId");
+                b.HasIndex("EventId");
 
-                    b.HasIndex("HealthId")
-                        .IsUnique();
+                b.HasIndex("HealthId")
+                    .IsUnique();
 
-                    b.HasIndex("MemberId");
+                b.HasIndex("MemberId");
 
-                    b.HasIndex("StaffId");
+                b.HasIndex("StaffId");
 
-                    b.HasIndex("VolunteerId")
-                        .IsUnique();
+                b.HasIndex("VolunteerId")
+                    .IsUnique();
 
-                    b.ToTable("BloodRegistrations");
-                });
+                b.ToTable("BloodRegistrations");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                b.Property<string>("Type")
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .HasColumnType("nvarchar(10)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("BloodTypes");
-                });
+                b.ToTable("BloodTypes");
+            });
 
             modelBuilder.Entity("Domain.Entities.Comment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BlogId")
-                        .HasColumnType("int");
+                b.Property<int>("BlogId")
+                    .HasColumnType("int");
 
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsLegit")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsLegit")
+                    .HasColumnType("bit");
 
-                    b.Property<Guid>("MemberId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("MemberId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StaffId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("StaffId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Text")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("UpdateAt")
+                    .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("BlogId");
+                b.HasIndex("BlogId");
 
-                    b.HasIndex("MemberId");
+                b.HasIndex("MemberId");
 
-                    b.HasIndex("StaffId");
+                b.HasIndex("StaffId");
 
-                    b.ToTable("Comments");
-                });
+                b.ToTable("Comments");
+            });
 
             modelBuilder.Entity("Domain.Entities.Event", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("BloodComponent")
-                        .HasColumnType("int");
+                b.Property<int>("BloodComponent")
+                    .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
-                        .HasColumnType("int");
+                b.Property<int>("BloodTypeId")
+                    .HasColumnType("int");
 
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<Guid>("CreateBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("CreateBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("EstimatedVolume")
-                        .HasColumnType("float");
+                b.Property<double>("EstimatedVolume")
+                    .HasColumnType("float");
 
-                    b.Property<DateTime>("EventTime")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("EventTime")
+                    .HasColumnType("datetime2");
 
-                    b.Property<bool>("EventType")
-                        .HasColumnType("bit");
+                b.Property<bool>("EventType")
+                    .HasColumnType("bit");
 
-                    b.Property<int>("FacilityId")
-                        .HasColumnType("int");
+                b.Property<int>("FacilityId")
+                    .HasColumnType("int");
 
-                    b.Property<bool>("IsExpired")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsExpired")
+                    .HasColumnType("bit");
 
-                    b.Property<int>("MaxOfDonor")
-                        .HasColumnType("int");
+                b.Property<int>("MaxOfDonor")
+                    .HasColumnType("int");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("UpdateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("UpdateBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("BloodTypeId");
+                b.HasIndex("BloodTypeId");
 
-                    b.HasIndex("CreateBy");
+                b.HasIndex("CreateBy");
 
-                    b.HasIndex("FacilityId");
+                b.HasIndex("FacilityId");
 
-                    b.HasIndex("UpdateBy");
+                b.HasIndex("UpdateBy");
 
-                    b.ToTable("Events");
-                });
+                b.ToTable("Events");
+            });
 
             modelBuilder.Entity("Domain.Entities.Facility", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Address")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ClosingDay")
-                        .HasColumnType("int");
+                b.Property<int>("ClosingDay")
+                    .HasColumnType("int");
 
-                    b.Property<TimeSpan>("ClosingHour")
-                        .HasColumnType("time");
+                b.Property<TimeSpan>("ClosingHour")
+                    .HasColumnType("time");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Email")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(9,6)");
+                b.Property<decimal>("Latitude")
+                    .HasColumnType("decimal(9,6)");
 
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(9,6)");
+                b.Property<decimal>("Longitude")
+                    .HasColumnType("decimal(9,6)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OpeningDay")
-                        .HasColumnType("int");
+                b.Property<int>("OpeningDay")
+                    .HasColumnType("int");
 
-                    b.Property<TimeSpan>("OpeningHour")
-                        .HasColumnType("time");
+                b.Property<TimeSpan>("OpeningHour")
+                    .HasColumnType("time");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Phone")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("Facilities");
-                });
+                b.ToTable("Facilities");
+            });
 
             modelBuilder.Entity("Domain.Entities.HealthProcedure", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("HBV")
-                        .HasColumnType("bit");
+                b.Property<bool>("HBV")
+                    .HasColumnType("bit");
 
-                    b.Property<float>("Hb")
-                        .HasColumnType("real");
+                b.Property<float>("Hb")
+                    .HasColumnType("real");
 
-                    b.Property<double?>("Height")
-                        .HasColumnType("float");
+                b.Property<double?>("Height")
+                    .HasColumnType("float");
 
-                    b.Property<bool>("IsHealth")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsHealth")
+                    .HasColumnType("bit");
 
-                    b.Property<DateTime>("PerformedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("PerformedAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<Guid>("PerformedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("PerformedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Pressure")
-                        .HasColumnType("int");
+                b.Property<int>("Pressure")
+                    .HasColumnType("int");
 
-                    b.Property<float>("Temperature")
-                        .HasColumnType("real");
+                b.Property<float>("Temperature")
+                    .HasColumnType("real");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<double?>("Weight")
-                        .HasColumnType("float");
+                b.Property<double?>("Weight")
+                    .HasColumnType("float");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("PerformedBy");
+                b.HasIndex("PerformedBy");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("HealthProcedures");
-                });
+                b.ToTable("HealthProcedures");
+            });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("ExpiredAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("ExpiredAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsRevoked")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsUsed")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsUsed")
+                    .HasColumnType("bit");
 
-                    b.Property<string>("JwtId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("JwtId")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("Token")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
-                });
+                b.ToTable("RefreshTokens");
+            });
 
             modelBuilder.Entity("Domain.Entities.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("RoleName")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("Roles");
-                });
+                b.ToTable("Roles");
+            });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("BloodTypeId")
-                        .HasColumnType("int");
+                b.Property<int?>("BloodTypeId")
+                    .HasColumnType("int");
 
-<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
-========
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreateAt")
+                    .HasColumnType("datetime2");
 
->>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
-                    b.Property<DateOnly?>("Dob")
-                        .HasColumnType("date");
+                b.Property<DateOnly?>("Dob")
+                    .HasColumnType("date");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("FirstName")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool?>("Gender")
-                        .HasColumnType("bit");
+                b.Property<bool?>("Gender")
+                    .HasColumnType("bit");
 
-                    b.Property<string>("Gmail")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Gmail")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HashPass")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("HashPass")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActived")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActived")
+                    .HasColumnType("bit");
 
-                    b.Property<DateTime?>("LastDonation")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("LastDonation")
+                    .HasColumnType("datetime2");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("LastName")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-========
-                    b.Property<decimal?>("Latitude")
-                        .HasColumnType("decimal(9,6)");
+                b.Property<decimal?>("Latitude")
+                    .HasColumnType("decimal(9,6)");
 
-                    b.Property<decimal?>("Longitude")
-                        .HasColumnType("decimal(9,6)");
+                b.Property<decimal?>("Longitude")
+                    .HasColumnType("decimal(9,6)");
 
-                    b.Property<string>("Phone")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
->>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
+                b.Property<string>("Phone")
+                    .HasMaxLength(10)
+                    .HasColumnType("nvarchar(10)");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                b.Property<int>("RoleId")
+                    .HasColumnType("int");
 
-<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
-========
-                    b.Property<DateTime?>("UpdateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UpdateBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UpdateBy")
+                    .HasColumnType("uniqueidentifier");
 
->>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("BloodTypeId");
+                b.HasIndex("BloodTypeId");
 
-                    b.HasIndex("RoleId");
+                b.HasIndex("RoleId");
 
-                    b.HasIndex("UpdateBy");
+                b.HasIndex("UpdateBy");
 
-                    b.ToTable("Users");
-                });
+                b.ToTable("Users");
+            });
 
             modelBuilder.Entity("Domain.Entities.Volunteer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndVolunteerDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("EndVolunteerDate")
+                    .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsExpired")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsExpired")
+                    .HasColumnType("bit");
 
-                    b.Property<Guid>("MemberId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("MemberId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("StartVolunteerDate")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("StartVolunteerDate")
+                    .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("UpdateAt")
+                    .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("MemberId");
+                b.HasIndex("MemberId");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("Volunteers");
-                });
+                b.ToTable("Volunteers");
+            });
 
             modelBuilder.Entity("Domain.Entities.Blog", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.User", "Author")
+                    .WithMany()
+                    .HasForeignKey("AuthorId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("Blogs")
-                        .HasForeignKey("UserId");
+                b.HasOne("Domain.Entities.User", null)
+                    .WithMany("Blogs")
+                    .HasForeignKey("UserId");
 
-                    b.Navigation("Author");
-                });
+                b.Navigation("Author");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodCompatibility", b =>
-                {
-                    b.HasOne("Domain.Entities.BloodType", "BloodType")
-                        .WithMany()
-                        .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.BloodType", "BloodType")
+                    .WithMany()
+                    .HasForeignKey("BloodTypeId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.BloodType", "DonorType")
-                        .WithMany("Donors")
-                        .HasForeignKey("DonorTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.BloodType", "DonorType")
+                    .WithMany("Donors")
+                    .HasForeignKey("DonorTypeId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.BloodType", "RecipientType")
-                        .WithMany("Recipients")
-                        .HasForeignKey("RecipientTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.BloodType", "RecipientType")
+                    .WithMany("Recipients")
+                    .HasForeignKey("RecipientTypeId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.Navigation("BloodType");
+                b.Navigation("BloodType");
 
-                    b.Navigation("DonorType");
+                b.Navigation("DonorType");
 
-                    b.Navigation("RecipientType");
-                });
+                b.Navigation("RecipientType");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodInventory", b =>
-                {
-                    b.HasOne("Domain.Entities.BloodType", "BloodType")
-                        .WithMany("BloodInventories")
-                        .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.BloodType", "BloodType")
+                    .WithMany("BloodInventories")
+                    .HasForeignKey("BloodTypeId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.BloodRegistration", "BloodRegistration")
-                        .WithOne("BloodInventory")
-                        .HasForeignKey("Domain.Entities.BloodInventory", "RegistrationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.BloodRegistration", "BloodRegistration")
+                    .WithOne("BloodInventory")
+                    .HasForeignKey("Domain.Entities.BloodInventory", "RegistrationId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "RemovedByUser")
-                        .WithMany()
-                        .HasForeignKey("RemoveBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.User", "RemovedByUser")
+                    .WithMany()
+                    .HasForeignKey("RemoveBy")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("BloodInventories")
-                        .HasForeignKey("UserId");
+                b.HasOne("Domain.Entities.User", null)
+                    .WithMany("BloodInventories")
+                    .HasForeignKey("UserId");
 
-                    b.Navigation("BloodRegistration");
+                b.Navigation("BloodRegistration");
 
-                    b.Navigation("BloodType");
+                b.Navigation("BloodType");
 
-                    b.Navigation("RemovedByUser");
-                });
+                b.Navigation("RemovedByUser");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodProcedure", b =>
-                {
-                    b.HasOne("Domain.Entities.BloodType", "BloodType")
-                        .WithMany("BloodProcedures")
-                        .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.BloodType", "BloodType")
+                    .WithMany("BloodProcedures")
+                    .HasForeignKey("BloodTypeId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "PerformedByUser")
-                        .WithMany()
-                        .HasForeignKey("PerformedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.User", "PerformedByUser")
+                    .WithMany()
+                    .HasForeignKey("PerformedBy")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("BloodProcedures")
-                        .HasForeignKey("UserId");
+                b.HasOne("Domain.Entities.User", null)
+                    .WithMany("BloodProcedures")
+                    .HasForeignKey("UserId");
 
-                    b.Navigation("BloodType");
+                b.Navigation("BloodType");
 
-                    b.Navigation("PerformedByUser");
-                });
+                b.Navigation("PerformedByUser");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodRegistration", b =>
-                {
-                    b.HasOne("Domain.Entities.BloodProcedure", "BloodProcedure")
-                        .WithOne("BloodRegistration")
-                        .HasForeignKey("Domain.Entities.BloodRegistration", "BloodProcedureId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.BloodProcedure", "BloodProcedure")
+                    .WithOne("BloodRegistration")
+                    .HasForeignKey("Domain.Entities.BloodRegistration", "BloodProcedureId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.Event", "Event")
-                        .WithMany("BloodRegistrations")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.Event", "Event")
+                    .WithMany("BloodRegistrations")
+                    .HasForeignKey("EventId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.HealthProcedure", "HealthProcedure")
-                        .WithOne("BloodRegistration")
-                        .HasForeignKey("Domain.Entities.BloodRegistration", "HealthId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.HealthProcedure", "HealthProcedure")
+                    .WithOne("BloodRegistration")
+                    .HasForeignKey("Domain.Entities.BloodRegistration", "HealthId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "Member")
-                        .WithMany("MemberRegistrations")
-                        .HasForeignKey("MemberId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.User", "Member")
+                    .WithMany("MemberRegistrations")
+                    .HasForeignKey("MemberId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "Staff")
-                        .WithMany("StaffRegistrations")
-                        .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.User", "Staff")
+                    .WithMany("StaffRegistrations")
+                    .HasForeignKey("StaffId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.Volunteer", "Volunteer")
-                        .WithOne("BloodRegistration")
-                        .HasForeignKey("Domain.Entities.BloodRegistration", "VolunteerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.Volunteer", "Volunteer")
+                    .WithOne("BloodRegistration")
+                    .HasForeignKey("Domain.Entities.BloodRegistration", "VolunteerId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.Navigation("BloodProcedure");
+                b.Navigation("BloodProcedure");
 
-                    b.Navigation("Event");
+                b.Navigation("Event");
 
-                    b.Navigation("HealthProcedure");
+                b.Navigation("HealthProcedure");
 
-                    b.Navigation("Member");
+                b.Navigation("Member");
 
-                    b.Navigation("Staff");
+                b.Navigation("Staff");
 
-                    b.Navigation("Volunteer");
-                });
+                b.Navigation("Volunteer");
+            });
 
             modelBuilder.Entity("Domain.Entities.Comment", b =>
-                {
-                    b.HasOne("Domain.Entities.Blog", "Blog")
-                        .WithMany("Comments")
-                        .HasForeignKey("BlogId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.Blog", "Blog")
+                    .WithMany("Comments")
+                    .HasForeignKey("BlogId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "Member")
-                        .WithMany("MemberComments")
-                        .HasForeignKey("MemberId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.User", "Member")
+                    .WithMany("MemberComments")
+                    .HasForeignKey("MemberId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "Staff")
-                        .WithMany("StaffComments")
-                        .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.User", "Staff")
+                    .WithMany("StaffComments")
+                    .HasForeignKey("StaffId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("Blog");
+                b.Navigation("Blog");
 
-                    b.Navigation("Member");
+                b.Navigation("Member");
 
-                    b.Navigation("Staff");
-                });
+                b.Navigation("Staff");
+            });
 
             modelBuilder.Entity("Domain.Entities.Event", b =>
-                {
-                    b.HasOne("Domain.Entities.BloodType", "BloodType")
-                        .WithMany("Events")
-                        .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.BloodType", "BloodType")
+                    .WithMany("Events")
+                    .HasForeignKey("BloodTypeId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "Creator")
-                        .WithMany("CreatedEvents")
-                        .HasForeignKey("CreateBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.User", "Creator")
+                    .WithMany("CreatedEvents")
+                    .HasForeignKey("CreateBy")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.Facility", "Facility")
-                        .WithMany("Events")
-                        .HasForeignKey("FacilityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.Facility", "Facility")
+                    .WithMany("Events")
+                    .HasForeignKey("FacilityId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "Updater")
-                        .WithMany("UpdatedEvents")
-                        .HasForeignKey("UpdateBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.User", "Updater")
+                    .WithMany("UpdatedEvents")
+                    .HasForeignKey("UpdateBy")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.Navigation("BloodType");
+                b.Navigation("BloodType");
 
-                    b.Navigation("Creator");
+                b.Navigation("Creator");
 
-                    b.Navigation("Facility");
+                b.Navigation("Facility");
 
-                    b.Navigation("Updater");
-                });
+                b.Navigation("Updater");
+            });
 
             modelBuilder.Entity("Domain.Entities.HealthProcedure", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "PerformedByUser")
-                        .WithMany()
-                        .HasForeignKey("PerformedBy")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.User", "PerformedByUser")
+                    .WithMany()
+                    .HasForeignKey("PerformedBy")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("HealthProcedures")
-                        .HasForeignKey("UserId");
+                b.HasOne("Domain.Entities.User", null)
+                    .WithMany("HealthProcedures")
+                    .HasForeignKey("UserId");
 
-                    b.Navigation("PerformedByUser");
-                });
+                b.Navigation("PerformedByUser");
+            });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.User", "User")
+                    .WithMany("RefreshTokens")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
-                {
-                    b.HasOne("Domain.Entities.BloodType", "BloodType")
-                        .WithMany("Users")
-<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
-                        .HasForeignKey("BloodTypeId");
-========
-                        .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
->>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
+            {
+                b.HasOne("Domain.Entities.BloodType", "BloodType")
+                    .WithMany("Users")
+                    .HasForeignKey("BloodTypeId")
+                    .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Domain.Entities.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                b.HasOne("Domain.Entities.Role", "Role")
+                    .WithMany("Users")
+                    .HasForeignKey("RoleId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdateBy")
-                        .OnDelete(DeleteBehavior.NoAction);
+                b.HasOne("Domain.Entities.User", "UpdatedByUser")
+                    .WithMany()
+                    .HasForeignKey("UpdateBy")
+                    .OnDelete(DeleteBehavior.NoAction);
 
-                    b.Navigation("BloodType");
+                b.Navigation("BloodType");
 
-                    b.Navigation("Role");
+                b.Navigation("Role");
 
-                    b.Navigation("UpdatedByUser");
-                });
+                b.Navigation("UpdatedByUser");
+            });
 
             modelBuilder.Entity("Domain.Entities.Volunteer", b =>
-                {
-                    b.HasOne("Domain.Entities.User", "Member")
-                        .WithMany()
-                        .HasForeignKey("MemberId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Entities.User", "Member")
+                    .WithMany()
+                    .HasForeignKey("MemberId")
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("Volunteers")
-                        .HasForeignKey("UserId");
+                b.HasOne("Domain.Entities.User", null)
+                    .WithMany("Volunteers")
+                    .HasForeignKey("UserId");
 
-                    b.Navigation("Member");
-                });
+                b.Navigation("Member");
+            });
 
             modelBuilder.Entity("Domain.Entities.Blog", b =>
-                {
-                    b.Navigation("Comments");
-                });
+            {
+                b.Navigation("Comments");
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodProcedure", b =>
-                {
-                    b.Navigation("BloodRegistration")
-                        .IsRequired();
-                });
+            {
+                b.Navigation("BloodRegistration")
+                    .IsRequired();
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodRegistration", b =>
-                {
-                    b.Navigation("BloodInventory")
-                        .IsRequired();
-                });
+            {
+                b.Navigation("BloodInventory")
+                    .IsRequired();
+            });
 
             modelBuilder.Entity("Domain.Entities.BloodType", b =>
-                {
-                    b.Navigation("BloodInventories");
+            {
+                b.Navigation("BloodInventories");
 
-                    b.Navigation("BloodProcedures");
+                b.Navigation("BloodProcedures");
 
-                    b.Navigation("Donors");
+                b.Navigation("Donors");
 
-                    b.Navigation("Events");
+                b.Navigation("Events");
 
-                    b.Navigation("Recipients");
+                b.Navigation("Recipients");
 
-                    b.Navigation("Users");
-                });
+                b.Navigation("Users");
+            });
 
             modelBuilder.Entity("Domain.Entities.Event", b =>
-                {
-                    b.Navigation("BloodRegistrations");
-                });
+            {
+                b.Navigation("BloodRegistrations");
+            });
 
             modelBuilder.Entity("Domain.Entities.Facility", b =>
-                {
-                    b.Navigation("Events");
-                });
+            {
+                b.Navigation("Events");
+            });
 
             modelBuilder.Entity("Domain.Entities.HealthProcedure", b =>
-                {
-                    b.Navigation("BloodRegistration")
-                        .IsRequired();
-                });
+            {
+                b.Navigation("BloodRegistration")
+                    .IsRequired();
+            });
 
             modelBuilder.Entity("Domain.Entities.Role", b =>
-                {
-                    b.Navigation("Users");
-                });
+            {
+                b.Navigation("Users");
+            });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
-                {
-                    b.Navigation("Blogs");
+            {
+                b.Navigation("Blogs");
 
-                    b.Navigation("BloodInventories");
+                b.Navigation("BloodInventories");
 
-                    b.Navigation("BloodProcedures");
+                b.Navigation("BloodProcedures");
 
-                    b.Navigation("CreatedEvents");
+                b.Navigation("CreatedEvents");
 
-                    b.Navigation("HealthProcedures");
+                b.Navigation("HealthProcedures");
 
-                    b.Navigation("MemberComments");
+                b.Navigation("MemberComments");
 
-                    b.Navigation("MemberRegistrations");
+                b.Navigation("MemberRegistrations");
 
-                    b.Navigation("RefreshTokens");
+                b.Navigation("RefreshTokens");
 
-                    b.Navigation("StaffComments");
+                b.Navigation("StaffComments");
 
-                    b.Navigation("StaffRegistrations");
+                b.Navigation("StaffRegistrations");
 
-                    b.Navigation("UpdatedEvents");
+                b.Navigation("UpdatedEvents");
 
-                    b.Navigation("Volunteers");
-                });
+                b.Navigation("Volunteers");
+            });
 
             modelBuilder.Entity("Domain.Entities.Volunteer", b =>
-                {
-                    b.Navigation("BloodRegistration")
-                        .IsRequired();
-                });
+            {
+                b.Navigation("BloodRegistration")
+                    .IsRequired();
+            });
 #pragma warning restore 612, 618
         }
     }

@@ -21,5 +21,6 @@ namespace Infrastructure.Repository.Auth
 
         Task SaveRefreshTokenAsync(RefreshToken refreshToken);
         Task<RefreshToken> GetRefreshTokenAsync(string refreshToken);
+        Task<RefreshToken> UpdateRefreshTokenAsync(RefreshToken refreshToken);
     }
 }
