@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,16 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    partial class BloodDonationSystemContextModelSnapshot : ModelSnapshot
+<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
+    [Migration("20250609021038_Init_2")]
+    partial class Init_2
+========
+    [Migration("20250610154444_Init")]
+    partial class Init
+>>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -525,9 +533,12 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("BloodTypeId")
                         .HasColumnType("int");
 
+<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
+========
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
+>>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
                     b.Property<DateOnly?>("Dob")
                         .HasColumnType("date");
 
@@ -556,6 +567,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+========
                     b.Property<decimal?>("Latitude")
                         .HasColumnType("decimal(9,6)");
 
@@ -565,16 +580,20 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Phone")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+>>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
+<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
+========
                     b.Property<DateTime?>("UpdateAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UpdateBy")
                         .HasColumnType("uniqueidentifier");
 
+>>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
                     b.HasKey("Id");
 
                     b.HasIndex("BloodTypeId");
@@ -863,8 +882,12 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.BloodType", "BloodType")
                         .WithMany("Users")
+<<<<<<<< HEAD:Infrastructure/Migrations/20250609021038_Init_2.Designer.cs
+                        .HasForeignKey("BloodTypeId");
+========
                         .HasForeignKey("BloodTypeId")
                         .OnDelete(DeleteBehavior.Restrict);
+>>>>>>>> 6fb0c7211d2f17d0a626f03dd1f60cbeeca61e74:Infrastructure/Migrations/20250610154444_Init.Designer.cs
 
                     b.HasOne("Domain.Entities.Role", "Role")
                         .WithMany("Users")
