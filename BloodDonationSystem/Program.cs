@@ -1,8 +1,10 @@
 using Application.Service.Auth;
+using Application.Service.Events;
 using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Blood;
+using Infrastructure.Repository.Events;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +19,8 @@ builder.Services.AddScoped<IBloodRepository, BloodRepository>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IEventService, EventService>();
 
 //Add token config
 var secretKey = builder.Configuration["AppSettings:SecretKey"];

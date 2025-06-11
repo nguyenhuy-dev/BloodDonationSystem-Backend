@@ -86,6 +86,7 @@ namespace Application.Service.Auth
             {
                 Subject = new ClaimsIdentity(new[]
                 {
+                    new Claim("UserId", user.Id.ToString()), //User ID
                     new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Phone),
                     new Claim(JwtRegisteredClaimNames.Email, user.Gmail),
