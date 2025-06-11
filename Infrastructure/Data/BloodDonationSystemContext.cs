@@ -147,7 +147,7 @@ namespace Infrastructure.Data
 
             modelBuilder.Entity<BloodProcedure>()
                 .HasOne(bp => bp.PerformedByUser)
-                .WithMany()
+                .WithMany(u => u.BloodProcedures)
                 .HasForeignKey(bp => bp.PerformedBy)
                 .OnDelete(DeleteBehavior.NoAction);
 
@@ -160,7 +160,7 @@ namespace Infrastructure.Data
 
             modelBuilder.Entity<BloodInventory>()
                 .HasOne(bi => bi.RemovedByUser)
-                .WithMany()
+                .WithMany(u => u.BloodInventories)
                 .HasForeignKey(bi => bi.RemoveBy)
                 .OnDelete(DeleteBehavior.NoAction);
 
@@ -193,21 +193,21 @@ namespace Infrastructure.Data
             // Configure HealthProcedure relationships
             modelBuilder.Entity<HealthProcedure>()
                 .HasOne(hp => hp.PerformedByUser)
-                .WithMany()
+                .WithMany(u => u.HealthProcedures)
                 .HasForeignKey(hp => hp.PerformedBy)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // Configure Blog relationships
             modelBuilder.Entity<Blog>()
                 .HasOne(b => b.Author)
-                .WithMany()
+                .WithMany(a => a.Blogs)
                 .HasForeignKey(b => b.AuthorId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // Configure Volunteer relationships
             modelBuilder.Entity<Volunteer>()
                 .HasOne(v => v.Member)
-                .WithMany()
+                .WithMany(u => u.Volunteers)
                 .HasForeignKey(v => v.MemberId)
                 .OnDelete(DeleteBehavior.NoAction);
         }
