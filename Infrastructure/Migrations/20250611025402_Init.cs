@@ -148,8 +148,7 @@ namespace Infrastructure.Migrations
                     CreateAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActived = table.Column<bool>(type: "bit", nullable: false),
-                    AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -157,11 +156,6 @@ namespace Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Blogs_Users_AuthorId",
                         column: x => x.AuthorId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Blogs_Users_UserId",
-                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
@@ -178,8 +172,7 @@ namespace Infrastructure.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BloodTypeId = table.Column<int>(type: "int", nullable: false),
                     BloodComponent = table.Column<int>(type: "int", nullable: false),
-                    PerformedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    PerformedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -193,11 +186,6 @@ namespace Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_BloodProcedures_Users_PerformedBy",
                         column: x => x.PerformedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_BloodProcedures_Users_UserId",
-                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
@@ -264,8 +252,7 @@ namespace Infrastructure.Migrations
                     IsHealth = table.Column<bool>(type: "bit", nullable: false),
                     PerformedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PerformedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    PerformedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -273,11 +260,6 @@ namespace Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_HealthProcedures_Users_PerformedBy",
                         column: x => x.PerformedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_HealthProcedures_Users_UserId",
-                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
@@ -317,8 +299,7 @@ namespace Infrastructure.Migrations
                     StartVolunteerDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndVolunteerDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsExpired = table.Column<bool>(type: "bit", nullable: false),
-                    MemberId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    MemberId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -326,11 +307,6 @@ namespace Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Volunteers_Users_MemberId",
                         column: x => x.MemberId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Volunteers_Users_UserId",
-                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
@@ -438,8 +414,7 @@ namespace Infrastructure.Migrations
                     BloodTypeId = table.Column<int>(type: "int", nullable: false),
                     BloodComponent = table.Column<int>(type: "int", nullable: false),
                     RemoveBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RegistrationId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    RegistrationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -461,22 +436,12 @@ namespace Infrastructure.Migrations
                         column: x => x.RemoveBy,
                         principalTable: "Users",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_BloodInventories_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Blogs_AuthorId",
                 table: "Blogs",
                 column: "AuthorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Blogs_UserId",
-                table: "Blogs",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BloodCompatibilities_BloodTypeId",
@@ -510,11 +475,6 @@ namespace Infrastructure.Migrations
                 column: "RemoveBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BloodInventories_UserId",
-                table: "BloodInventories",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_BloodProcedures_BloodTypeId",
                 table: "BloodProcedures",
                 column: "BloodTypeId");
@@ -523,11 +483,6 @@ namespace Infrastructure.Migrations
                 name: "IX_BloodProcedures_PerformedBy",
                 table: "BloodProcedures",
                 column: "PerformedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BloodProcedures_UserId",
-                table: "BloodProcedures",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BloodRegistrations_BloodProcedureId",
@@ -603,11 +558,6 @@ namespace Infrastructure.Migrations
                 column: "PerformedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HealthProcedures_UserId",
-                table: "HealthProcedures",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
                 table: "RefreshTokens",
                 column: "UserId");
@@ -631,11 +581,6 @@ namespace Infrastructure.Migrations
                 name: "IX_Volunteers_MemberId",
                 table: "Volunteers",
                 column: "MemberId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Volunteers_UserId",
-                table: "Volunteers",
-                column: "UserId");
         }
 
         /// <inheritdoc />

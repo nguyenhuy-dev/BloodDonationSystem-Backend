@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    [Migration("20250610154444_Init")]
+    [Migration("20250611025402_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -54,14 +54,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Blogs");
                 });
@@ -123,9 +118,6 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("RemoveBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<float>("Volume")
                         .HasColumnType("real");
 
@@ -137,8 +129,6 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("RemoveBy");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("BloodInventories");
                 });
@@ -170,9 +160,6 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("PerformedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<float>("Volume")
                         .HasColumnType("real");
 
@@ -181,8 +168,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("BloodTypeId");
 
                     b.HasIndex("PerformedBy");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("BloodProcedures");
                 });
@@ -450,17 +435,12 @@ namespace Infrastructure.Migrations
                     b.Property<float>("Temperature")
                         .HasColumnType("real");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<double?>("Weight")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PerformedBy");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("HealthProcedures");
                 });
@@ -615,14 +595,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("MemberId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Volunteers");
                 });
@@ -630,14 +605,10 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Blog", b =>
                 {
                     b.HasOne("Domain.Entities.User", "Author")
-                        .WithMany()
+                        .WithMany("Blogs")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("Blogs")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Author");
                 });
@@ -684,14 +655,10 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "RemovedByUser")
-                        .WithMany()
+                        .WithMany("BloodInventories")
                         .HasForeignKey("RemoveBy")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("BloodInventories")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("BloodRegistration");
 
@@ -709,14 +676,10 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "PerformedByUser")
-                        .WithMany()
+                        .WithMany("BloodProcedures")
                         .HasForeignKey("PerformedBy")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("BloodProcedures")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("BloodType");
 
@@ -839,14 +802,10 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.HealthProcedure", b =>
                 {
                     b.HasOne("Domain.Entities.User", "PerformedByUser")
-                        .WithMany()
+                        .WithMany("HealthProcedures")
                         .HasForeignKey("PerformedBy")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("HealthProcedures")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("PerformedByUser");
                 });
@@ -890,14 +849,10 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Volunteer", b =>
                 {
                     b.HasOne("Domain.Entities.User", "Member")
-                        .WithMany()
+                        .WithMany("Volunteers")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-
-                    b.HasOne("Domain.Entities.User", null)
-                        .WithMany("Volunteers")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Member");
                 });
