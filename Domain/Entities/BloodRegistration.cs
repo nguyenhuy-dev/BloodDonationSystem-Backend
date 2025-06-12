@@ -12,16 +12,16 @@ public class BloodRegistration
     public int Id { get; set; }
 
     [Required]
-    public RegistrationStatus Status { get; set; }
+    public RegistrationStatus? Status { get; set; }
 
     public DateTime CreateAt { get; set; }
-    public DateTime UpdateAt { get; set; }
+    public DateTime? UpdateAt { get; set; }
 
-    public int VolunteerId { get; set; }
-    public int HealthId { get; set; }
-    public int BloodProcedureId { get; set; }
+    public int? VolunteerId { get; set; }
+    public int? HealthId { get; set; }
+    public int? BloodProcedureId { get; set; }
     public Guid MemberId { get; set; }
-    public Guid StaffId { get; set; }
+    public Guid? StaffId { get; set; }
     public int EventId { get; set; }
 
     [ForeignKey("VolunteerId")]

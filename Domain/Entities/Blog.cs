@@ -14,7 +14,7 @@ public class Blog
     public string Content { get; set; }
     
     public DateTime CreateAt { get; set; }
-    public DateTime LastUpdate { get; set; }
+    public DateTime? LastUpdate { get; set; }
     public bool IsActived { get; set; }
 
     public Guid AuthorId { get; set; }

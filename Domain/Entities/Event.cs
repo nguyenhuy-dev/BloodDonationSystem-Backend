@@ -18,7 +18,7 @@ public class Event
     public DateTime CreateAt { get; set; }
     public DateTime? UpdateAt { get; set; }
     public DateTime EventTime { get; set; }
-    public bool EventType { get; set; }
+    public bool IsUrgent { get; set; }
     public bool IsExpired { get; set; }
 
     public int? BloodTypeId { get; set; }
