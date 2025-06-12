@@ -21,7 +21,7 @@ public class Event
     public bool IsUrgent { get; set; }
     public bool IsExpired { get; set; }
 
-    public int BloodTypeId { get; set; }
+    public int? BloodTypeId { get; set; }
     public BloodComponent? BloodComponent { get; set; }
     public Guid CreateBy { get; set; }
     public Guid? UpdateBy { get; set; }
