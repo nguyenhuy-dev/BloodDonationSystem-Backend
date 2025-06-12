@@ -20,7 +20,10 @@ namespace BloodDonationSystem.Controllers
         public async Task<IActionResult> RegisterDonation([FromBody] BloodRegistrationRequest request)
         {
             var registration = await _service.RegisterDonation(request);
-            return Ok("Register donation successfully");
+            return Ok(new
+            {
+                Message = "Register donation successfully"
+            });
         }
     }
 }

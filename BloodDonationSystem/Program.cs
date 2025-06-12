@@ -1,6 +1,8 @@
 using Application.Service.BloodRegistrationServ;
 using Infrastructure.Data;
 using Infrastructure.Repository.BloodRegistrationRepo;
+using Infrastructure.Repository.HealthProcedureRepo;
+using Application.Service.HealthProcedureServ;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 //Dependency Injection (DI) for donation
 builder.Services.AddScoped<IBloodRegistrationRepository, BloodRegistrationRepository>();
 builder.Services.AddScoped<IBloodRegistrationService, BloodRegistrationService>();
+builder.Services.AddScoped<IHealthProcedureRepository, HealthProcedureRepository>();
+builder.Services.AddScoped<IHealthProcedureService, HealthProcedureService>();
 
 //Add token config
 //var secretKey = builder.Configuration["AppSettings:SecretKey"];
