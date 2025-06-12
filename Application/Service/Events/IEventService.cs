@@ -1,10 +1,6 @@
 ﻿using Application.DTO.EventsDTO;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Infrastructure.Helper;
 
 namespace Application.Service.Events
 {
@@ -12,5 +8,6 @@ namespace Application.Service.Events
     {
         Task<Event?> AddEventAsync(NormalEventDTO eventRequest);
         Task<Event?> AddUrgentEventAsync(UrgentEventDTO eventRequest);
+        Task<PaginatedResult<Event>> GetAllEventAsync(int pageNumber, int pageSize);
     }
 }

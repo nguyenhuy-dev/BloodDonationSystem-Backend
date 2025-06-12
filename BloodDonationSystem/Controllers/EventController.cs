@@ -23,8 +23,8 @@ namespace BloodDonationSystem.Controllers
             {
                 return BadRequest("Failed to create event.");
             }
-            return Ok(new 
-            { 
+            return Ok(new
+            {
                 Message = "Event created successfully"
             });
         }
@@ -43,10 +43,21 @@ namespace BloodDonationSystem.Controllers
             {
                 return BadRequest("Failed created urgent event");
             }
-            return Ok(new 
-            { 
+            return Ok(new
+            {
                 Message = "Urgent event created successfully"
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllEvents([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var events = await _eventService.GetAllEventAsync(pageNumber, pageSize);
+            if (events == null || !events.Items.Any())
+            {
+                return NotFound("No events found.");
+            }
+            return Ok(events);
         }
     }
 }

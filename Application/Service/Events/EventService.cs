@@ -1,5 +1,6 @@
 ﻿using Application.DTO.EventsDTO;
 using Domain.Entities;
+using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.Events;
 using Microsoft.AspNetCore.Http;
@@ -60,6 +61,15 @@ namespace Application.Service.Events
             };
             await _eventRepository.AddEventAsync(events);
             return events;
+        }
+
+        public async Task<PaginatedResult<Event>> GetAllEventAsync(int pageNumber, int pageSize)
+        {
+            if (pageNumber <= 0 || pageSize <= 0)
+            {
+                throw new ArgumentException("Page number and page size must be greater than zero.");
+            }
+            return await _eventRepository.GetAllEventAsync(pageNumber, pageSize);
         }
     }
 }
