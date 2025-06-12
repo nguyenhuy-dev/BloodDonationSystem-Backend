@@ -1,6 +1,7 @@
 ﻿using Application.DTO;
 using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
+using Application.DTO.Token;
 using Domain.Entities;
 
 namespace Application.Service.Auth
@@ -13,6 +14,8 @@ namespace Application.Service.Auth
         Task<User?> RegisterAsync(UserDTO userDTO);
         Task<User> RegisterWithGoogleAsync(User user);
         TokenModel GenerateToken(User user);
+
         Task<User> UpdateGoogleLoginAsync(UpdateGoogleLogin request);
+        Task<RefreshToken> UpdateRefreshTokenAsync(RefreshToken refreshToken);
     }
 }

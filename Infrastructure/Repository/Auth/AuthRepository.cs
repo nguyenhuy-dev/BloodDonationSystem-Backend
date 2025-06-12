@@ -82,5 +82,12 @@ namespace Infrastructure.Repository.Auth
             await _context.SaveChangesAsync();
             return user; // Return the updated user
         }
+
+        public async Task<RefreshToken> UpdateRefreshTokenAsync(RefreshToken refreshToken)
+        {
+            _context.RefreshTokens.Update(refreshToken);
+            await _context.SaveChangesAsync();
+            return refreshToken; // Return the updated refresh token
+        }
     }
 }

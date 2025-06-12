@@ -1,9 +1,11 @@
 ﻿using Application.DTO;
 using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
+using Application.DTO.Token;
 using Domain.Entities;
 using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Blood;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -19,7 +21,7 @@ using System.Threading.Tasks;
 namespace Application.Service.Auth
 {
     public class AuthService(IAuthRepository _authRepository, 
-        IBloodRepository _bloodRepository, IConfiguration _configuration) : IAuthService
+        IBloodRepository _bloodRepository, IConfiguration _configuration, IHttpContextAccessor _httpContext) : IAuthService
     {
         public async Task<LoginResponse> LoginAsync(string phone, string password)
         {
@@ -32,11 +34,14 @@ namespace Application.Service.Auth
                     Message = "Invalid phone or password."
                 };
             }
+            var token = GenerateToken(user);
+            SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
+
             return new LoginResponse // Successful login response
             {
                 IsSuccess = true,
                 Message = "Login successful.",
-                Token = GenerateToken(user),
+                Token = token.AccessToken,
                 Phone = user.Phone,
                 FirstName = user.FirstName,
                 LastName = user.LastName
@@ -82,9 +87,10 @@ namespace Application.Service.Auth
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
-                    new Claim(ClaimTypes.MobilePhone, user.Phone),
-                    new Claim(ClaimTypes.Email, user.Gmail),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Phone),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Gmail),
                     new Claim(ClaimTypes.Role, user.Role.RoleName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 }), //Config token tra ra cai gi
                 Expires = DateTime.UtcNow.AddMinutes(1), //Token expires in 1 min to test
                 SigningCredentials = new SigningCredentials(
@@ -100,7 +106,10 @@ namespace Application.Service.Auth
             var refreshTokenEntity = new RefreshToken
             {
                 Token = refreshToken,
+                JwtId = token.Id,
                 UserId = user.Id,
+                IsUsed = false,
+                IsRevoked = false,
                 ExpiredAt = DateTime.UtcNow.AddDays(7) // Set expiration for the refresh token
             };
             _authRepository.SaveRefreshTokenAsync(refreshTokenEntity);
@@ -108,8 +117,21 @@ namespace Application.Service.Auth
             return new TokenModel
             {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken // Return the generated refresh token
             };
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken)
+        {
+            // Set the refresh token in a secure cookie
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true, // Prevents JavaScript access to the cookie
+                Secure = true, // Use HTTPS in production
+                Expires = DateTime.UtcNow.AddDays(7), // Set expiration for the cookie
+                SameSite = SameSiteMode.Strict // Prevent CSRF attacks
+            };
+            _httpContext.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
 
         private string GenerateRefreshToken()
@@ -161,6 +183,18 @@ namespace Application.Service.Auth
 
             await _authRepository.UpdateGoogleLogin(existUser);
             return existUser;
+        }
+
+        public async Task<RefreshToken> UpdateRefreshTokenAsync(RefreshToken refreshToken)
+        {
+            var token = await _authRepository.GetRefreshTokenAsync(refreshToken.Token);
+            if (token == null)
+            {
+                return null; // Refresh token not found
+            }
+
+            await _authRepository.UpdateRefreshTokenAsync(refreshToken);
+            return refreshToken; // Return the updated refresh token
         }
     }
 }
