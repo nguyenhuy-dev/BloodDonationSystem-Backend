@@ -12,10 +12,10 @@ public class Comment
     [Required]
     public string Text { get; set; }
     public DateTime CreateAt { get; set; }
-    public DateTime UpdateAt { get; set; }
-    public bool IsLegit { get; set; }
+    public DateTime? UpdateAt { get; set; }
+    public bool? IsLegit { get; set; }
 
-    public Guid StaffId { get; set; }
+    public Guid? StaffId { get; set; }
     public Guid MemberId { get; set; }
     public int BlogId { get; set; }
 

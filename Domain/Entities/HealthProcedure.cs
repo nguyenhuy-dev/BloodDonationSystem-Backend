@@ -20,7 +20,7 @@ namespace Domain.Entities
         public double? Height { get; set; }
         public bool IsHealth { get; set; }
         public DateTime PerformedAt { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public Guid PerformedBy { get; set; }
 

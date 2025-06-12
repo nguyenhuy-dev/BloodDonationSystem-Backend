@@ -14,7 +14,7 @@ namespace Domain.Entities
         public int Id { get; set; }
 
         public DateTime CreateAt { get; set; }
-        public DateTime UpdateAt { get; set; }
+        public DateTime? UpdateAt { get; set; }
         public DateTime StartVolunteerDate { get; set; }
         public DateTime EndVolunteerDate { get; set; }
         public bool IsExpired { get; set; }

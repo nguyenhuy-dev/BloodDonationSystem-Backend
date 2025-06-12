@@ -16,15 +16,15 @@ public class Event
     public int MaxOfDonor { get; set; }
     public double EstimatedVolume { get; set; }
     public DateTime CreateAt { get; set; }
-    public DateTime UpdateAt { get; set; }
+    public DateTime? UpdateAt { get; set; }
     public DateTime EventTime { get; set; }
-    public bool EventType { get; set; }
+    public bool IsUrgent { get; set; }
     public bool IsExpired { get; set; }
 
     public int BloodTypeId { get; set; }
-    public BloodComponent BloodComponent { get; set; }
+    public BloodComponent? BloodComponent { get; set; }
     public Guid CreateBy { get; set; }
-    public Guid UpdateBy { get; set; }
+    public Guid? UpdateBy { get; set; }
     public int FacilityId { get; set; }
 
     [ForeignKey("BloodTypeId")]
