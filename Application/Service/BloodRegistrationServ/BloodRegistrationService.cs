@@ -18,23 +18,17 @@ namespace Application.Service.BloodRegistrationServ
             _repository = repository;
         }
 
-        public async Task<int> RegisterDonation(BloodRegistrationRequest request)
+        public async Task<BloodRegistration?> RegisterDonation(BloodRegistrationRequest request)
         {
             var registration = new BloodRegistration
             {
                 CreateAt = DateTime.UtcNow,
                 MemberId = request.MemberId,
-                EventId = request.EventId,
-                Status = 0,
-                UpdateAt = DateTime.UtcNow, 
-                VolunteerId = 2,
-                HealthId = 2,
-                BloodProcedureId = 2,
-                StaffId = request.MemberId
+                EventId = request.EventId
             };
 
             await _repository.AddAsync(registration);
-            return registration.Id;
+            return registration;
         }
     }
 }

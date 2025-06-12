@@ -13,6 +13,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
     {
         public BloodRegistrationRepository(BloodDonationSystemContext context) : base(context)
         {
+
         }
     }
 }

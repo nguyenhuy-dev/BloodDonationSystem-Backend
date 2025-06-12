@@ -1,4 +1,5 @@
 ﻿using Application.DTO.BloodRegistration;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Application.Service.BloodRegistrationServ
 {
     public interface IBloodRegistrationService
     {
-        Task<int> RegisterDonation(BloodRegistrationRequest request);
+        Task<BloodRegistration?> RegisterDonation(BloodRegistrationRequest request);
     }
 }

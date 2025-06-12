@@ -19,15 +19,8 @@ namespace BloodDonationSystem.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterDonation([FromBody] BloodRegistrationRequest request)
         {
-            try
-            {
-                var registrationId = await _service.RegisterDonation(request);
-                return Ok(new { RegistrationId = registrationId });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
+            var registration = await _service.RegisterDonation(request);
+            return Ok("Register donation successfully");
         }
     }
 }

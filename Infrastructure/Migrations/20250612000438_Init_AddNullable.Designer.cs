@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    partial class BloodDonationSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20250612000438_Init_AddNullable")]
+    partial class Init_AddNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,7 +197,7 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("StaffId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Status")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdateAt")
@@ -296,7 +299,7 @@ namespace Infrastructure.Migrations
                     b.Property<int?>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BloodTypeId")
+                    b.Property<int>("BloodTypeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateAt")
@@ -761,7 +764,8 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.BloodType", "BloodType")
                         .WithMany("Events")
                         .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.User", "Creator")
                         .WithMany("CreatedEvents")
