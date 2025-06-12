@@ -11,6 +11,6 @@ namespace Application.Service.Events
     public interface IEventService
     {
         Task<Event?> AddEventAsync(NormalEventDTO eventRequest);
-        
+        Task<Event?> AddUrgentEventAsync(UrgentEventDTO eventRequest);
     }
 }

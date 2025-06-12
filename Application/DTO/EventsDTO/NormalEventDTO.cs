@@ -12,7 +12,7 @@ namespace Application.DTO.EventsDTO
         public int MaxOfDonor { get; set; }
         public double EstimateVolume { get; set; }
         public DateTime EventTime { get; set; }
-        public bool EventType { get; set; } // true: Donation, false: Registration
+        public bool IsUrgent { get; set; } = false; // true: EmergencyEvent, false: NormalEvent
         public bool IsExprired { get; set; }
 
     }

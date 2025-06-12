@@ -28,5 +28,25 @@ namespace BloodDonationSystem.Controllers
                 Message = "Event created successfully"
             });
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpPost("add-urgent-event")]
+        public async Task<IActionResult> AddUrgentEvent([FromBody] UrgentEventDTO urgentEvent)
+        {
+            if (urgentEvent == null)
+            {
+                return BadRequest("Urgent event request cannot be null.");
+            }
+
+            var createdEvent = await _eventService.AddUrgentEventAsync(urgentEvent);
+            if (createdEvent == null)
+            {
+                return BadRequest("Failed created urgent event");
+            }
+            return Ok(new 
+            { 
+                Message = "Urgent event created successfully"
+            });
+        }
     }
 }
