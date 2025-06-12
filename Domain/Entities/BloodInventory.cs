@@ -20,7 +20,7 @@ namespace Domain.Entities
 
         public int BloodTypeId { get; set; }
         public BloodComponent BloodComponent { get; set; }
-        public Guid RemoveBy { get; set; }
+        public Guid? RemoveBy { get; set; }
         public int RegistrationId { get; set; }
 
         [ForeignKey("BloodTypeId")]

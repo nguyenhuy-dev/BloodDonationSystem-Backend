@@ -14,7 +14,7 @@ namespace Domain.Entities
         public float Volume { get; set; }
         public bool IsQualified { get; set; }
         public DateTime PerformedAt { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public int BloodTypeId { get; set; }
         public BloodComponent BloodComponent { get; set; }
