@@ -11,7 +11,6 @@ public class BloodRegistration
     [Key]
     public int Id { get; set; }
 
-    [Required]
     public RegistrationStatus? Status { get; set; }
 
     public DateTime CreateAt { get; set; }
