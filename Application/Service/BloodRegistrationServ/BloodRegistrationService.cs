@@ -1,5 +1,7 @@
 ﻿using Application.DTO.BloodRegistration;
+using Application.DTO.BloodRegistrationDTO;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,20 @@ namespace Application.Service.BloodRegistrationServ
 
             await _repository.AddAsync(registration);
             return registration;
+        }
+
+        public async Task<BloodRegistration?> EvaluateRegistration(int bloodRegisId, EvaluateBloodRegistration evaluate)
+        {
+            var bloodRegistration = await _repository.GetByIdAsync(bloodRegisId);
+            if (bloodRegistration == null)
+                return null;
+
+            bloodRegistration.Status = evaluate.Status;
+            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.StaffId = evaluate.StaffId;
+
+            await _repository.UpdateAsync(bloodRegistration);
+            return bloodRegistration;
         }
     }
 }

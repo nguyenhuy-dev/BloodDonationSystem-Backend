@@ -12,12 +12,12 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
         public float Volume { get; set; }
-        public bool IsQualified { get; set; }
+        public bool? IsQualified { get; set; }
         public DateTime PerformedAt { get; set; }
         public string? Description { get; set; }
 
-        public int BloodTypeId { get; set; }
-        public BloodComponent BloodComponent { get; set; }
+        public int? BloodTypeId { get; set; }
+        public BloodComponent? BloodComponent { get; set; }
         public Guid PerformedBy { get; set; }
 
 

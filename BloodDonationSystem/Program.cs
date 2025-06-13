@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Infrastructure.Repository.BloodProcedureRepo;
+using Application.Service.BloodProcedureServ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,8 @@ builder.Services.AddScoped<IBloodRegistrationRepository, BloodRegistrationReposi
 builder.Services.AddScoped<IBloodRegistrationService, BloodRegistrationService>();
 builder.Services.AddScoped<IHealthProcedureRepository, HealthProcedureRepository>();
 builder.Services.AddScoped<IHealthProcedureService, HealthProcedureService>();
+builder.Services.AddScoped<IBloodProcedureRepository, BloodProcedureRepository>();
+builder.Services.AddScoped<IBloodProcedureService, BloodProcedureService>();
 
 //Add token config
 //var secretKey = builder.Configuration["AppSettings:SecretKey"];

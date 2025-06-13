@@ -29,7 +29,7 @@ namespace Application.Service.HealthProcedureServ
             if (bloodRegistration == null || bloodRegistration.Status != RegistrationStatus.Approved)
                 return null;
 
-            var recordHealth = new HealthProcedure
+            var healthProcedure = new HealthProcedure
             {
                 Pressure = request.Pressure,
                 Temperature = request.Temperature,
@@ -43,14 +43,11 @@ namespace Application.Service.HealthProcedureServ
                 PerformedBy = request.PerformedBy
             };
 
-            if (request.IsHealth == false)
-                bloodRegistration.Status = RegistrationStatus.Rejected;
-            bloodRegistration.HealthProcedure = recordHealth;
-            bloodRegistration.UpdateAt = DateTime.Now;
-            bloodRegistration.StaffId = request.PerformedBy;
+            var healthProcedureAdded = await _repo.AddAsync(healthProcedure);
+            bloodRegistration.HealthProcedure = healthProcedureAdded;
             await _repoRegis.UpdateAsync(bloodRegistration);
 
-            return await _repo.AddAsync(recordHealth);
+            return healthProcedureAdded;
         }
     }
 }

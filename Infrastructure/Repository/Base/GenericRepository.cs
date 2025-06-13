@@ -27,7 +27,7 @@ namespace Infrastructure.Repository.Base
         }
 
         //Lấy 1 entity theo ID
-        public virtual async Task<T?> GetByIdAsync(int id)
+        public virtual async Task<T?> GetByIdAsync(int? id)
         {
             return await _dbSet.FindAsync(id);
         }
@@ -60,10 +60,10 @@ namespace Infrastructure.Repository.Base
         }
 
         //Cập nhật một entity
-        public virtual Task UpdateAsync(T entity)
+        public virtual async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
-            return Task.CompletedTask;
+            await SaveChangesAsync();
         }
 
         //Xoá một entity theo ID
