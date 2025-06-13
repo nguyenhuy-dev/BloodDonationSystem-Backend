@@ -13,7 +13,7 @@ namespace BloodDonationSystem.Controllers
     {
         [Authorize(Roles = "Staff")]
         [HttpPost("add-event")]
-        public async Task<IActionResult> AddEvent([FromBody] NormalEventDTO eventRequest)
+        public async Task<IActionResult> AddEvent([FromBody] EventDTO eventRequest)
         {
             if (eventRequest == null)
             {
@@ -32,7 +32,7 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpPost("add-urgent-event")]
-        public async Task<IActionResult> AddUrgentEvent([FromBody] UrgentEventDTO urgentEvent)
+        public async Task<IActionResult> AddUrgentEvent([FromBody] EventDTO urgentEvent)
         {
             if (urgentEvent == null)
             {
@@ -63,7 +63,7 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpPut("update/{eventId}")]
-        public async Task<IActionResult> UpdateEvent(int eventId, [FromBody]UpdateEventDTO updateEvent)
+        public async Task<IActionResult> UpdateEvent(int eventId, [FromBody]EventDTO updateEvent)
         {
             var eventItem = await _eventService.UpdateEventAsync(eventId, updateEvent);
             if (eventItem == null)

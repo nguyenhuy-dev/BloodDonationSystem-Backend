@@ -11,7 +11,7 @@ namespace Application.Service.Events
                             IHttpContextAccessor _contextAccessor, 
                             IBloodRepository _bloodRepository) : IEventService
     {
-        public async Task<Event?> AddEventAsync(NormalEventDTO eventRequest)
+        public async Task<Event?> AddEventAsync(EventDTO eventRequest)
         {
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
@@ -23,10 +23,10 @@ namespace Application.Service.Events
             {
                 Title = eventRequest.Title,
                 MaxOfDonor = eventRequest.MaxOfDonor,
-                EstimatedVolume = eventRequest.EstimateVolume,
+                EstimatedVolume = eventRequest.EstimatedVolume,
                 CreateAt = DateTime.UtcNow,
                 EventTime = eventRequest.EventTime,
-                IsUrgent = eventRequest.IsUrgent,
+                IsUrgent = false,
                 IsExpired = false,
                 CreateBy = creatorId,
                 FacilityId = 1
@@ -35,7 +35,7 @@ namespace Application.Service.Events
             return events;
         }
 
-        public async Task<Event?> AddUrgentEventAsync(UrgentEventDTO eventRequest)
+        public async Task<Event?> AddUrgentEventAsync(EventDTO eventRequest)
         {
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
@@ -43,18 +43,16 @@ namespace Application.Service.Events
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
-            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(eventRequest.BloodType);
-
             var events = new Event
             {
                 Title = eventRequest.Title,
                 MaxOfDonor = eventRequest.MaxOfDonor,
-                EstimatedVolume = eventRequest.EstimateVolume,
-                BloodTypeId = bloodType.Id,
+                EstimatedVolume = eventRequest.EstimatedVolume,
+                BloodTypeId = eventRequest.BloodTypeId,
                 BloodComponent = eventRequest.BloodComponent,
                 CreateAt = DateTime.UtcNow,
                 EventTime = eventRequest.EventTime,
-                IsUrgent = eventRequest.IsUrgent,
+                IsUrgent = true,
                 IsExpired = false,
                 CreateBy = creatorId,
                 FacilityId = 1
@@ -104,7 +102,7 @@ namespace Application.Service.Events
             return eventItem;
         }
 
-        public async Task<Event> UpdateEventAsync(int eventId, UpdateEventDTO updateEvent)
+        public async Task<Event> UpdateEventAsync(int eventId, EventDTO updateEvent)
         {
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid updaterId))
