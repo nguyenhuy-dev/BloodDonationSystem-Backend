@@ -38,5 +38,18 @@ namespace Infrastructure.Repository.Events
                 PageSize = pageSize
             };
         }
+
+        public async Task<Event?> GetEventByIdAsync(int eventId)
+        {
+            var eventItem = await _context.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            return eventItem; // Return the event if found, otherwise null
+        }
+
+        public async Task<Event> UpdateEventAsync(Event updateEvent)
+        {
+            _context.Events.Update(updateEvent);
+            await _context.SaveChangesAsync();
+            return updateEvent; // Return the updated event
+        }
     }
 }
