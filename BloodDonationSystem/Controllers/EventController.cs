@@ -10,12 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace BloodDonationSystem.Controllers
 {
     [EnableCors("LocalPolicy")]
-    [Route("api/[controller]")]
     [ApiController]
     public class EventController(IEventService _eventService) : ControllerBase
     {
         [Authorize(Roles = "Staff")]
-        [HttpPost]
+        [HttpPost("api/events")]
         public async Task<IActionResult> AddEvent([FromBody] NormalEventDTO eventRequest)
         {
             if (eventRequest == null)
@@ -44,7 +43,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPost("urgent-event")]
+        [HttpPost("api/events/urgent")]
         public async Task<IActionResult> AddUrgentEvent([FromBody] UrgentEventDTO urgentEvent)
         {
             if (urgentEvent == null)
@@ -72,7 +71,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [HttpGet]
+        [HttpGet("api/events")]
         public async Task<IActionResult> GetAllEvents([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var events = await _eventService.GetAllEventAsync(pageNumber, pageSize);
@@ -84,7 +83,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("{eventId}")]
+        [HttpPut("api/events/{eventId}")]
         public async Task<IActionResult> UpdateEvent(int eventId, [FromBody]EventDTO updateEvent)
         {
             var eventItem = await _eventService.UpdateEventAsync(eventId, updateEvent);
@@ -100,7 +99,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize (Roles = "Staff")]
-        [HttpPut("{eventId}/deactive")]
+        [HttpPut("api/events/{eventId}/deactive")]
         public async Task<IActionResult> DeleteEvent(int eventId)
         {
             if (eventId <= 0)

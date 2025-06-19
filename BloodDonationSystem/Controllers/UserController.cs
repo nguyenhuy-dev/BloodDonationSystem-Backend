@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace BloodDonationSystem.Controllers
 {
     [EnableCors("LocalPolicy")]
-    [Route("api/[controller]")]
     [ApiController]
     public class UserController(IUserService _userService) : ControllerBase
     {
-        [HttpPut("{userId}/deactive")]
+        [HttpPut("api/users/{userId}/deactive")]
         public async Task<IActionResult> DeactiveUser(Guid userId)
         {
             var result = await _userService.DeactiveUserAsync(userId);
@@ -23,7 +22,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("{userId}/assign-role")]
+        [HttpPut("api/users/{userId}/assign-role")]
         public async Task<IActionResult> AssignUserRole(Guid userId, int roleId)
         {
             var user = await _userService.AssignUserRole(userId, roleId);
@@ -41,7 +40,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet]
+        [HttpGet("api/users")]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var users = await _userService.GetAllUserAsync(pageNumber, pageSize);
@@ -53,7 +52,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize]
-        [HttpGet("profile")]
+        [HttpGet("api/users/profile")]
         public async Task<IActionResult> GetUserProfile()
         {
             var userId = User.FindFirst("UserId")?.Value;
@@ -70,7 +69,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize]
-        [HttpPut("update-profile")]
+        [HttpPut("/api/users/profile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UserDTO profileDto)
         {
             if (profileDto == null)

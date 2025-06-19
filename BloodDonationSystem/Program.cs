@@ -28,17 +28,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("LocalPolicy", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:5173")    // your React app
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();                      // if you send cookies/auth
-    });
-});
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("LocalPolicy", policy =>
+//    {
+//        policy
+//            .WithOrigins("http://localhost:5173")    // your React app
+//            .AllowAnyHeader()
+//            .AllowAnyMethod()
+//            .AllowCredentials();                      // if you send cookies/auth
+//    });
+//});
 
 
 //Dependency Injection (DI) for donation
@@ -139,7 +139,7 @@ app.UseAuthentication();              // Bật middleware xác thực
 app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();                         // Bật Swagger middleware
     app.UseSwaggerUI();                       // Giao diện UI

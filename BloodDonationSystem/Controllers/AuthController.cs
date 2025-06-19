@@ -19,12 +19,11 @@ using System.Text;
 namespace BloodDonationSystem.Controllers
 {
     [EnableCors("LocalPolicy")]
-    [Route("api/[controller]")]
     [ApiController]
     public class AuthController(IAuthService _authService, IConfiguration _configuration,
                                 IGoogleService _googleService, IHttpContextAccessor _httpContextAccessor) : ControllerBase
     {
-        [HttpPost("login")]
+        [HttpPost("api/login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var response = await _authService.LoginAsync(request.Phone, request.Password);
@@ -44,7 +43,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [HttpPost("register")]
+        [HttpPost("api/register")]
         public async Task<IActionResult> Register([FromBody] UserDTO request)
         {
             var user = await _authService.RegisterAsync(request);
@@ -55,7 +54,7 @@ namespace BloodDonationSystem.Controllers
             return Ok("Register sucessfully");
         }
 
-        [HttpPost("google")]
+        [HttpPost("api/google")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthRequest request)
         {
             var payload = await _googleService.ValidateGoogleTokenAsync(request.Credential);
@@ -107,7 +106,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [HttpPut("google-update-Login")]
+        [HttpPut("api/google-update-Login")]
         public async Task<IActionResult> UpdateGoogleLogin([FromBody] UpdateGoogleLogin request)
         {
             var user = await _authService.UpdateGoogleLoginAsync(request);
@@ -127,7 +126,7 @@ namespace BloodDonationSystem.Controllers
 
 
 
-        [HttpPost("refresh-token")]
+        [HttpPost("api/refresh-token")]
         public async Task<IActionResult> RenewToken()
         {
             var refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["RefreshToken"];
