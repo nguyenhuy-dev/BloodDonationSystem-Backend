@@ -32,7 +32,7 @@ namespace Infrastructure.Data
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 //Note: Remove this to migrationdotnet
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BloodDonationSystem/"))
+                //.SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BloodDonationSystem/"))
                 .AddJsonFile("appsettings.json")
                 .Build();
 
