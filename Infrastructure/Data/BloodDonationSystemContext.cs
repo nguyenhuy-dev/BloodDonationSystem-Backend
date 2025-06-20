@@ -10,7 +10,6 @@ namespace Infrastructure.Data
         public BloodDonationSystemContext(DbContextOptions<BloodDonationSystemContext> options)
             : base(options)
         {
-
         }
 
         public DbSet<BloodType> BloodTypes { get; set; }

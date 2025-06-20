@@ -17,6 +17,7 @@ namespace Infrastructure.Repository.Users
         Task<User> AssignUserRole(User user);
         Task<User> UpdateUserProfileAsync(User updateUser);
 
+        Task<int> BanUserAsync(Guid id);
         Task<int> DeactiveUserAsync(Guid id);
     }
 }

@@ -15,7 +15,7 @@ namespace Application.DTO.EventsDTO
         //public DateTime? UpdateAt { get; set; }
         public bool IsUrgent { get; set; }
         public DateOnly EventTime { get; set; }
-        public int? BloodTypeId { get; set; } = null;
-        public BloodComponent? BloodComponent { get; set; } = null;
+        public string? BloodType { get; set; } = null;
+        public string? BloodComponent { get; set; } = null;
     }
 }

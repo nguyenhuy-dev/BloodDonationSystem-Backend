@@ -1,6 +1,8 @@
 ﻿using Application.DTO;
 using Application.DTO.BloodRegistration;
+using Application.DTO.BloodRegistrationDTO;
 using Application.Service.BloodRegistrationServ;
+using Infrastructure.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -66,6 +68,19 @@ namespace BloodDonationSystem.Controllers
             {
                 IsSuccess = true,
                 Message = "Cancel own registration successfully"
+            });
+        }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("api/blood-registrations")]
+        public async Task<IActionResult> GetBloodRegistrationsByPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var bloodRegisResponse = await _service.GetBloodRegistrationsByPaged(pageNumber, pageSize);
+            return Ok(new ApiResponse<PaginatedResult<BloodRegistrationResponse>>()
+            {
+                IsSuccess = true,
+                Message = "Get blood registrations successfully",
+                Data = bloodRegisResponse
             });
         }
     }

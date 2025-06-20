@@ -4,6 +4,8 @@ using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
+using Infrastructure.Helper;
+using Application.DTO.BloodRegistrationDTO;
 
 namespace Application.Service.BloodRegistrationServ
 {
@@ -83,5 +85,32 @@ namespace Application.Service.BloodRegistrationServ
             return bloodRegistration;
         }
 
+        public async Task<PaginatedResult<BloodRegistrationResponse>> GetBloodRegistrationsByPaged(int pageNumber, int pageSize)
+        {
+            var pagedBloodRegisRaw = _repository.GetPagedAsync(pageNumber, pageSize);
+
+            var pagedBloodRegis = new PaginatedResult<BloodRegistrationResponse>()
+            {
+                PageNumber = pagedBloodRegisRaw.Result.PageNumber,
+                PageSize = pagedBloodRegisRaw.Result.PageSize,
+                TotalItems = pagedBloodRegisRaw.Result.TotalItems,
+                Items = new List<BloodRegistrationResponse>()
+            };
+            
+            foreach (var bloodRegis in pagedBloodRegisRaw.Result.Items)
+            {
+                var member = await _repoUser.GetUserByIdAsync(bloodRegis.MemberId);
+                var eventDetails = await _repoEvent.GetEventByIdAsync(bloodRegis.EventId);
+                pagedBloodRegis.Items.Add(new BloodRegistrationResponse()
+                {
+                    Id = bloodRegis.Id,
+                    MemberName = member.LastName + " " + member.FirstName,
+                    Phone = member.Phone,
+                    EventTime = eventDetails.EventTime
+                });
+            }
+
+            return pagedBloodRegis;
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Helper;
 using Microsoft.EntityFrameworkCore;
@@ -27,9 +27,32 @@ namespace Infrastructure.Repository.Events
         }
 
         //Tach pagination ra
-        public async Task<List<Event>> GetAllEventAsync(int pageNumber, int pageSize)
-    {
+        public async Task<List<Event>> GetAllUrgentEventAsync(int pageNumber, int pageSize)
+        {
             return await _context.Events
+                .Where(e => e.IsUrgent)
+                .Include(e => e.BloodType) // Include related BloodType entity if needed
+                .OrderByDescending(e => e.CreateAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<List<Event>> GetAllNormalEventAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Events
+                .Where(e => !e.IsUrgent)
+                .Include(e => e.BloodType) // Include related BloodType entity if needed
+                .OrderByDescending(e => e.CreateAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<List<Event>> GetAllEventAsync(int pageNumber, int pageSize)
+        {
+            return await _context.Events
+                .Include(e => e.BloodType) // Include related BloodType entity if needed
                 .OrderByDescending(e => e.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

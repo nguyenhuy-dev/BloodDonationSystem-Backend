@@ -15,6 +15,8 @@ namespace Infrastructure.Repository.Events
         Task<int> CountAllAsync();
 
         Task<List<Event>> GetAllEventAsync(int pageNumber, int pageSize);
+        Task<List<Event>> GetAllUrgentEventAsync(int pageNumber, int pageSize);
+        Task<List<Event>> GetAllNormalEventAsync(int pageNumber, int pageSize);
         Task<Event?> GetEventByIdAsync(int eventId);
 
         Task<Event> UpdateEventAsync(Event updateEvent);

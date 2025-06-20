@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Infrastructure.Helper
+﻿namespace Infrastructure.Helper
 {
     public class PaginatedResult<T>
     {
@@ -12,5 +6,6 @@ namespace Infrastructure.Helper
         public int TotalItems { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
+        public int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);
     }
 }

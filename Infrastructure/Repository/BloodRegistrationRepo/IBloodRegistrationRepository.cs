@@ -1,14 +1,11 @@
 ﻿using Domain.Entities;
+using Infrastructure.Helper;
 using Infrastructure.Repository.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repository.BloodRegistrationRepo
 {
     public interface IBloodRegistrationRepository : IGenericRepository<BloodRegistration>
     {
+        Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int pageNumber, int pageSize);
     }
 }

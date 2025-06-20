@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 namespace Application.Service.Users
 {
     public class UserService(IUserRepository _userRepository,
-                             IAuthRepository _authRepository,
                              IHttpContextAccessor _contextAccessor,
                              IBloodTypeRepository _bloodRepository) : IUserService
     {
@@ -28,8 +27,31 @@ namespace Application.Service.Users
             return assignedRole;
         }
 
+        public async Task<bool> BanUserAsync(Guid userId)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user.RoleId == 1)
+            {
+                return false;
+            }
+
+            var banUser = await _userRepository.BanUserAsync(userId);
+            if (banUser <= 0)
+            {
+                // Log or handle the case where no user was banned
+                return false;
+            }
+            return banUser > 0;
+        }
+
         public async Task<bool> DeactiveUserAsync(Guid userId)
         {
+            var user = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (user == null || !Guid.TryParse(user, out Guid parsedUserId) || parsedUserId != userId)
+            {
+                // Log or handle the case where the user ID is invalid or does not match
+                return false; // Unauthorized access or invalid user ID
+            }
             var deactiveUser = await _userRepository.DeactiveUserAsync(userId);
             if (deactiveUser <= 0)
             {
@@ -49,9 +71,9 @@ namespace Application.Service.Users
             {
                 Name = $"{u.LastName} {u.FirstName}",
                 Email = u.Gmail,
-                Status = u.Status,
+                Status = u.Status.ToString(),
                 Dob = u.Dob,
-
+                Role = u.Role.RoleName
             }).ToList();
 
             return new PaginatedResult<ListUserDTO>

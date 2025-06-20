@@ -1,13 +1,15 @@
 ﻿using Application.DTO.EventsDTO;
 using Domain.Entities;
 using Infrastructure.Helper;
+using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.Events;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Service.Events
 {
     public class EventService(IEventRepository _eventRepository, 
-                            IHttpContextAccessor _contextAccessor) : IEventService
+                            IHttpContextAccessor _contextAccessor,
+                            IBloodTypeRepository _bloodRepository) : IEventService
     {
         public async Task<Event?> AddEventAsync(NormalEventDTO eventRequest)
         {
@@ -92,11 +94,11 @@ namespace Application.Service.Events
                 EstimatedVolume = e.EstimatedVolume,
                 EventTime = e.EventTime,
                 IsUrgent = e.IsUrgent,
-            //    IsExpired = e.IsExpired,
-                BloodTypeId = e.BloodTypeId, // Include blood type if available
-                BloodComponent = e.BloodComponent // Include blood component if available
+                BloodType = e.BloodType?.Type,
+                BloodComponent = e.BloodComponent?.ToString()
             }).ToList();
 
+            
             return new PaginatedResult<EventDTO>
             {
                 Items = eventDTOs,
@@ -137,8 +139,8 @@ namespace Application.Service.Events
             existEvent.IsUrgent = updateEvent.IsUrgent;
             existEvent.UpdateAt = DateTime.Now;
             existEvent.IsExpired = existEvent.IsExpired; // Keep original expired status
-            existEvent.BloodTypeId = updateEvent.BloodTypeId; // Update blood type if provided
-            existEvent.BloodComponent = updateEvent.BloodComponent; // Update blood component if provided
+            //existEvent.BloodTypeId = updateEvent.BloodTypeId; // Update blood type if provided
+            //existEvent.BloodComponent = updateEvent.BloodComponent.; // Update blood component if provided
             existEvent.UpdateBy = updaterId; // Set the updater ID
 
             await _eventRepository.UpdateEventAsync(existEvent);
@@ -149,9 +151,9 @@ namespace Application.Service.Events
                 EstimatedVolume = existEvent.EstimatedVolume,
                 EventTime = existEvent.EventTime,
                 IsUrgent = existEvent.IsUrgent,
-            //    IsExpired = existEvent.IsExpired,
-                BloodTypeId = existEvent.BloodTypeId, // Include blood type if available
-                BloodComponent = existEvent.BloodComponent // Include blood component if available
+                //    IsExpired = existEvent.IsExpired,
+                //BloodType = existEvent.BloodTypeId, // Include blood type if available
+                BloodComponent = existEvent.BloodComponent.ToString() // Include blood component if available
             };
         }
     }
