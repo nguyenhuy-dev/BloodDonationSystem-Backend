@@ -2,11 +2,13 @@
 using Application.DTO.BlogDTO;
 using Application.Service.BlogSer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonationSystem.Controllers
 {
+    [EnableCors("LocalPolicy")]
     [ApiController]
     public class BlogController(IBlogService _blogService) : ControllerBase
     {
