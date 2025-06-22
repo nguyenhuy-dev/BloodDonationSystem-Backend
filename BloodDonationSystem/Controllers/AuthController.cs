@@ -1,19 +1,13 @@
-﻿using Application.DTO;
-using Application.DTO.GoogleDTO;
+﻿using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
-using Application.DTO.Token;
 using Application.DTO.UserDTO;
 using Application.Service.Auth;
 using Domain.Entities;
 using Domain.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
-using System.Runtime.ExceptionServices;
 using System.Text;
 
 namespace BloodDonationSystem.Controllers
@@ -110,7 +104,7 @@ namespace BloodDonationSystem.Controllers
         public async Task<IActionResult> UpdateGoogleLogin([FromBody] UpdateGoogleLogin request)
         {
             var user = await _authService.UpdateGoogleLoginAsync(request);
-            
+
             if (user == null)
             {
                 return BadRequest("Update failed.");
@@ -123,8 +117,6 @@ namespace BloodDonationSystem.Controllers
                 Token = token
             });
         }
-
-
 
         [HttpPost("api/refresh-token")]
         public async Task<IActionResult> RenewToken()
@@ -161,12 +153,12 @@ namespace BloodDonationSystem.Controllers
                     tokenValidateParam, out var validatedToken);
 
                 //Check2: Check alg
-                if(validatedToken is JwtSecurityToken jwtSecurityToken)
+                if (validatedToken is JwtSecurityToken jwtSecurityToken)
                 {
                     var alg = jwtSecurityToken.Header.Alg.Equals
                         (SecurityAlgorithms.HmacSha256,
                         StringComparison.InvariantCultureIgnoreCase);
-                    if(!alg)
+                    if (!alg)
                     {
                         return Ok(new
                         {
@@ -202,7 +194,7 @@ namespace BloodDonationSystem.Controllers
                 }
 
                 //Check5: Check if refresh token is used/revoked?
-                if(storageToken.IsUsed)
+                if (storageToken.IsUsed)
                 {
                     return Ok(new
                     {
@@ -211,7 +203,7 @@ namespace BloodDonationSystem.Controllers
                     });
                 }
 
-                if(storageToken.IsRevoked)
+                if (storageToken.IsRevoked)
                 {
                     return Ok(new
                     {
@@ -265,7 +257,7 @@ namespace BloodDonationSystem.Controllers
 
         private DateTime ConvertUnixToDateTime(long utcExpireDate) //Chuyen unix thanh date time
         {
-            var dateTimeInterval = new DateTime(1970,1,1,0,0,0, DateTimeKind.Utc);
+            var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             dateTimeInterval.AddSeconds(utcExpireDate);
             return dateTimeInterval;
         }

@@ -1,10 +1,8 @@
 ﻿using Application.DTO;
 using Application.DTO.EventsDTO;
 using Application.Service.Events;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonationSystem.Controllers
@@ -84,7 +82,7 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpPut("api/events/{eventId}")]
-        public async Task<IActionResult> UpdateEvent(int eventId, [FromBody]EventDTO updateEvent)
+        public async Task<IActionResult> UpdateEvent(int eventId, [FromBody] EventDTO updateEvent)
         {
             var eventItem = await _eventService.UpdateEventAsync(eventId, updateEvent);
             if (eventItem == null)
@@ -98,7 +96,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [Authorize (Roles = "Staff")]
+        [Authorize(Roles = "Staff")]
         [HttpPut("api/events/{eventId}/deactive")]
         public async Task<IActionResult> DeleteEvent(int eventId)
         {

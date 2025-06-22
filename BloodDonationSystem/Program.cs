@@ -1,28 +1,32 @@
+using Application.DTO.SendEmailDTO;
 using Application.Service.Auth;
+using Application.Service.BlogSer;
+using Application.Service.BloodCompatibilitySer;
+using Application.Service.BloodProcedureServ;
+using Application.Service.BloodRegistrationServ;
+using Application.Service.EmailServ;
 using Application.Service.Events;
-using Application.Service.Users;
-using Infrastructure.Repository.Blood;
-using Infrastructure.Data;
-using Infrastructure.Repository.BloodRegistrationRepo;
-using Infrastructure.Repository.HealthProcedureRepo;
 using Application.Service.HealthProcedureServ;
+using Application.Service.Users;
+using Application.Service.VolunteerServ;
+using Infrastructure.Data;
 using Infrastructure.Repository.Auth;
+using Infrastructure.Repository.BlogRepo;
+using Infrastructure.Repository.Blood;
+using Infrastructure.Repository.BloodCompatibilityRepo;
+using Infrastructure.Repository.BloodInventoryRepo;
+using Infrastructure.Repository.BloodProcedureRepo;
+using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
+using Infrastructure.Repository.Facilities;
+using Infrastructure.Repository.HealthProcedureRepo;
 using Infrastructure.Repository.Users;
+using Infrastructure.Repository.VolunteerRepo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using Infrastructure.Repository.BloodProcedureRepo;
-using Application.Service.BloodProcedureServ;
-using Infrastructure.Repository.BloodInventoryRepo;
-using Infrastructure.Repository.VolunteerRepo;
-using Application.DTO.SendEmailDTO;
-using Application.Service.EmailServ;
-using Infrastructure.Repository.Facilities;
-using Application.Service.BloodRegistrationServ;
-using Application.Service.VolunteerServ;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +67,12 @@ builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
 builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
 builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
+
+builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+builder.Services.AddScoped<IBlogService, BlogService>();
+
+builder.Services.AddScoped<IBloodCompatibilityRepository, BloodCompatibilityRepository>();
+builder.Services.AddScoped<IBloodCompatibilityService, BloodCompatibilityService>();
 
 
 // Add configuration for email service

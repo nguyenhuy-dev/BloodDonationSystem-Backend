@@ -63,9 +63,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("int");
 
-                    b.Property<int>("BloodTypeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("DonorTypeId")
                         .HasColumnType("int");
 
@@ -75,9 +72,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("BloodComponent")
                         .HasColumnType("int");
 
-                    b.HasKey("Id", "BloodTypeId", "DonorTypeId", "RecipientTypeId");
-
-                    b.HasIndex("BloodTypeId");
+                    b.HasKey("Id", "DonorTypeId", "RecipientTypeId");
 
                     b.HasIndex("DonorTypeId");
 
@@ -619,12 +614,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.BloodCompatibility", b =>
                 {
-                    b.HasOne("Domain.Entities.BloodType", "BloodType")
-                        .WithMany()
-                        .HasForeignKey("BloodTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.BloodType", "DonorType")
                         .WithMany("Donors")
                         .HasForeignKey("DonorTypeId")
@@ -636,8 +625,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("RecipientTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("BloodType");
 
                     b.Navigation("DonorType");
 

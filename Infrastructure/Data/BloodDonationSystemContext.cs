@@ -46,7 +46,7 @@ namespace Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<BloodCompatibility>()
-                .HasKey(bc => new { bc.Id, bc.BloodTypeId, bc.DonorTypeId, bc.RecipientTypeId });
+                .HasKey(bc => new { bc.Id, bc.DonorTypeId, bc.RecipientTypeId });
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Latitude)

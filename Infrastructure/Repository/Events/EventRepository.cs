@@ -1,13 +1,6 @@
 using Domain.Entities;
 using Infrastructure.Data;
-using Infrastructure.Helper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repository.Events
 {
@@ -22,7 +15,7 @@ namespace Infrastructure.Repository.Events
 
         public async Task<int> CountAllAsync()
         {
-            var count = await _context.Events.CountAsync();
+            var count = await _context.Events.Where(e => e.IsExpired == false).CountAsync();
             return count; // Return the total count of events
         }
 
