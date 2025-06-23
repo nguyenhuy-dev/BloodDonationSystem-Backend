@@ -124,7 +124,7 @@ namespace Application.Service.Users
             }
 
             var existingUser = await _userRepository.GetUserByIdAsync(userId);
-           // var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(updateUser.BloodTypeId);
+            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(updateUser.BloodTypeId);
 
             existingUser.FirstName = updateUser.FirstName;
             existingUser.LastName = updateUser.LastName;
@@ -132,9 +132,9 @@ namespace Application.Service.Users
             existingUser.Gmail = updateUser.Gmail;
             existingUser.Gender = updateUser.Gender;
             existingUser.Dob = updateUser.Dob;
-            existingUser.BloodTypeId = updateUser.BloodTypeId;
+            existingUser.BloodTypeId = bloodType.Id;
 
-            var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(updateUser.BloodTypeId);
+           // var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(updateUser.BloodTypeId);
 
             var updatedUser = await _userRepository.UpdateUserProfileAsync(existingUser);
 

@@ -38,7 +38,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [Authorize]
+        [Authorize(Roles = "Staff")]
         [HttpPut("api/blogs/{id}/delete")]
         public async Task<IActionResult> DeleteBlog(int id)
         {

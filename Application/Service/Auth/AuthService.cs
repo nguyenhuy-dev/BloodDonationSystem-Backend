@@ -5,6 +5,7 @@ using Application.DTO.UserDTO;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Repository.Auth;
+using Infrastructure.Repository.Blood;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -19,7 +20,8 @@ using System.Threading.Tasks;
 namespace Application.Service.Auth
 {
     public class AuthService(IAuthRepository _authRepository, 
-        IConfiguration _configuration, IHttpContextAccessor _httpContext) : IAuthService
+        IConfiguration _configuration, IHttpContextAccessor _httpContext,
+        IBloodTypeRepository _bloodRepository) : IAuthService
     {
         public async Task<LoginResponse> LoginAsync(string phone, string password)
         {
@@ -68,12 +70,14 @@ namespace Application.Service.Auth
                 return null; // User already exists
             }
 
+            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(userDTO.BloodTypeId);
+
             var user = new User
             {
                 FirstName = userDTO.FirstName,
                 LastName = userDTO.LastName,
                 Phone = userDTO.Phone,
-                BloodTypeId = userDTO.BloodTypeId,
+                BloodTypeId = bloodType.Id,
                 Longitude = userDTO.Longitude,
                 Latitude = userDTO.Latitude,
                 Dob = userDTO.Dob,

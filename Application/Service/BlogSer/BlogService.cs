@@ -50,18 +50,32 @@ namespace Application.Service.BlogSer
 
         public async Task<PaginatedResult<BlogResponseDTO>> GetAllBlogAsync(int pageNumber, int pageSize)
         {
-            var totalItems = await _blogRepository.CountAllAsync();
-            var blogs = await _blogRepository.GetAllBlogAsync(pageNumber, pageSize);
+            var userRole = _contextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+
+            int totalItems;
+            IEnumerable<Blog> blogs;
+
+            if (userRole == "Staff")
+            {
+                totalItems = await _blogRepository.CountAllAsync();
+                blogs = await _blogRepository.GetAllBlogAsync(pageNumber, pageSize);
+            } else
+            {
+                totalItems = await _blogRepository.CountAllActiveBlogAsync();
+                blogs = await _blogRepository.GetAllActiveBlogAsync(pageNumber, pageSize);
+            }
+
 
             var items = blogs.Select(b => new BlogResponseDTO
-            {
-                Id = b.Id,
-                Title = b.Title,
-                Content = b.Content,
-                CreateAt = b.CreateAt,
-                LastUpdate = b.LastUpdate,
-                Author = b.Author.LastName + " " + b.Author.FirstName,
-            }).ToList();
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Content = b.Content,
+                    CreateAt = b.CreateAt,
+                    LastUpdate = b.LastUpdate,
+                    Author = b.Author.LastName + " " + b.Author.FirstName,
+                }).ToList();
+
             return new PaginatedResult<BlogResponseDTO>
             {
                 Items = items,

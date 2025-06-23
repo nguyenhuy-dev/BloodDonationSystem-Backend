@@ -11,7 +11,7 @@ namespace BloodDonationSystem.Controllers
     public class UserController(IUserService _userService) : ControllerBase
     {
         [Authorize(Roles = "Admin")]
-        [HttpPost("api/users/{userId}/ban")]
+        [HttpPut("api/users/{userId}/ban")]
         public async Task<IActionResult> BanUser(Guid userId)
         {
             var result = await _userService.BanUserAsync(userId);
