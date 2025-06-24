@@ -70,14 +70,14 @@ namespace Application.Service.Auth
                 return null; // User already exists
             }
 
-            var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(userDTO.BloodTypeId);
+            //var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(userDTO.BloodTypeId);
 
             var user = new User
             {
                 FirstName = userDTO.FirstName,
                 LastName = userDTO.LastName,
                 Phone = userDTO.Phone,
-                BloodTypeId = bloodType.Id,
+                BloodTypeId = userDTO.BloodTypeId,
                 Longitude = userDTO.Longitude,
                 Latitude = userDTO.Latitude,
                 Dob = userDTO.Dob,
