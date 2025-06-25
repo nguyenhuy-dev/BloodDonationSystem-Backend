@@ -15,5 +15,7 @@ namespace Application.Service.Events
         Task<EventDTO> UpdateEventAsync(int eventId, EventDTO updateEvent);
 
         Task<Event> DeleteEventAsync(int eventId);
+
+        Task<int> ExpireEventsAsync();
     }
 }

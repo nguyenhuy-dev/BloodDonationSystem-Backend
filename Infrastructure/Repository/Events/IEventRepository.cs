@@ -12,13 +12,18 @@ namespace Infrastructure.Repository.Events
     {
         Task<Event?> AddEventAsync(Event newEvent);
 
-        Task<int> CountAllAsync();
+        Task<int> CountAllActiveEventAsync();
+        Task<int> CountAllEventAsync();
 
+        Task<List<Event>> GetAllActiveEventAsync(int pageNumber, int pageSize);
         Task<List<Event>> GetAllEventAsync(int pageNumber, int pageSize);
+
         Task<List<Event>> GetAllUrgentEventAsync(int pageNumber, int pageSize);
         Task<List<Event>> GetAllNormalEventAsync(int pageNumber, int pageSize);
         Task<Event?> GetEventByIdAsync(int eventId);
 
         Task<Event> UpdateEventAsync(Event updateEvent);
+
+        Task<int> EventExpiredAsync();
     }
 }

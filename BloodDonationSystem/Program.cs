@@ -10,6 +10,7 @@ using Application.Service.Events;
 using Application.Service.HealthProcedureServ;
 using Application.Service.Users;
 using Application.Service.VolunteerServ;
+using BloodDonationSystem.BackgroundServices;
 using Infrastructure.Data;
 using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.BlogRepo;
@@ -76,6 +77,8 @@ builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IBloodCompatibilityRepository, BloodCompatibilityRepository>();
 builder.Services.AddScoped<IBloodCompatibilityService, BloodCompatibilityService>();
 
+//Add background service
+builder.Services.AddHostedService<EventExpiryBackgroundService>();
 
 // Add configuration for email service
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Smtp"));

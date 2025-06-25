@@ -9,6 +9,7 @@ namespace Application.DTO.EventsDTO
 {
     public class EventDTO
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public int MaxOfDonor { get; set; }
         public double EstimatedVolume { get; set; }
