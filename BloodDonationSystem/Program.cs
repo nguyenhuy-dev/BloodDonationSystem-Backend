@@ -38,7 +38,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("LocalPolicy", policy =>
     {
         policy
-            .AllowAnyOrigin()    // your React app
+            .WithOrigins("http://localhost:5173")    // your React app
             .AllowAnyHeader()
             .AllowAnyMethod();
             //.AllowCredentials();                      // if you send cookies/auth
