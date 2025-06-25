@@ -16,5 +16,7 @@ namespace Application.DTO.BlogDTO
         public DateTime CreateAt { get; set; }
         public DateTime? LastUpdate { get; set; }
         public string Author { get; set; }
+
+        public bool IsActived { get; set; }
     }
 }

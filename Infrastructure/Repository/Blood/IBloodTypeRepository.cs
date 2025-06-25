@@ -9,6 +9,7 @@ namespace Infrastructure.Repository.Blood
 {
     public interface IBloodTypeRepository
     {
+        Task<List<BloodType>> GetAllBloodTypeAsync();
         Task<BloodType?> GetBloodTypeByIdAsync(int? id);
         Task<BloodType?> GetBloodTypeByNameAsync(string name);
     }

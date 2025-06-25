@@ -14,7 +14,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
 
         public async Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int pageNumber, int pageSize)
         {
-             var bloodRegis = await _dbSet
+             var bloodRegistrations = await _dbSet
                                     .OrderByDescending(e => e.CreateAt)
                                     .Skip(pageSize * (pageNumber - 1))
                                     .Take(pageSize)
@@ -22,7 +22,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
 
             var pagedResult = new PaginatedResult<BloodRegistration>
             {
-                Items = bloodRegis,
+                Items = bloodRegistrations,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 TotalItems = await _dbSet.CountAsync()

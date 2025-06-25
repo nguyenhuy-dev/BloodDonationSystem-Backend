@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,7 +51,7 @@ namespace Application.Service.BlogSer
 
         public async Task<PaginatedResult<BlogResponseDTO>> GetAllBlogAsync(int pageNumber, int pageSize)
         {
-            var userRole = _contextAccessor.HttpContext?.User.FindFirst("Role")?.Value;
+            var userRole = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
 
             int totalItems;
             IEnumerable<Blog> blogs;
@@ -73,6 +74,7 @@ namespace Application.Service.BlogSer
                     Content = b.Content,
                     CreateAt = b.CreateAt,
                     LastUpdate = b.LastUpdate,
+                    IsActived = b.IsActived,
                     Author = b.Author.LastName + " " + b.Author.FirstName,
                 }).ToList();
 
@@ -87,7 +89,18 @@ namespace Application.Service.BlogSer
 
         public async Task<BlogResponseDTO> GetBlogByIdAsync(int id)
         {
-            var blog = await _blogRepository.GetBlogByIdAsync(id);
+            var userRole = _contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
+
+            Blog blog;
+
+            if (userRole == "Staff")
+            {
+                blog = await _blogRepository.GetBlogByIdAsync(id);
+            } else
+            {
+                blog = await _blogRepository.GetActiveBlogByIdAsync(id);
+            }
+
             if (blog == null)
             {
                 return null;
@@ -99,6 +112,7 @@ namespace Application.Service.BlogSer
                 Content = blog.Content,
                 CreateAt = blog.CreateAt,
                 LastUpdate = blog.LastUpdate,
+                IsActived = blog.IsActived,
                 Author = blog.Author.LastName + " " + blog.Author.FirstName,
             };
         }
@@ -113,6 +127,7 @@ namespace Application.Service.BlogSer
 
             existingBlog.Title = blogDTO.Title;
             existingBlog.Content = blogDTO.Content;
+            existingBlog.IsActived = true;
             existingBlog.LastUpdate = DateTime.Now;
 
             var updated = await _blogRepository.UpdateBlogAsync(existingBlog);

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository.Blood
 {
-    public class BloodTypeRepository (BloodDonationSystemContext _context) : IBloodTypeRepository
+    public class BloodTypeRepository(BloodDonationSystemContext _context) : IBloodTypeRepository
     {
         public async Task<BloodType?> GetBloodTypeByIdAsync(int? id)
         {
@@ -19,6 +19,11 @@ namespace Infrastructure.Repository.Blood
         public async Task<BloodType?> GetBloodTypeByNameAsync(string name)
         {
             return await _context.BloodTypes.FirstOrDefaultAsync(b => b.Type.ToUpper() == name.ToUpper());
+        }
+
+        public async Task<List<BloodType>> GetAllBloodTypeAsync()
+        {
+            return await _context.BloodTypes.ToListAsync();
         }
     }
 }

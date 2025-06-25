@@ -17,9 +17,17 @@ namespace BloodDonationSystem.Controllers
             var result = await _userService.BanUserAsync(userId);
             if (!result)
             {
-                return BadRequest("User may not exist or is already banned.");
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "User may not exist or is already banned."
+                });
             }
-            return Ok("Ban successfully");
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "User banned successfully."
+            });
         }
 
         [Authorize]
@@ -29,9 +37,17 @@ namespace BloodDonationSystem.Controllers
             var result = await _userService.DeactiveUserAsync(userId);
             if (!result)
             {
-                return BadRequest("User may not exist or is already deactivated.");
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "User may not exist or is already deactivated."
+                });
             }
-            return Ok("Deactive successfully");
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "User deactivated successfully."
+            });
         }
 
         [Authorize(Roles = "Admin")]
@@ -59,9 +75,18 @@ namespace BloodDonationSystem.Controllers
             var users = await _userService.GetAllUserAsync(pageNumber, pageSize);
             if (users == null || !users.Items.Any())
             {
-                return NotFound("No users found.");
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "No users found."
+                });
             }
-            return Ok(users);
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Users retrieved successfully.",
+                Data = users
+            });
         }
 
         [Authorize]
@@ -71,14 +96,27 @@ namespace BloodDonationSystem.Controllers
             var userId = User.FindFirst("UserId")?.Value;
             if (userId == null)
             {
-                return Unauthorized("User not authenticated.");
+                return Unauthorized(new
+                {
+                    IsSuccess = false,
+                    Message = "User not authenticated."
+                });
             }
             var profile = await _userService.GetUserByIdAsync(Guid.Parse(userId));
             if (profile == null)
             {
-                return NotFound("User profile not found.");
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "User profile not found."
+                });
             }
-            return Ok(profile);
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "User profile retrieved successfully.",
+                Data = profile
+            });
         }
 
         [Authorize]
@@ -92,14 +130,27 @@ namespace BloodDonationSystem.Controllers
             var userId = User.FindFirst("UserId")?.Value;
             if (userId == null)
             {
-                return Unauthorized("User not authenticated.");
+                return Unauthorized(new
+                {
+                    IsSuccess = false,
+                    Message = "User not authenticated."
+                });
             }
             var updatedProfile = await _userService.UpdateUserProfileAsync(Guid.Parse(userId), profileDto);
             if (updatedProfile == null)
             {
-                return NotFound("User profile not found or update failed.");
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "User profile not found or could not be updated."
+                });
             }
-            return Ok(updatedProfile);
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "User profile updated successfully.",
+                Data = updatedProfile
+            });
         }
     }
 }

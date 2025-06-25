@@ -56,7 +56,11 @@ namespace BloodDonationSystem.Controllers
             var blogs = await _blogService.GetAllBlogAsync(pageNumber, pageSize);
             if (blogs == null)
             {
-                return NotFound("No blog founded");
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "No blogs found"
+                });
             }
             return Ok(blogs);
         }
@@ -67,7 +71,11 @@ namespace BloodDonationSystem.Controllers
             var blog = await _blogService.GetBlogByIdAsync(id);
             if(blog == null)
             {
-                return NotFound("No blog found");
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "No blogs found"
+                });
             }
             return Ok(blog);
         }

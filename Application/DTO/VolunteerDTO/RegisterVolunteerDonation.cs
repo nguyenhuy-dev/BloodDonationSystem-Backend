@@ -1,4 +1,4 @@
-﻿namespace Application.DTO.BloodRegistrationDTO
+﻿namespace Application.DTO.VolunteerDTO
 {
     public class RegisterVolunteerDonation
     {

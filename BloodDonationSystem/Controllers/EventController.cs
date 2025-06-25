@@ -77,7 +77,12 @@ namespace BloodDonationSystem.Controllers
             {
                 return NotFound("No events found.");
             }
-            return Ok(events);
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Events retrieved successfully.",
+                Data = events
+            });
         }
 
         [Authorize(Roles = "Staff")]

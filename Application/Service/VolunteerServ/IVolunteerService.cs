@@ -1,15 +1,13 @@
-﻿using Application.DTO.BloodRegistrationDTO;
+﻿using Application.DTO.VolunteerDTO;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Infrastructure.Helper;
 
 namespace Application.Service.VolunteerServ
 {
     public interface IVolunteerService
     {
         Task<Volunteer?> RegisterVolunteerDonation(RegisterVolunteerDonation request);
+        Task<Volunteer?> UpdateVolunteerDonation(int id, UpdateVolunteerDonation request);
+        Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPaged(int pageNumber, int pageSize); 
     }
 }

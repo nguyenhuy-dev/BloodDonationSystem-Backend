@@ -61,9 +61,8 @@ namespace Application.Service.BloodRegistrationServ
 
         public async Task<BloodRegistration?> CancelOwnRegistration(int id)
         {
-            var bloodRegistration = await _repository.GetByIdAsync(id);
             // Check đơn có tồn tại, bị hủy, hay bị từ chối, hoặc đã khám hay chưa
-
+            var bloodRegistration = await _repository.GetByIdAsync(id);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false ||
                 bloodRegistration.HealthId != null)
                 return null;
