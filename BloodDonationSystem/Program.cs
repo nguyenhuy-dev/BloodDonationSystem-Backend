@@ -39,10 +39,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy("LocalPolicy", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173")    // your React app
+            .WithOrigins(
+            "https://cors-test.codehappy.dev/",
+            "http://localhost:5173",
+            "https://localhost:5173",
+            "https://Blood-Donation-Support-System.somee.com")    // your React app
+                                                                  //.AllowAnyOrigin()
             .AllowAnyHeader()
-            .AllowAnyMethod();
-            //.AllowCredentials();                      // if you send cookies/auth
+            .AllowAnyMethod()
+            .AllowCredentials();                     // if you send cookies/auth
     });
 });
 
@@ -146,6 +151,8 @@ builder.Services.AddDbContext<BloodDonationSystemContext>(options =>
 
 
 var app = builder.Build();
+
+// In Program.cs, add this middleware before UseCors
 
 // Configure the HTTP request pipeline.
 app.UseCors("LocalPolicy");

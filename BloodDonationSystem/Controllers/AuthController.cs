@@ -37,16 +37,26 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [HttpPost("api/register")]
+        [HttpPost("api/auth/register")]
         public async Task<IActionResult> Register([FromBody] UserDTO request)
         {
+
             var user = await _authService.RegisterAsync(request);
             if (user == null)
             {
-                return BadRequest("User already exists or registration failed.");
+                return BadRequest(new
+                {
+                    Message = "User already exists or registration failed."
+
+                });
             }
-            return Ok("Register sucessfully");
+            return Ok(new
+            {
+                Message = "Register sucessfully"
+            });
+            
         }
+        
 
         [HttpPost("api/google")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthRequest request)
