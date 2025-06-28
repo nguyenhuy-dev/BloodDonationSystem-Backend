@@ -1,16 +1,17 @@
 ﻿using Application.DTO.BloodRegistration;
+using Application.DTO.BloodRegistrationDTO;
 using Domain.Entities;
+using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
-using Infrastructure.Helper;
-using Application.DTO.BloodRegistrationDTO;
 
 namespace Application.Service.BloodRegistrationServ
 {
     public class BloodRegistrationService(IBloodRegistrationRepository _repository, IHttpContextAccessor _contextAccessor,
-        IEventRepository _repoEvent, IUserRepository _repoUser) : IBloodRegistrationService
+        IEventRepository _repoEvent, IUserRepository _repoUser, 
+        IBloodTypeRepository _repoBloodType) : IBloodRegistrationService
     {
         public async Task<BloodRegistration?> RegisterDonation(int id, BloodRegistrationRequest request)
         {
@@ -113,11 +114,14 @@ namespace Application.Service.BloodRegistrationServ
                 if (member == null)
                     continue; // Skip if member not found
 
+                var bloodType = await _repoBloodType.GetBloodTypeByIdAsync(member.BloodTypeId);
+
                 pagedBloodRegis.Items.Add(new BloodRegistrationResponse()
                 {
                     Id = bloodRegis.Id,
                     MemberName = member.LastName + " " + member.FirstName,
                     Phone = member.Phone,
+                    Type = bloodType?.Type,
                     EventTime = eventExists.EventTime
                 });
             }

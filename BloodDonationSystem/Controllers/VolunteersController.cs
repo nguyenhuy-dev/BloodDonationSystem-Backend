@@ -33,8 +33,8 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Member")]
-        [HttpPut]
-        public async Task<IActionResult> UpdateVolunteerDonation([FromQuery] int id, [FromBody] UpdateVolunteerDonation request)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateVolunteerDonation(int id, [FromBody] UpdateVolunteerDonation request)
         {
             var volunteerRegis = await _service.UpdateVolunteerDonation(id, request);
 
