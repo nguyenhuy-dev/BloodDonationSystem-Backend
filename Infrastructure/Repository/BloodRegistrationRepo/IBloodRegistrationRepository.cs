@@ -6,6 +6,6 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
 {
     public interface IBloodRegistrationRepository : IGenericRepository<BloodRegistration>
     {
-        Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int pageNumber, int pageSize);
+        Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int eventId, int pageNumber, int pageSize);
     }
 }

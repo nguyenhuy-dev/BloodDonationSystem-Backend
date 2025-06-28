@@ -84,6 +84,7 @@ namespace Application.Service.Auth
                 Gmail = userDTO.Gmail,
                 Gender = userDTO.Gender,
                 Status = AccountStatus.Active,
+                CreateAt = DateTime.Now,
                 RoleId = 3, // Assuming 3 is the default role ID for a user
             };
 

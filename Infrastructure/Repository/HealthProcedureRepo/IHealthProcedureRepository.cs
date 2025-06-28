@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Infrastructure.Helper;
 using Infrastructure.Repository.Base;
 using System;
 using System.Collections.Generic;
@@ -10,5 +11,6 @@ namespace Infrastructure.Repository.HealthProcedureRepo
 {
     public interface IHealthProcedureRepository : IGenericRepository<HealthProcedure>
     {
+        Task<PaginatedResult<HealthProcedure>> GetHealthProceduresByPaged(int id, int pageNumber, int pageSize);
     }
 }

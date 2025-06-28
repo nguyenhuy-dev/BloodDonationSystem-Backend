@@ -5,16 +5,50 @@ using Domain.Enums;
 using Infrastructure.Repository.BloodInventoryRepo;
 using Infrastructure.Repository.BloodProcedureRepo;
 using Infrastructure.Repository.BloodRegistrationRepo;
+using Infrastructure.Repository.Events;
 using Infrastructure.Repository.HealthProcedureRepo;
 using Microsoft.AspNetCore.Http;
-
 
 namespace Application.Service.BloodProcedureServ
 {
     public class BloodProcedureService(IBloodProcedureRepository _repo, IBloodRegistrationRepository _repoRegis,
         IHealthProcedureRepository _repoHealth, IBloodInventoryRepository _repoInven,
-        IHttpContextAccessor _contextAccessor, IEmailService _servEmail) : IBloodProcedureService
+        IHttpContextAccessor _contextAccessor, IEmailService _servEmail, 
+        IEventRepository _repoEvent) : IBloodProcedureService
     {
+        public async Task<PaginatedResultBloodProce?> GetBloodCollectionsByPaged(int eventId, int pageNumber, int pageSize)
+        {
+            var eventExists = await _repoEvent.GetEventByIdAsync(eventId);
+            if (eventExists == null)
+                return null;
+
+            var pagedResultRaw = await _repo.GetBloodCollectionsByPagedAsync(eventId, pageNumber, pageSize);
+
+            var pageResult = new PaginatedResultBloodProce
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = pagedResultRaw.TotalItems,
+                EventTime = eventExists.EventTime,
+                Items = new List<BloodCollectionResponse>()
+            };
+
+            foreach (var item in pagedResultRaw.Items)
+            {
+                pageResult.Items.Add(new BloodCollectionResponse
+                {
+                    Id = item.Id,
+                    DonationRegisId = item.BloodRegistration.Id,
+                    Volume = item.Volume,
+                    FullName = item.BloodRegistration.Member.LastName + " " + item.BloodRegistration.Member.FirstName,
+                    BloodTypeName = item.BloodRegistration.Member.BloodType?.Type,
+                    PerformedAt = item.PerformedAt,
+                    IsQualified = item.IsQualified
+                });
+            }
+            return pageResult;
+        }
+
         public async Task<BloodProcedure?> RecordBloodCollectionAsync(int id, BloodCollectionRequest request)
         {
             var bloodRegistration = await _repoRegis.GetByIdAsync(id);
@@ -53,10 +87,12 @@ namespace Application.Service.BloodProcedureServ
 
         public async Task<BloodProcedure?> UpdateBloodQualificationAsync(int regisId, RecordBloodQualification request)
         {
+            // Kiểm tra đơn đăng ký hiến máu có được chấp nhận
             var bloodRegistration = await _repoRegis.GetByIdAsync(regisId);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false)
                 return null;
 
+            // Kiểm tra xem đã lấy máu chưa
             var bloodProcedure = await _repo.GetByIdAsync(bloodRegistration.BloodProcedureId);
             if (bloodProcedure == null)
                 return null;
@@ -78,6 +114,7 @@ namespace Application.Service.BloodProcedureServ
             bloodProcedure.PerformedBy = creatorId;
             await _repo.UpdateAsync(bloodProcedure);  // Cập nhật thông tin kiểm tra chất lượng máu
 
+            // Thêm máu vào kho nếu đủ điều kiện
             if (request.IsQualified == true)
             {
                 await AddNewBloodUnit(bloodRegistration);

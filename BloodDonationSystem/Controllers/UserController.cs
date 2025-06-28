@@ -32,15 +32,15 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize]
         [HttpPut("api/users/deactive")]
-        public async Task<IActionResult> DeactiveUser(Guid userId)
+        public async Task<IActionResult> DeactiveUser()
         {
-            var result = await _userService.DeactiveUserAsync(userId);
+            var result = await _userService.DeactiveUserAsync();
             if (!result)
             {
                 return BadRequest(new
                 {
                     IsSuccess = false,
-                    Message = "User may not exist or is already deactivated."
+                    Message = "Failed to deactive user."
                 });
             }
             return Ok(new

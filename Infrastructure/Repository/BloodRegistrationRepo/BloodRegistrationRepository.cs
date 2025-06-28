@@ -12,9 +12,11 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
         }
 
-        public async Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int eventId, int pageNumber, int pageSize)
         {
              var bloodRegistrations = await _dbSet
+                                    .Include(br => br.Event)
+                                    .Where(br => br.EventId == eventId)
                                     .OrderByDescending(e => e.CreateAt)
                                     .Skip(pageSize * (pageNumber - 1))
                                     .Take(pageSize)
@@ -25,7 +27,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                 Items = bloodRegistrations,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalItems = await _dbSet.CountAsync()
+                TotalItems = await _dbSet.CountAsync(br => br.EventId == eventId)
             };
             return pagedResult;
         }

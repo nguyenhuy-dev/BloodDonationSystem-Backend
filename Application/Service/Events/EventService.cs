@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
+using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
@@ -10,7 +11,8 @@ namespace Application.Service.Events
 {
     public class EventService(IEventRepository _eventRepository, 
                             IHttpContextAccessor _contextAccessor,
-                            IBloodTypeRepository _bloodRepository) : IEventService
+                            IBloodTypeRepository _bloodRepository,
+                            IBloodRegistrationRepository _bloodRegisRepo) : IEventService
     {
         public async Task<Event?> AddEventAsync(NormalEventDTO eventRequest)
         {
@@ -117,7 +119,9 @@ namespace Application.Service.Events
                 EventTime = e.EventTime,
                 IsUrgent = e.IsUrgent,
                 BloodType = e.BloodType?.Type,
-                BloodComponent = e.BloodComponent?.ToString()
+                BloodComponent = e.BloodComponent?.ToString(),
+                BloodRegisCount = _bloodRegisRepo.GetAllAsync().Result
+                                        .Where(br => br.EventId == e.Id).Count()
             }).ToList();
 
             

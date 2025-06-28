@@ -52,5 +52,26 @@ namespace BloodDonationSystem.Controllers
                 Message = "Blood qualification recorded successfully."
             });
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("api/events/{id}/blood-procedures")]
+        public async Task<IActionResult> GetBloodCollectionsByPaged(int id, int pageNumber = 1, int pageSize = 10)
+        {
+            var pagedResult = await _service.GetBloodCollectionsByPaged(id, pageNumber, pageSize);
+
+            if (pagedResult == null)
+                return NotFound(new ApiResponse<PaginatedResultBloodProce>
+                {
+                    IsSuccess = false,
+                    Message = "Not found event."
+                });
+
+            return Ok(new ApiResponse<PaginatedResultBloodProce>
+            {
+                IsSuccess = true,
+                Message = "Blood collections retrieved successfully.",
+                Data = pagedResult
+            });
+        }
     }
 }

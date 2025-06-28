@@ -14,6 +14,7 @@ namespace Application.Service.BloodRegistrationServ
     {
         public async Task<BloodRegistration?> RegisterDonation(int id, BloodRegistrationRequest request)
         {
+            // Kiểm tra event tương ứng với đơn đăng ký máu có tồn tại
             var existingEvent = await _repoEvent.GetEventByIdAsync(id);
             if (existingEvent == null)
                 return null;
@@ -23,9 +24,15 @@ namespace Application.Service.BloodRegistrationServ
             {
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
-
             var user = await _repoUser.GetUserByIdAsync(creatorId);
-            if (user != null && user.LastDonation == null)
+            if (user == null)
+                return null;
+
+            // Kiểm tra xem lần cuối hiến máu có phù hợp
+            if (request.LastDonation >= DateTime.Now.AddDays(-90))
+                return null;  // Request xuống đều có LastDonation nên không cần xét trong hệ thống
+
+            if (user.LastDonation == null)
                 user.LastDonation = request.LastDonation;
 
             var registration = new BloodRegistration
@@ -35,7 +42,6 @@ namespace Application.Service.BloodRegistrationServ
                 EventId = id
             };
             await _repository.AddAsync(registration);
-            
             return registration;
         }
 
@@ -84,28 +90,35 @@ namespace Application.Service.BloodRegistrationServ
             return bloodRegistration;
         }
 
-        public async Task<PaginatedResult<BloodRegistrationResponse>> GetBloodRegistrationsByPaged(int pageNumber, int pageSize)
+        public async Task<PaginatedResultBloodRegis?> GetBloodRegistrationsByPaged(int eventId, int pageNumber, int pageSize)
         {
-            var pagedBloodRegisRaw = _repository.GetPagedAsync(pageNumber, pageSize);
+            var eventExists = await _repoEvent.GetEventByIdAsync(eventId);
+            if (eventExists == null)
+                return null;
 
-            var pagedBloodRegis = new PaginatedResult<BloodRegistrationResponse>()
+            var pagedBloodRegisRaw = _repository.GetPagedAsync(eventId, pageNumber, pageSize);
+
+            var pagedBloodRegis = new PaginatedResultBloodRegis
             {
                 PageNumber = pagedBloodRegisRaw.Result.PageNumber,
                 PageSize = pagedBloodRegisRaw.Result.PageSize,
                 TotalItems = pagedBloodRegisRaw.Result.TotalItems,
+                EventTime = eventExists.EventTime,
                 Items = new List<BloodRegistrationResponse>()
             };
-            
+
             foreach (var bloodRegis in pagedBloodRegisRaw.Result.Items)
             {
                 var member = await _repoUser.GetUserByIdAsync(bloodRegis.MemberId);
-                var eventDetails = await _repoEvent.GetEventByIdAsync(bloodRegis.EventId);
+                if (member == null)
+                    continue; // Skip if member not found
+
                 pagedBloodRegis.Items.Add(new BloodRegistrationResponse()
                 {
                     Id = bloodRegis.Id,
                     MemberName = member.LastName + " " + member.FirstName,
                     Phone = member.Phone,
-                    EventTime = eventDetails.EventTime
+                    EventTime = eventExists.EventTime
                 });
             }
 

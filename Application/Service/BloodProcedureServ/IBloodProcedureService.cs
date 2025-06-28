@@ -1,10 +1,5 @@
 ﻿using Application.DTO.BloodProcedureDTO;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Service.BloodProcedureServ
 {
@@ -12,5 +7,6 @@ namespace Application.Service.BloodProcedureServ
     {
         Task<BloodProcedure?> RecordBloodCollectionAsync(int id, BloodCollectionRequest request);
         Task<BloodProcedure?> UpdateBloodQualificationAsync(int regisId, RecordBloodQualification request);
+        Task<PaginatedResultBloodProce?> GetBloodCollectionsByPaged(int eventId, int pageNumber, int pageSize);
     }
 }

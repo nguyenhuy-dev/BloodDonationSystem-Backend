@@ -16,7 +16,7 @@ namespace Application.Service.Users
 
         Task<User> AssignUserRole(Guid userId, int roleId);
         Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser);
-        Task<bool> DeactiveUserAsync(Guid userId);
+        Task<bool> DeactiveUserAsync();
         Task<bool> BanUserAsync(Guid userId);
         //Task<User> AddStaffAsync (UserDTO request);
     }

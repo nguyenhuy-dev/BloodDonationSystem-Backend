@@ -10,7 +10,6 @@ namespace Infrastructure.Repository.VolunteerRepo
     {
         public VolunteerRepository(BloodDonationSystemContext context) : base(context)
         {
-
         }
 
         public async Task<PaginatedResult<Volunteer>> GetPagedAsync(int pageNumber, int pageSize)

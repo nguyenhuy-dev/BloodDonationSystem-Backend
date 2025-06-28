@@ -18,5 +18,6 @@ namespace Application.DTO.EventsDTO
         public DateOnly EventTime { get; set; }
         public string? BloodType { get; set; } = null;
         public string? BloodComponent { get; set; } = null;
+        public int BloodRegisCount { get; set; }
     }
 }

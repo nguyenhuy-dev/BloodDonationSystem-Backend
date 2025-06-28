@@ -72,11 +72,19 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpGet("api/blood-registrations")]
-        public async Task<IActionResult> GetBloodRegistrationsByPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [HttpGet("api/events/{id}/blood-registrations")]
+        public async Task<IActionResult> GetBloodRegistrationsByPaged(int id, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var bloodRegisResponse = await _service.GetBloodRegistrationsByPaged(pageNumber, pageSize);
-            return Ok(new ApiResponse<PaginatedResult<BloodRegistrationResponse>>()
+            var bloodRegisResponse = await _service.GetBloodRegistrationsByPaged(id, pageNumber, pageSize);
+
+            if (bloodRegisResponse == null)
+                return NotFound(new ApiResponse<PaginatedResultBloodRegis>
+                {
+                    IsSuccess = false,
+                    Message = "Not found event"
+                });
+
+            return Ok(new ApiResponse<PaginatedResultBloodRegis>()
             {
                 IsSuccess = true,
                 Message = "Get blood registrations successfully",
