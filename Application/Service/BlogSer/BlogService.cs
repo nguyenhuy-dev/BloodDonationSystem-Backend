@@ -3,12 +3,7 @@ using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.BlogRepo;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Service.BlogSer
 {
@@ -60,23 +55,23 @@ namespace Application.Service.BlogSer
             {
                 totalItems = await _blogRepository.CountAllAsync();
                 blogs = await _blogRepository.GetAllBlogAsync(pageNumber, pageSize);
-            } else
+            }
+            else
             {
                 totalItems = await _blogRepository.CountAllActiveBlogAsync();
                 blogs = await _blogRepository.GetAllActiveBlogAsync(pageNumber, pageSize);
             }
 
-
             var items = blogs.Select(b => new BlogResponseDTO
-                {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Content = b.Content,
-                    CreateAt = b.CreateAt,
-                    LastUpdate = b.LastUpdate,
-                    IsActived = b.IsActived,
-                    Author = b.Author.LastName + " " + b.Author.FirstName,
-                }).ToList();
+            {
+                Id = b.Id,
+                Title = b.Title,
+                Content = b.Content,
+                CreateAt = b.CreateAt,
+                LastUpdate = b.LastUpdate,
+                IsActived = b.IsActived,
+                Author = b.Author.LastName + " " + b.Author.FirstName,
+            }).ToList();
 
             return new PaginatedResult<BlogResponseDTO>
             {
@@ -96,7 +91,8 @@ namespace Application.Service.BlogSer
             if (userRole == "Staff")
             {
                 blog = await _blogRepository.GetBlogByIdAsync(id);
-            } else
+            }
+            else
             {
                 blog = await _blogRepository.GetActiveBlogByIdAsync(id);
             }
@@ -106,7 +102,8 @@ namespace Application.Service.BlogSer
                 return null;
             }
 
-            return new BlogResponseDTO{
+            return new BlogResponseDTO
+            {
                 Id = blog.Id,
                 Title = blog.Title,
                 Content = blog.Content,

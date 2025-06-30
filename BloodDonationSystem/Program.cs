@@ -5,6 +5,7 @@ using Application.Service.BloodCompatibilitySer;
 using Application.Service.BloodProcedureServ;
 using Application.Service.BloodRegistrationServ;
 using Application.Service.BloodTypeServ;
+using Application.Service.CommentServ;
 using Application.Service.EmailServ;
 using Application.Service.Events;
 using Application.Service.HealthProcedureServ;
@@ -19,6 +20,7 @@ using Infrastructure.Repository.BloodCompatibilityRepo;
 using Infrastructure.Repository.BloodInventoryRepo;
 using Infrastructure.Repository.BloodProcedureRepo;
 using Infrastructure.Repository.BloodRegistrationRepo;
+using Infrastructure.Repository.CommentRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
 using Infrastructure.Repository.HealthProcedureRepo;
@@ -61,6 +63,9 @@ builder.Services.AddScoped<IVolunteerService, VolunteerService>();
 
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddScoped<IBloodCompatibilityRepository, BloodCompatibilityRepository>();
 builder.Services.AddScoped<IBloodCompatibilityService, BloodCompatibilityService>();
