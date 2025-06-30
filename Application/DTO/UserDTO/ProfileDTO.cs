@@ -14,5 +14,7 @@ namespace Application.DTO.UserDTO
         public string BloodType { get; set; }
         public DateOnly? Dob { get; set; }
         public bool? Gender { get; set; }
+        public decimal? Longitude { get; set; }
+        public decimal? Latitude { get; set; }
     }
 }
