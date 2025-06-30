@@ -164,7 +164,9 @@ namespace Application.Service.Users
                 Gmail = user.Gmail,
                 Gender = user.Gender,
                 Dob = user.Dob,
-                BloodType = bloodType.Type
+                BloodType = bloodType.Type,
+                Longitude = user.Longitude,
+                Latitude = user.Latitude
             };
         }
 

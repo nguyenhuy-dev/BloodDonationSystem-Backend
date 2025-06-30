@@ -1,5 +1,6 @@
 ﻿using Application.DTO.CommentDTO;
 using Domain.Entities;
+using Infrastructure.Repository.BlogRepo;
 using Infrastructure.Repository.CommentRepo;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 namespace Application.Service.CommentServ
 {
     public class CommentService(ICommentRepository _commentRepository,
+                                IBlogRepository _blogRepository,
                                 IHttpContextAccessor _contextAccessor) : ICommentService
     {
         public async Task<CommentRequestDTO?> AddCommentAsync(int blogId, CommentRequestDTO requestComment)
@@ -21,13 +23,19 @@ namespace Application.Service.CommentServ
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
+            var blog = await _blogRepository.GetBlogByIdAsync(blogId);
+            if (blog == null)
+            {
+                return null;
+            }
+
             var comment = new Comment
             { 
                 Text = requestComment.Text,
                 CreateAt = DateTime.Now,
                 IsLegit = true,
                 MemberId = userId,
-                BlogId = blogId
+                BlogId = blog.Id
             };
 
             var createdComment = await _commentRepository.CreateCommentAsync(comment);
@@ -60,6 +68,11 @@ namespace Application.Service.CommentServ
         {
             var comment = await _commentRepository.GetCommentByIdAsync(id);
 
+            if(comment == null)
+            {
+                return null;
+            }
+
             return new CommentResponseDTO
             {
                 Id = comment.Id,
@@ -88,6 +101,8 @@ namespace Application.Service.CommentServ
             existingComment.IsLegit = false;
             existingComment.UpdateAt = DateTime.Now;
             existingComment.StaffId = parsedUserId;
+
+            var update = _commentRepository.ModerateCommentAsync(id);
 
             return new CommentResponseDTO
             {
