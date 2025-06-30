@@ -10,6 +10,7 @@ namespace Infrastructure.Repository.Users
 {
     public interface IUserRepository
     {
+        Task<int> CountAllActiveUserAsync();
         Task<int> CountAllAsync();
         Task<List<User>> GetAllUserAsync(int pageNumber, int pageSize);
         Task<User?> GetUserByIdAsync(Guid id);

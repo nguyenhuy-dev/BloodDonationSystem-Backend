@@ -14,7 +14,10 @@ namespace Infrastructure.Repository.Users
                 .ExecuteUpdateAsync(u => u.SetProperty(x => x.Status, AccountStatus.Inactive));
         }
 
-
+        public async Task<int> CountAllActiveUserAsync()
+        {
+            return await _context.Users.Where(u => u.Status == AccountStatus.Active).CountAsync();
+        }
 
         public async Task<int> CountAllAsync()
         {
@@ -25,6 +28,7 @@ namespace Infrastructure.Repository.Users
         {
             return await _context.Users
                 .Include(u => u.Role)
+                .Where(u => u.Status == AccountStatus.Active)
                 .OrderByDescending(u => u.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

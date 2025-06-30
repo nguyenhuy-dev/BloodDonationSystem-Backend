@@ -13,13 +13,15 @@ namespace Application.Service.BloodRegistrationServ
         IEventRepository _repoEvent, IUserRepository _repoUser, 
         IBloodTypeRepository _repoBloodType) : IBloodRegistrationService
     {
-        public async Task<BloodRegistration?> RegisterDonation(int id, BloodRegistrationRequest request)
+        public async Task<BloodRegistration?> RegisterDonation(int eventId, BloodRegistrationRequest request)
         {
             // Kiểm tra event tương ứng với đơn đăng ký máu có tồn tại
-            var existingEvent = await _repoEvent.GetEventByIdAsync(id);
-            if (existingEvent == null)
+            // Không được đăng ký vào ngày diễn ra sự kiện
+            var existingEvent = await _repoEvent.GetEventByIdAsync(eventId);
+            if (existingEvent == null || existingEvent.IsExpired == true || existingEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
                 return null;
 
+            // Lấy thông tin user đang thao tác form
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
             {
@@ -29,21 +31,30 @@ namespace Application.Service.BloodRegistrationServ
             if (user == null)
                 return null;
 
-            // Kiểm tra xem lần cuối hiến máu có phù hợp
-            if (request.LastDonation >= DateTime.Now.AddDays(-90))
-                return null;  // Request xuống đều có LastDonation nên không cần xét trong hệ thống
+            // Kiểm tra member chỉ được đăng ký vào 1 event hiến máu
+            var checkedRegis = _repository.GetAllAsync().Result
+                .FirstOrDefault(br => br.MemberId == user.Id);
+            if (checkedRegis != null)
+                return null;
 
+            // Kiểm tra người dùng đã từng hiến máu ở hệ thống lần nào chưa
             if (user.LastDonation == null)
                 user.LastDonation = request.LastDonation;
 
-            var registration = new BloodRegistration
+            // Kiểm tra xem lần cuối hiến máu có phù hợp
+            if (user.LastDonation >= DateTime.Now.AddDays(-90))
+                return null;  // Request xuống đều có LastDonation nên không cần xét trong hệ thống
+
+            await _repoUser.UpdateUserProfileAsync(user);
+
+            var bloodRegis = new BloodRegistration
             {
                 CreateAt = DateTime.Now,
                 MemberId = creatorId,
-                EventId = id
+                EventId = eventId
             };
-            await _repository.AddAsync(registration);
-            return registration;
+            await _repository.AddAsync(bloodRegis);
+            return bloodRegis;
         }
 
         public async Task<BloodRegistration?> RejectBloodRegistration(int bloodRegisId)
@@ -72,6 +83,11 @@ namespace Application.Service.BloodRegistrationServ
             var bloodRegistration = await _repository.GetByIdAsync(id);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false ||
                 bloodRegistration.HealthId != null)
+                return null;
+
+            // Không được hủy vào ngày diễn ra sự kiện
+            var checkedEvent = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
+            if (checkedEvent != null && checkedEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
                 return null;
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;

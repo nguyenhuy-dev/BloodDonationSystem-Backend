@@ -6,27 +6,71 @@ using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Org.BouncyCastle.Crypto.Macs;
+using System.Numerics;
 using System.Security.Claims;
 
 namespace Application.Service.Users
 {
     public class UserService(IUserRepository _userRepository,
                              IHttpContextAccessor _contextAccessor,
+                             IAuthRepository _authRepository,
                              IBloodTypeRepository _bloodRepository) : IUserService
     {
-        public async Task<User> AssignUserRole(Guid userId, int roleId)
+        public async Task<UserDTO> AddStaffAsync(UserDTO request)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
-            if (user == null)
+            if (await _authRepository.UserExistsByPhoneAsync(request.Phone))
             {
                 return null;
             }
 
-            user.RoleId = roleId;
+            var user = new User
+            {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Gender = request.Gender,
+                Dob = request.Dob,
+                Phone = request.Phone,
+                Gmail = request.Gmail,
+                BloodTypeId = request.BloodTypeId,
+                CreateAt = DateTime.UtcNow,
+                Status = AccountStatus.Active,
+                RoleId = 2
+            };
 
-            var assignedRole = await _userRepository.AssignUserRole(user);
-            return assignedRole;
+            var hashedPassword = new PasswordHasher<User>();
+            user.HashPass = hashedPassword.HashPassword(user, request.Password);
+
+            await _authRepository.RegisterAsync(user);
+            return new UserDTO
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Dob = user.Dob,
+                Phone = user.Phone,
+                Gmail = user.Gmail,
+                BloodTypeId = user.BloodTypeId,
+                Gender = user.Gender
+            };
         }
+
+        //public async Task<User> AssignUserRole(Guid userId, int roleId)
+        //{
+        //    var user = await _userRepository.GetUserByIdAsync(userId);
+        //    if (user == null)
+        //    {
+        //        return null;
+        //    }
+
+        //    user.RoleId = roleId;
+
+        //    var assignedRole = await _userRepository.AssignUserRole(user);
+        //    return assignedRole;
+        //}
+
+
 
         public async Task<bool> BanUserAsync(Guid userId)
         {
@@ -73,14 +117,15 @@ namespace Application.Service.Users
 
         public async Task<PaginatedResult<ListUserDTO>> GetAllUserAsync(int pageNumber, int pageSize)
         {
-            var totalItems = await _userRepository.CountAllAsync();
+            var totalItems = await _userRepository.CountAllActiveUserAsync();
             var users = await _userRepository.GetAllUserAsync(pageNumber, pageSize);
 
             var userDtos = users.Select(u => new ListUserDTO
             {
+                UserId = u.Id,
                 Name = $"{u.LastName} {u.FirstName}",
+                Phone = u.Phone,
                 Email = u.Gmail,
-                Status = u.Status.ToString(),
                 Dob = u.Dob,
                 Role = u.Role.RoleName
             }).ToList();
@@ -123,19 +168,46 @@ namespace Application.Service.Users
             };
         }
 
+        public async Task<UpdateUserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO update)
+        {
+            var id = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (id == null || !Guid.TryParse(id, out Guid parsedUserId))
+            {
+                return null;
+            }
+
+            var existingUser = await _userRepository.GetUserByIdAsync(userId);
+            if (existingUser == null || existingUser.RoleId == 1)
+            {
+                return null;
+            }
+
+            existingUser.FirstName = update.FirstName;
+            existingUser.LastName = update.LastName;
+            existingUser.Dob = update.Dob;
+            existingUser.UpdateBy = parsedUserId;
+            existingUser.UpdateAt = DateTime.Now;
+
+            var updated = await _userRepository.UpdateUserProfileAsync(existingUser);
+            return new UpdateUserDTO
+            {
+                FirstName = existingUser.FirstName,
+                LastName = existingUser.LastName,
+                Dob = existingUser.Dob
+            };
+        }
+
         public async Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser)
         {
             var id = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (id == null || !Guid.TryParse(id, out Guid parsedUserId) || parsedUserId != userId)
             {
-                // Log or handle the case where the user ID is invalid or does not match
                 return null; // Unauthorized access or invalid user ID
             }
 
             var existingUser = await _userRepository.GetUserByIdAsync(userId);
             if (existingUser == null || existingUser.Phone == updateUser.Phone || existingUser.Gmail == updateUser.Gmail)
             {
-                // Log or handle the case where the user was not found
                 return null; // User not found or already has the same phone or email
             }
             //var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(updateUser.BloodTypeId);

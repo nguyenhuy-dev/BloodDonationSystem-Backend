@@ -12,10 +12,10 @@ namespace BloodDonationSystem.Controllers
     public class BloodProceduresController(IBloodProcedureService _service) : ControllerBase
     {
         [Authorize(Roles = "Staff")]
-        [HttpPost("api/blood-registrations/{id}/blood-procedures/collect")]
-        public async Task<IActionResult> RecordBloodCollection(int id, [FromBody] BloodCollectionRequest request)
+        [HttpPost("api/blood-registrations/{bloodRegisId}/blood-procedures/collect")]
+        public async Task<IActionResult> RecordBloodCollection(int bloodRegisId, [FromBody] BloodCollectionRequest request)
         {
-            var bloodCollection = await _service.RecordBloodCollectionAsync(id, request);
+            var bloodCollection = await _service.RecordBloodCollectionAsync(bloodRegisId, request);
 
             if (bloodCollection == null)
             {
@@ -34,10 +34,10 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPost("api/blood-registrations/{id}/blood-procedures/qualify")]
-        public async Task<IActionResult> RecordBloodQualification(int id, [FromBody] RecordBloodQualification request)
+        [HttpPost("api/blood-registrations/{bloodRegisId}/blood-procedures/qualify")]
+        public async Task<IActionResult> RecordBloodQualification(int bloodRegisId, [FromBody] RecordBloodQualification request)
         {
-            var bloodProcedure = await _service.UpdateBloodQualificationAsync(id, request);
+            var bloodProcedure = await _service.UpdateBloodQualificationAsync(bloodRegisId, request);
 
             if (bloodProcedure == null)
                 return BadRequest(new ApiResponse<RecordBloodQualification>()
@@ -54,10 +54,10 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpGet("api/events/{id}/blood-procedures")]
-        public async Task<IActionResult> GetBloodCollectionsByPaged(int id, int pageNumber = 1, int pageSize = 10)
+        [HttpGet("api/events/{eventId}/blood-procedures")]
+        public async Task<IActionResult> GetBloodCollectionsByPaged(int eventId, int pageNumber = 1, int pageSize = 10)
         {
-            var pagedResult = await _service.GetBloodCollectionsByPaged(id, pageNumber, pageSize);
+            var pagedResult = await _service.GetBloodCollectionsByPaged(eventId, pageNumber, pageSize);
 
             if (pagedResult == null)
                 return NotFound(new ApiResponse<PaginatedResultBloodProce>

@@ -10,10 +10,10 @@ namespace Application.Service.HealthProcedureServ
     public class HealthProcedureService(IHealthProcedureRepository _repo, IBloodRegistrationRepository _repoRegis,
         IHttpContextAccessor _contextAccessor, IEventRepository _repoEvent) : IHealthProcedureService
     {
-        public async Task<HealthProcedure?> CancelHealthProcessAsync(int bloodRegisId)
+        public async Task<HealthProcedure?> CancelHealthProcessAsync(int id)
         {
             // Kiểm tra xem đơn đăng ký hiến máu có tồn tại không
-            var bloodRegistration = await _repoRegis.GetByIdAsync(bloodRegisId);
+            var bloodRegistration = await _repoRegis.GetByIdAsync(id);
             if (bloodRegistration == null)
                 return null;
 
@@ -69,7 +69,8 @@ namespace Application.Service.HealthProcedureServ
                     IsHealth = health.IsHealth,
                     PerformedAt = health.PerformedAt,
                     FullName = health.BloodRegistration?.Member?.LastName + " " + health.BloodRegistration?.Member?.FirstName,
-                    BloodTypeName = health.BloodRegistration?.Member?.BloodType?.Type
+                    BloodTypeName = health.BloodRegistration?.Member?.BloodType?.Type,
+                    BloodRegisId = health.BloodRegistration.Id
                 };
                 pagedResult.Items.Add(healthProcedure);
             }

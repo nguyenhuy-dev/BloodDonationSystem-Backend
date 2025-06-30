@@ -10,8 +10,9 @@ namespace Application.DTO.UserDTO
 {
     public class ListUserDTO
     {
+        public Guid UserId { get; set; }
         public string Name { get; set; }
-        public string Status { get; set; }
+        public string Phone { get; set; }
         public string Email { get; set; }
         public DateOnly? Dob { get; set; }
         public string Role { get; set; }

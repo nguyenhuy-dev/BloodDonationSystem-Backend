@@ -13,10 +13,10 @@ namespace BloodDonationSystem.Controllers
     public class HealthProceduresController(IHealthProcedureService _service) : ControllerBase
     {
         [Authorize(Roles = "Staff")]
-        [HttpPost("api/blood-registrations/{id}/health-procedures")]
-        public async Task<IActionResult> RecordHealthProcedure(int id, [FromBody] HealthProcedureRequest request)
+        [HttpPost("api/blood-registrations/{bloodRegisId}/health-procedures")]
+        public async Task<IActionResult> RecordHealthProcedure(int bloodRegisId, [FromBody] HealthProcedureRequest request)
         {
-            var healthProcedure = await _service.RecordHealthProcedureAsync(id, request);
+            var healthProcedure = await _service.RecordHealthProcedureAsync(bloodRegisId, request);
 
             if (healthProcedure == null)
             {
@@ -36,10 +36,10 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpGet("api/events/{id}/health-procedures")]
-        public async Task<IActionResult> GetHealthProceduresByPaged(int id, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [HttpGet("api/events/{eventId}/health-procedures")]
+        public async Task<IActionResult> GetHealthProceduresByPaged(int eventId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var pagedHealthProcedure = await _service.GetHealthProceduresByPagedAsync(id, pageNumber, pageSize);
+            var pagedHealthProcedure = await _service.GetHealthProceduresByPagedAsync(eventId, pageNumber, pageSize);
             if (pagedHealthProcedure == null)
                 return NotFound(new ApiResponse<object>
                 {

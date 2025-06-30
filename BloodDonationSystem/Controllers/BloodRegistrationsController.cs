@@ -2,7 +2,6 @@
 using Application.DTO.BloodRegistration;
 using Application.DTO.BloodRegistrationDTO;
 using Application.Service.BloodRegistrationServ;
-using Infrastructure.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +13,10 @@ namespace BloodDonationSystem.Controllers
     public class BloodRegistrationsController(IBloodRegistrationService _service) : ControllerBase
     {
         [Authorize(Roles = "Member")]
-        [HttpPost("api/events/{id}/blood-registrations")]
-        public async Task<IActionResult> RegisterDonation(int id, [FromBody] BloodRegistrationRequest request)
+        [HttpPost("api/events/{eventId}/blood-registrations")]
+        public async Task<IActionResult> RegisterDonation(int eventId, [FromBody] BloodRegistrationRequest request)
         {
-            var bloodRegistration = await _service.RegisterDonation(id, request);
+            var bloodRegistration = await _service.RegisterDonation(eventId, request);
 
             if (bloodRegistration == null)
                 return BadRequest(new ApiResponse<BloodRegistrationRequest>()
@@ -34,10 +33,10 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("api/blood-registrations/{id}/reject")]
-        public async Task<IActionResult> RejectBloodRegistration(int id)
+        [HttpPut("api/blood-registrations/{bloodRegisId}/reject")]
+        public async Task<IActionResult> RejectBloodRegistration(int bloodRegisId)
         {
-            var bloodRegistration = await _service.RejectBloodRegistration(id);
+            var bloodRegistration = await _service.RejectBloodRegistration(bloodRegisId);
             if (bloodRegistration == null)
                 return BadRequest(new ApiResponse<BloodRegistrationRequest>()
                 {
@@ -53,10 +52,10 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Member")]
-        [HttpPut("api/blood-registrations/{id}/cancel-own")]
-        public async Task<IActionResult> CancelOwnRegistration(int id)
+        [HttpPut("api/blood-registrations/{bloodRegisId}/cancel-own")]
+        public async Task<IActionResult> CancelOwnRegistration(int bloodRegisId)
         {
-            var bloodRegistration = await _service.CancelOwnRegistration(id);
+            var bloodRegistration = await _service.CancelOwnRegistration(bloodRegisId);
             if (bloodRegistration == null)
                 return BadRequest(new ApiResponse<BloodRegistrationRequest>()
                 {
@@ -72,10 +71,10 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpGet("api/events/{id}/blood-registrations")]
-        public async Task<IActionResult> GetBloodRegistrationsByPaged(int id, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [HttpGet("api/events/{eventId}/blood-registrations")]
+        public async Task<IActionResult> GetBloodRegistrationsByPaged(int eventId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var bloodRegisResponse = await _service.GetBloodRegistrationsByPaged(id, pageNumber, pageSize);
+            var bloodRegisResponse = await _service.GetBloodRegistrationsByPaged(eventId, pageNumber, pageSize);
 
             if (bloodRegisResponse == null)
                 return NotFound(new ApiResponse<PaginatedResultBloodRegis>

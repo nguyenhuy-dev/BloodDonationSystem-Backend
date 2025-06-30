@@ -35,5 +35,12 @@ namespace Infrastructure.Repository.HealthProcedureRepo
             };
             return pagedHealthProcedure;
         }
+
+        public async Task<HealthProcedure?> GetIncludeByIdAsync(int id)
+        {
+            return await _dbSet
+                .Include(hp => hp.BloodRegistration)
+                .FirstOrDefaultAsync(hp => hp.Id == id);
+        }
     }
 }
