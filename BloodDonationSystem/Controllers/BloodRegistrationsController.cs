@@ -21,7 +21,7 @@ namespace BloodDonationSystem.Controllers
             if (bloodRegistration == null)
                 return BadRequest(new ApiResponse<BloodRegistrationRequest>()
                 {
-                    IsSuccess = true,
+                    IsSuccess = false,
                     Message = "Register donation unsuccessfully"
                 });
 
