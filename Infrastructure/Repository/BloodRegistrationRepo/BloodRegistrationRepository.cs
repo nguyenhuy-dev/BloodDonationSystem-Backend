@@ -30,6 +30,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                 .Include(br => br.BloodProcedure)
                 .Include(br => br.HealthProcedure)
                 .Include(br => br.BloodInventory)
+                .Where(br => br.MemberId == userId)
                 .ToListAsync();
         }
 

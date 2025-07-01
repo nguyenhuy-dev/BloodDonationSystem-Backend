@@ -98,7 +98,7 @@ namespace BloodDonationSystem.Controllers
         {
             var bloodHistory = await _historyService.GetBloodRegistraionHistoryAsync();
 
-            if (bloodHistory == null)
+            if (bloodHistory == null || !bloodHistory.Any())
             {
                 return NotFound(new
                 {
@@ -119,7 +119,7 @@ namespace BloodDonationSystem.Controllers
         {
             var bloodHistory = await _historyService.GetDonationHistoryAsync();
 
-            if (bloodHistory == null)
+            if (bloodHistory == null || !bloodHistory.Any())
             {
                 return NotFound(new
                 {
