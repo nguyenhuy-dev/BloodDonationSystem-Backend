@@ -29,5 +29,21 @@ namespace Infrastructure.Repository.VolunteerRepo
             };
             return pagedResult;
         }
+
+        public async Task<bool> UpdateAvailableDateAsync(int id, DateTime startDate, DateTime endDate)
+        {
+            var volunteer = await GetByIdAsync(id);
+            if(volunteer == null)
+            {
+                return false;
+            }
+            volunteer.StartVolunteerDate = startDate;
+            volunteer.EndVolunteerDate = endDate;
+            volunteer.UpdateAt = DateTime.Now;
+
+            _context.Update(volunteer);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.DTO;
 using Application.DTO.BloodRegistration;
 using Application.DTO.BloodRegistrationDTO;
+using Application.Service.BloodHistoryServ;
 using Application.Service.BloodRegistrationServ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -10,7 +11,7 @@ namespace BloodDonationSystem.Controllers
 {
     [EnableCors("LocalPolicy")]
     [ApiController]
-    public class BloodRegistrationsController(IBloodRegistrationService _service) : ControllerBase
+    public class BloodRegistrationsController(IBloodRegistrationService _service, IBloodHistoryService _historyService) : ControllerBase
     {
         [Authorize(Roles = "Member")]
         [HttpPost("api/events/{eventId}/blood-registrations")]
@@ -88,6 +89,49 @@ namespace BloodDonationSystem.Controllers
                 IsSuccess = true,
                 Message = "Get blood registrations successfully",
                 Data = bloodRegisResponse
+            });
+        }
+
+        [Authorize]
+        [HttpGet("api/event-registration-history")]
+        public async Task<IActionResult> GetEventRegistrationHistory()
+        {
+            var bloodHistory = await _historyService.GetBloodRegistraionHistoryAsync();
+
+            if (bloodHistory == null)
+            {
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "Cannot found any registration"
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "History retrieve successfully",
+                Data = bloodHistory
+            });
+        }
+        [Authorize]
+        [HttpGet("api/donation-history")]
+        public async Task<IActionResult> GetDonationHistory()
+        {
+            var bloodHistory = await _historyService.GetDonationHistoryAsync();
+
+            if (bloodHistory == null)
+            {
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "Cannot found any record"
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "History retrieve successfully",
+                Data = bloodHistory
             });
         }
     }

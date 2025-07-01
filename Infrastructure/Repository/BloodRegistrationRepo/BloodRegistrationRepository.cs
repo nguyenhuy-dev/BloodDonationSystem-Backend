@@ -12,6 +12,27 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
         }
 
+        public async Task<List<BloodRegistration>> GetBloodRegistrationHistoryAsync(Guid userId)
+        {
+            return await _context.BloodRegistrations
+                                        .Include(br => br.Event)
+                                        .ThenInclude(e => e.Facility)
+                                        .OrderByDescending(e => e.CreateAt)
+                                        .Where(br => br.MemberId == userId && br.VolunteerId == null)
+                                        .ToListAsync();
+        }
+
+        public async Task<List<BloodRegistration>> GetDonationHistoryAsync(Guid userId)
+        {
+            return await _context.BloodRegistrations
+                .Include(br => br.Event)
+                .ThenInclude(e => e.Facility)
+                .Include(br => br.BloodProcedure)
+                .Include(br => br.HealthProcedure)
+                .Include(br => br.BloodInventory)
+                .ToListAsync();
+        }
+
         public async Task<PaginatedResult<BloodRegistration>> GetPagedAsync(int eventId, int pageNumber, int pageSize)
         {
              var bloodRegistrations = await _dbSet
@@ -30,6 +51,17 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                 TotalItems = await _dbSet.CountAsync(br => br.EventId == eventId)
             };
             return pagedResult;
+        }
+
+        public async Task<List<BloodRegistration>> GetVolunteerRegistrationHistoryAsync(Guid userId)
+        {
+            return await _context.BloodRegistrations
+                                        .Include(br => br.Event)
+                                        .ThenInclude(e => e.Facility)
+                                        .Include(br => br.Volunteer)
+                                        .OrderByDescending(e => e.CreateAt)
+                                        .Where(br => br.Volunteer.MemberId == userId)
+                                        .ToListAsync();
         }
     }
 }

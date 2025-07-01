@@ -2,6 +2,7 @@ using Application.DTO.SendEmailDTO;
 using Application.Service.Auth;
 using Application.Service.BlogSer;
 using Application.Service.BloodCompatibilitySer;
+using Application.Service.BloodHistoryServ;
 using Application.Service.BloodProcedureServ;
 using Application.Service.BloodRegistrationServ;
 using Application.Service.BloodTypeServ;
@@ -83,6 +84,8 @@ builder.Services.AddScoped<IBlogService, BlogService>();
 
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+
+builder.Services.AddScoped<IBloodHistoryService, BloodHistoryService>();
 
 builder.Services.AddScoped<IBloodCompatibilityRepository, BloodCompatibilityRepository>();
 builder.Services.AddScoped<IBloodCompatibilityService, BloodCompatibilityService>();
