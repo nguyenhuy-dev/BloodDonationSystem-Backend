@@ -84,6 +84,7 @@ namespace BloodDonationSystem.Controllers
                     LastName = lastName,
                     Gmail = email,
                     Status = AccountStatus.Pending, //Cannot use yet
+                    CreateAt = DateTime.Now,
                     RoleId = 3 // Assuming 3 is the default role ID for a user
                 };
                 await _authService.RegisterWithGoogleAsync(user);
@@ -121,10 +122,11 @@ namespace BloodDonationSystem.Controllers
             }
 
             var token = _authService.GenerateToken(user);
+            SetRefreshTokenCookie(token.RefreshToken);
             return Ok(new
             {
                 Message = "Update successfully",
-                Token = token
+                Token = token.AccessToken,
             });
         }
 
