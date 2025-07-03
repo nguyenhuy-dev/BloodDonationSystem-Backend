@@ -59,20 +59,12 @@ namespace BloodDonationSystem.Controllers
         [HttpPut("api/blood-registrations/{bloodRegisId}/health-procedures/cancel")]
         public async Task<IActionResult> CancelHealthProcess(int bloodRegisId)
         {
-            var healthProcedure = await _service.CancelHealthProcessAsync(bloodRegisId);
+            var apiResponse = await _service.CancelHealthProcessAsync(bloodRegisId);
 
-            if (healthProcedure == null)
-                return BadRequest(new ApiResponse<HealthProcedure>
-                {
-                    IsSuccess = false,
-                    Message = "Health procedure not found or cannot be cancelled."
-                });
+            if (apiResponse?.IsSuccess == false)
+                return BadRequest(apiResponse);
 
-            return Ok(new ApiResponse<HealthProcedure>
-            {
-                IsSuccess = true,
-                Message = "Health procedure cancelled successfully."
-            });
+            return Ok(apiResponse);
         }
     }
 }

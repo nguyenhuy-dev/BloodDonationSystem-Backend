@@ -2,7 +2,8 @@
 {
     public class HealthProcedureRequest
     {
-        public int Pressure { get; set; }
+        public int Systolic { get; set; }
+        public int Diastolic { get; set; }
         public float Temperature { get; set; }
         public float Hb { get; set; }
         public bool HBV { get; set; }

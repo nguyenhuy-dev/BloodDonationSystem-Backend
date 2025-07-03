@@ -17,20 +17,12 @@ namespace BloodDonationSystem.Controllers
         [HttpPost("api/events/{eventId}/blood-registrations")]
         public async Task<IActionResult> RegisterDonation(int eventId, [FromBody] BloodRegistrationRequest request)
         {
-            var bloodRegistration = await _service.RegisterDonation(eventId, request);
+            var apiResponse = await _service.RegisterDonation(eventId, request);
 
-            if (bloodRegistration == null)
-                return BadRequest(new ApiResponse<BloodRegistrationRequest>()
-                {
-                    IsSuccess = false,
-                    Message = "Register donation unsuccessfully"
-                });
+            if (apiResponse != null && apiResponse.IsSuccess == false)
+                return BadRequest(apiResponse);
 
-            return Ok(new ApiResponse<BloodRegistrationRequest>()
-            {
-                IsSuccess = true,
-                Message = "Register donation successfully"
-            });
+            return Ok(apiResponse);
         }
 
         [Authorize(Roles = "Staff")]
@@ -56,19 +48,11 @@ namespace BloodDonationSystem.Controllers
         [HttpPut("api/blood-registrations/{bloodRegisId}/cancel-own")]
         public async Task<IActionResult> CancelOwnRegistration(int bloodRegisId)
         {
-            var bloodRegistration = await _service.CancelOwnRegistration(bloodRegisId);
-            if (bloodRegistration == null)
-                return BadRequest(new ApiResponse<BloodRegistrationRequest>()
-                {
-                    IsSuccess = false,
-                    Message = "Blood registration not found or cancel unsuccessfully"
-                });
+            var apiResponse = await _service.CancelOwnRegistration(bloodRegisId);
+            if (apiResponse?.IsSuccess == false)
+                return BadRequest(apiResponse);
 
-            return Ok(new ApiResponse<BloodRegistrationRequest>()
-            {
-                IsSuccess = true,
-                Message = "Cancel own registration successfully"
-            });
+            return Ok(apiResponse);
         }
 
         [Authorize(Roles = "Staff")]

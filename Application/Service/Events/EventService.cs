@@ -145,6 +145,50 @@ namespace Application.Service.Events
             return eventItem;
         }
 
+        public async Task<PaginatedResult<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
+        {
+            var events = await _eventRepository.GetEventListDoBloodProcedure(pageNumber, pageSize);
+            var totalItems = await _eventRepository.CountEventListDoBloodProcedure();
+
+            var dto = events.Select(e => new ListWaiting
+            {
+                Id = e.Id,
+                Name = e.Title,
+                Total = e.BloodRegistrations.Count,
+            }).Where(e => e.Total > 0)
+              .ToList();
+
+            return new PaginatedResult<ListWaiting>
+            {
+                TotalItems = totalItems,
+                Items = dto,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<PaginatedResult<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        {
+            var events = await _eventRepository.GetPassedHealthProcedureAsync(pageNumber, pageSize);
+            var totalItems = await _eventRepository.CountEventPassedHealthProcedureAsync();
+
+            var dto = events.Select(e => new ListWaiting
+            {
+                Id = e.Id,
+                Name = e.Title,
+                Total = e.BloodRegistrations.Count,
+            }).Where(e => e.Total > 0)
+              .ToList();
+
+            return new PaginatedResult<ListWaiting>
+            {
+                TotalItems = totalItems,
+                Items = dto,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
         public async Task<EventDTO> UpdateEventAsync(int eventId, EventDTO updateEvent)
         {
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;

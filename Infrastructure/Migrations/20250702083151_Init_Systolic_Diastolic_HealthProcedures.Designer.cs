@@ -12,8 +12,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BloodDonationSystemContext))]
-    [Migration("20250701035101_Init_DEL")]
-    partial class Init_DEL
+
+    [Migration("20250702083151_Init_Systolic_Diastolic_HealthProcedures")]
+    partial class Init_Systolic_Diastolic_HealthProcedures
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -413,6 +414,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Diastolic")
+                        .HasColumnType("int");
+
                     b.Property<bool>("HBV")
                         .HasColumnType("bit");
 
@@ -431,7 +435,7 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("PerformedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Pressure")
+                    b.Property<int>("Systolic")
                         .HasColumnType("int");
 
                     b.Property<float>("Temperature")

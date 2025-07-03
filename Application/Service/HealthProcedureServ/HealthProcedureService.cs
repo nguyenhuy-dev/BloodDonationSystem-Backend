@@ -1,4 +1,5 @@
-﻿using Application.DTO.HealthProcedureDTO;
+﻿using Application.DTO;
+using Application.DTO.HealthProcedureDTO;
 using Domain.Entities;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
@@ -10,21 +11,35 @@ namespace Application.Service.HealthProcedureServ
     public class HealthProcedureService(IHealthProcedureRepository _repo, IBloodRegistrationRepository _repoRegis,
         IHttpContextAccessor _contextAccessor, IEventRepository _repoEvent) : IHealthProcedureService
     {
-        public async Task<HealthProcedure?> CancelHealthProcessAsync(int id)
+        public async Task<ApiResponse<HealthProcedure>?> CancelHealthProcessAsync(int id)
         {
+            ApiResponse<HealthProcedure> apiResponse = new();
+
             // Kiểm tra xem đơn đăng ký hiến máu có tồn tại không
             var bloodRegistration = await _repoRegis.GetByIdAsync(id);
             if (bloodRegistration == null)
-                return null;
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Blood registration not found.";
+                return apiResponse;
+            }
 
             // Kiểm tra xem đơn này sức khỏe có đảm bảo không, nếu sức khỏe không đảm bảo thì không thực hiện request
             var healthProcedure = await _repo.GetByIdAsync(bloodRegistration.HealthId);
             if (healthProcedure == null || healthProcedure.IsHealth == false)
-                return null;
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Health was not good.";
+                return apiResponse;
+            }
 
             // Nếu đã lấy máu rồi thì không thực hiện request
             if (bloodRegistration.BloodProcedureId != null)
-                return null;
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Blood collection being completed.";
+                return apiResponse;
+            }
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
@@ -40,7 +55,9 @@ namespace Application.Service.HealthProcedureServ
             healthProcedure.BloodRegistration.StaffId = creatorId;
             await _repoRegis.UpdateAsync(healthProcedure.BloodRegistration);
 
-            return healthProcedure;
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "Health procedure cancelled successfully.";
+            return apiResponse;
         }
 
         public async Task<object?> GetHealthProceduresByPagedAsync(int id, int pageNumber, int pageSize)
@@ -91,7 +108,8 @@ namespace Application.Service.HealthProcedureServ
 
             var healthProcedure = new HealthProcedure
             {
-                Pressure = request.Pressure,
+                Systolic = request.Systolic,
+                Diastolic = request.Diastolic,
                 Temperature = request.Temperature,
                 Hb = request.Hb,
                 HBV = request.HBV,

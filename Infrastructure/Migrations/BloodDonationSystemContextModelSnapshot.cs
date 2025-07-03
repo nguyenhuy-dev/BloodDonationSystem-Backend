@@ -410,6 +410,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Diastolic")
+                        .HasColumnType("int");
+
                     b.Property<bool>("HBV")
                         .HasColumnType("bit");
 
@@ -428,7 +431,7 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("PerformedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Pressure")
+                    b.Property<int>("Systolic")
                         .HasColumnType("int");
 
                     b.Property<float>("Temperature")

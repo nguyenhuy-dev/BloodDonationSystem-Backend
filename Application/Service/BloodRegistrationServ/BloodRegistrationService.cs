@@ -1,4 +1,5 @@
-﻿using Application.DTO.BloodRegistration;
+﻿using Application.DTO;
+using Application.DTO.BloodRegistration;
 using Application.DTO.BloodRegistrationDTO;
 using Domain.Entities;
 using Infrastructure.Repository.Blood;
@@ -13,13 +14,26 @@ namespace Application.Service.BloodRegistrationServ
         IEventRepository _repoEvent, IUserRepository _repoUser, 
         IBloodTypeRepository _repoBloodType) : IBloodRegistrationService
     {
-        public async Task<BloodRegistration?> RegisterDonation(int eventId, BloodRegistrationRequest request)
+
+        public async Task<ApiResponse<BloodRegistration>?> RegisterDonation(int eventId, BloodRegistrationRequest request)
         {
-            // Kiểm tra event tương ứng với đơn đăng ký máu có tồn tại
+            ApiResponse<BloodRegistration> apiResponse = new();
+
+            // Kiểm tra event tương ứng với đơn đăng ký máu có tồn tại(event hết hạn hay chưa)
             // Không được đăng ký vào ngày diễn ra sự kiện
             var existingEvent = await _repoEvent.GetEventByIdAsync(eventId);
-            if (existingEvent == null || existingEvent.IsExpired == true || existingEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
-                return null;
+            if (existingEvent == null || existingEvent.IsExpired == true)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Event not found or already expired.";
+                return apiResponse;
+            }
+            if (existingEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Event already started.";
+                return apiResponse;
+            }
 
             // Lấy thông tin user đang thao tác form
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
@@ -31,19 +45,29 @@ namespace Application.Service.BloodRegistrationServ
             if (user == null)
                 return null;
 
-            // Kiểm tra member chỉ được đăng ký vào 1 event hiến máu
+
+            // Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
             var checkedRegis = _repository.GetAllAsync().Result
                 .FirstOrDefault(br => br.MemberId == user.Id);
             if (checkedRegis != null)
-                return null;
-
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Already registered in this event.";
+                return apiResponse;
+            }
+                
             // Kiểm tra người dùng đã từng hiến máu ở hệ thống lần nào chưa
             if (user.LastDonation == null)
                 user.LastDonation = request.LastDonation;
 
             // Kiểm tra xem lần cuối hiến máu có phù hợp
             if (user.LastDonation >= DateTime.Now.AddDays(-90))
-                return null;  // Request xuống đều có LastDonation nên không cần xét trong hệ thống
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Last donation time not suitable.";
+                return apiResponse;  // Request xuống đều có LastDonation nên không cần xét trong hệ thống
+            }
+
 
             await _repoUser.UpdateUserProfileAsync(user);
 
@@ -54,7 +78,11 @@ namespace Application.Service.BloodRegistrationServ
                 EventId = eventId
             };
             await _repository.AddAsync(bloodRegis);
-            return bloodRegis;
+
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "Register donation successfully.";
+            return apiResponse;
+
         }
 
         public async Task<BloodRegistration?> RejectBloodRegistration(int bloodRegisId)
@@ -77,34 +105,57 @@ namespace Application.Service.BloodRegistrationServ
             return bloodRegistration;
         }
 
-        public async Task<BloodRegistration?> CancelOwnRegistration(int id)
+        public async Task<ApiResponse<BloodRegistration>?> CancelOwnRegistration(int id)
         {
-            // Check đơn có tồn tại, bị hủy, hay bị từ chối, hoặc đã khám hay chưa
-            var bloodRegistration = await _repository.GetByIdAsync(id);
-            if (bloodRegistration == null || bloodRegistration.IsApproved == false ||
-                bloodRegistration.HealthId != null)
-                return null;
+            ApiResponse<BloodRegistration> apiResponse = new(); 
 
-            // Không được hủy vào ngày diễn ra sự kiện
-            var checkedEvent = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
-            if (checkedEvent != null && checkedEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
-                return null;
+            // Check đơn có tồn tại, bị hủy, hay bị từ chối
+            var bloodRegistration = await _repository.GetByIdAsync(id);
+            if (bloodRegistration == null || bloodRegistration.IsApproved == false)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Blood registration not suitable.";
+                return apiResponse;
+            }
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
             {
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
-
             // Xác thực người dùng hiện tại có đang là chủ của đơn đăng ký này hay không
             if (bloodRegistration.MemberId != creatorId)
-                return null;
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "This member not own blood registration.";
+                return apiResponse;
+            }
+
+            // Check đơn đã khám hay chưa
+            if (bloodRegistration.HealthId != null)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Health procedure being completed.";
+                return apiResponse;
+            }
+
+            // Không được hủy vào ngày diễn ra sự kiện
+            var checkedEvent = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
+            if (checkedEvent != null && checkedEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Event being started.";
+                return apiResponse;
+            }
 
             bloodRegistration.IsApproved = false;
             bloodRegistration.UpdateAt = DateTime.Now;
 
             await _repository.UpdateAsync(bloodRegistration);
-            return bloodRegistration;
+
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "Cancel own registration successfully.";
+            return apiResponse;
         }
 
         public async Task<PaginatedResultBloodRegis?> GetBloodRegistrationsByPaged(int eventId, int pageNumber, int pageSize)

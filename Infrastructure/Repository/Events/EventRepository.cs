@@ -96,5 +96,81 @@ namespace Infrastructure.Repository.Events
 
             return await _context.SaveChangesAsync();
         }
+
+        //Khong nhan event het han, khong nhan event khong don
+        public async Task<List<Event>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        {
+            var events = await _context.Events
+                .Where(e => e.IsExpired == false)
+                .Include(e => e.BloodRegistrations.Where(br => br.HealthId != null && br.IsApproved == true && br.BloodProcedureId == null))
+                .OrderByDescending(e => e.CreateAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+            return events;
+        }
+
+        //Nhan event het han + khong hien event khong don
+        public async Task<List<Event>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
+        {
+            var events = await _context.Events
+                .Include(e => e.BloodRegistrations)
+                .ThenInclude(br => br.BloodProcedure)
+                .ToListAsync();
+
+            var filtered = events.Select(e => new Event
+            {
+            Id = e.Id,
+            Title = e.Title,
+            EventTime = e.EventTime,
+            Facility = e.Facility,
+            BloodRegistrations = e.BloodRegistrations
+                .Where(br =>
+                    br.HealthId != null &&
+                    br.IsApproved == true &&
+                    (br.BloodProcedureId != null && br.BloodProcedure.IsQualified == null)
+                ).ToList()
+            })
+                .Where(e => e.BloodRegistrations.Any())
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return filtered;
+        }
+
+        public async Task<int> CountEventPassedHealthProcedureAsync()
+        {
+            return await _context.Events
+                .Where(e => e.IsExpired == false &&
+                            e.BloodRegistrations.Any(br =>
+                                br.IsApproved == true &&
+                                br.HealthId != null &&
+                                br.BloodProcedureId == null))
+                .CountAsync();
+        }
+
+        public async Task<int> CountEventListDoBloodProcedure()
+        {
+            return await _context.Events
+                .Where(e => e.BloodRegistrations.Any(br =>
+                        br.HealthId != null &&
+                        br.IsApproved == true &&
+                        br.BloodProcedureId != null &&
+                        br.BloodProcedure.IsQualified == null))
+                .CountAsync();
+
+            //var totalCount = events
+            //    .SelectMany(e => e.BloodRegistrations)
+            //    .Count(br =>
+            //        br.HealthId != null &&
+            //        br.IsApproved == true &&
+            //        br.BloodProcedureId != null &&
+            //        br.BloodProcedure?.IsQualified == null
+            //    );
+
+            //return totalCount;
+        }
+
     }
 }

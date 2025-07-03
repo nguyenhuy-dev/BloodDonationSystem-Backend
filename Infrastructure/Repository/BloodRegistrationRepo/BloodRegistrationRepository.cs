@@ -17,6 +17,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             return await _context.BloodRegistrations
                                         .Include(br => br.Event)
                                         .ThenInclude(e => e.Facility)
+                                        .Include(br => br.HealthProcedure)
                                         .OrderByDescending(e => e.CreateAt)
                                         .Where(br => br.MemberId == userId && br.VolunteerId == null)
                                         .ToListAsync();

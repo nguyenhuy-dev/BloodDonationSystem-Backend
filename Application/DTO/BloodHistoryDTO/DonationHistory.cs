@@ -8,6 +8,7 @@ namespace Application.DTO.BloodHistoryDTO
 {
     public class DonationHistory
     {
+        public int RegistrationId { get; set; }
         public DateOnly DonateDate { get; set; }
         public string FacilityName { get; set; }
         public string FacilityAddress { get; set; }

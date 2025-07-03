@@ -15,42 +15,24 @@ namespace BloodDonationSystem.Controllers
         [HttpPost("api/blood-registrations/{bloodRegisId}/blood-procedures/collect")]
         public async Task<IActionResult> RecordBloodCollection(int bloodRegisId, [FromBody] BloodCollectionRequest request)
         {
-            var bloodCollection = await _service.RecordBloodCollectionAsync(bloodRegisId, request);
+            var apiResponse = await _service.RecordBloodCollectionAsync(bloodRegisId, request);
 
-            if (bloodCollection == null)
-            {
-                return BadRequest(new ApiResponse<BloodCollectionRequest>
-                {
-                    IsSuccess = false,
-                    Message = "Failed to record blood collection."
-                });
-            }
+            if (apiResponse?.IsSuccess == false)
+                return BadRequest(apiResponse);
 
-            return Ok(new ApiResponse<BloodCollectionRequest>
-            {
-                IsSuccess = true,
-                Message = "Blood collection recorded successfully.",
-            });
+            return Ok(apiResponse);
         }
 
         [Authorize(Roles = "Staff")]
         [HttpPost("api/blood-registrations/{bloodRegisId}/blood-procedures/qualify")]
         public async Task<IActionResult> RecordBloodQualification(int bloodRegisId, [FromBody] RecordBloodQualification request)
         {
-            var bloodProcedure = await _service.UpdateBloodQualificationAsync(bloodRegisId, request);
+            var apiResponse = await _service.UpdateBloodQualificationAsync(bloodRegisId, request);
 
-            if (bloodProcedure == null)
-                return BadRequest(new ApiResponse<RecordBloodQualification>()
-                {
-                    IsSuccess = false,
-                    Message = "Failed to record blood qualification."
-                });
+            if (apiResponse?.IsSuccess == false)
+                return BadRequest(apiResponse);
 
-            return Ok(new ApiResponse<RecordBloodQualification>()
-            {
-                IsSuccess = true,
-                Message = "Blood qualification recorded successfully."
-            });
+            return Ok(apiResponse);
         }
 
         [Authorize(Roles = "Staff")]
