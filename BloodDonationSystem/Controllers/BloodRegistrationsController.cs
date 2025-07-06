@@ -118,5 +118,26 @@ namespace BloodDonationSystem.Controllers
                 Data = bloodHistory
             });
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("api/blood-registrations/search")]
+        public async Task<IActionResult> SearchBloodRegistrationsByPhoneOrName([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = null)
+        {
+            var bloodRegistrations = await _service.SearchBloodRegistrationsByPhoneOrName(pageNumber, pageSize, keyword);
+            if (bloodRegistrations == null)
+            {
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "No registrations found for the given keyword."
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Search completed successfully.",
+                Data = bloodRegistrations
+            });
+        }
     }
 }

@@ -14,6 +14,7 @@ namespace Infrastructure.Repository.Events
 
         Task<int> CountAllActiveEventAsync();
         Task<int> CountAllEventAsync();
+        Task<int> CountEventFromDayToDay(DateOnly? startDay, DateOnly? endDay);
 
         Task<List<Event>> GetAllActiveEventAsync(int pageNumber, int pageSize);
         Task<List<Event>> GetAllEventAsync(int pageNumber, int pageSize);
@@ -28,6 +29,8 @@ namespace Infrastructure.Repository.Events
         Task<int> CountEventPassedHealthProcedureAsync();
         Task<List<Event>> GetEventListDoBloodProcedure(int pageNumber, int pageSize);
         Task<int> CountEventListDoBloodProcedure();
+
+        Task<List<Event>> SearchEventByDayAsync(DateOnly? startDay, DateOnly? endDay);
 
         Task<int> EventExpiredAsync();
     }

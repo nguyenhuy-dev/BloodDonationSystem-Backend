@@ -172,5 +172,22 @@ namespace Infrastructure.Repository.Events
             //return totalCount;
         }
 
+        public async Task<List<Event>> SearchEventByDayAsync(DateOnly? startDay, DateOnly? endDay)
+        {
+            return await _context.Events
+                .Include(e => e.BloodType)
+                .Include(e => e.BloodRegistrations)
+                .Where(e => e.EventTime >= startDay && e.EventTime <= endDay)
+                .ToListAsync();
+        }
+
+        public async Task<int> CountEventFromDayToDay(DateOnly? startDay, DateOnly? endDay)
+        {
+            return await _context.Events
+                .Include(e => e.BloodType)
+                .Include(e => e.BloodRegistrations)
+                .Where(e => e.EventTime >= startDay && e.EventTime <= endDay)
+                .CountAsync();
+        }
     }
 }

@@ -4,6 +4,7 @@ using Application.Service.BloodProcedureServ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit.Cryptography;
 
 namespace BloodDonationSystem.Controllers
 {
@@ -52,6 +53,25 @@ namespace BloodDonationSystem.Controllers
             {
                 IsSuccess = true,
                 Message = "Blood collections retrieved successfully.",
+                Data = pagedResult
+            });
+        }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("api/blood-procedures/search")]
+        public async Task<IActionResult> SearchBloodProcedures([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string keyword = null)
+        {
+            var pagedResult = await _service.SearchBloodCollectionsByPhoneOrName(pageNumber, pageSize, keyword);
+            if (pagedResult == null || !pagedResult.Items.Any())
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "No blood procedures found."
+                });
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Blood procedures retrieved successfully.",
                 Data = pagedResult
             });
         }

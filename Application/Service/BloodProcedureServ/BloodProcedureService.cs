@@ -3,6 +3,7 @@ using Application.DTO.BloodProcedureDTO;
 using Application.Service.EmailServ;
 using Domain.Entities;
 using Domain.Enums;
+using Infrastructure.Helper;
 using Infrastructure.Repository.BloodInventoryRepo;
 using Infrastructure.Repository.BloodProcedureRepo;
 using Infrastructure.Repository.BloodRegistrationRepo;
@@ -98,6 +99,35 @@ namespace Application.Service.BloodProcedureServ
             apiResponse.IsSuccess = true;
             apiResponse.Message = "Blood collection recorded successfully.";
             return apiResponse;
+        }
+
+        public async Task<PaginatedResult<BloodCollectionResponse>?> SearchBloodCollectionsByPhoneOrName(int pageNumber, int pageSize, string keyword)
+        {
+            var bloodCollections = await _repo.SearchBloodCollectionsByPhoneOrNameAsync(pageNumber, pageSize, keyword);
+
+            if (bloodCollections == null || !bloodCollections.Any())
+            {
+                return null;
+            }
+
+            var dto = bloodCollections.Select(bc => new BloodCollectionResponse
+            {
+                Id = bc.Id,
+                DonationRegisId = bc.BloodRegistration.Id,
+                Volume = bc.Volume,
+                FullName = bc.BloodRegistration.Member.LastName + " " + bc.BloodRegistration.Member.FirstName,
+                BloodTypeName = bc.BloodRegistration.Member.BloodType?.Type,
+                PerformedAt = bc.PerformedAt,
+                IsQualified = bc.IsQualified
+            }).ToList();
+
+            return new PaginatedResult<BloodCollectionResponse>
+            {
+                Items = dto,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = bloodCollections.Count
+            };
         }
 
         public async Task<ApiResponse<BloodProcedure>?> UpdateBloodQualificationAsync(int regisId, RecordBloodQualification request)

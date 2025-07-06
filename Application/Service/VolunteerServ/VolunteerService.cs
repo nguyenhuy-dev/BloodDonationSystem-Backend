@@ -96,5 +96,10 @@ namespace Application.Service.VolunteerServ
 
             return pagedVolunteer;
         }
+
+        public async Task<int> VolunteerEndDateExpiredAsync()
+        {
+            return await _repoVolun.EndVolunteerDateExpired();
+        }
     }
 }

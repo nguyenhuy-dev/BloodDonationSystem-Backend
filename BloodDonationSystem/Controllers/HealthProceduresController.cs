@@ -66,5 +66,26 @@ namespace BloodDonationSystem.Controllers
 
             return Ok(apiResponse);
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("api/health-procedures/search")]
+        public async Task<IActionResult> SearchHealthProcedures([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string keyword = null)
+        {
+            var healthProcedures = await _service.SearchHealthProceduresByPhoneOrNameAsync(pageNumber, pageSize, keyword);
+            if (healthProcedures == null || !healthProcedures.Items.Any())
+            {
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "No health procedures found."
+                });
+            }
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Health procedures retrieved successfully.",
+                Data = healthProcedures
+            });
+        }
     }
 }

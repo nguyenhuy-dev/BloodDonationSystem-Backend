@@ -189,6 +189,38 @@ namespace Application.Service.Events
             };
         }
 
+        public async Task<PaginatedResult<EventDTO>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay)
+        {
+            var events = await _eventRepository.SearchEventByDayAsync(startDay, endDay);
+            var total = await _eventRepository.CountEventFromDayToDay(startDay, endDay);
+
+            if (!events.Any())
+            {
+                return null;
+            }
+
+            var dto = events.Select(e => new EventDTO
+            {
+                Id = e.Id,
+                Title = e.Title,
+                MaxOfDonor = e.MaxOfDonor,
+                EventTime = e.EventTime,
+                BloodType = e.BloodType.Type,
+                BloodComponent = e.BloodComponent.ToString(),
+                EstimatedVolume = e.EstimatedVolume,
+                IsUrgent = e.IsUrgent,
+                BloodRegisCount = e.BloodRegistrations.Count(),
+            }).ToList();
+
+            return new PaginatedResult<EventDTO>
+            {
+                TotalItems = total,
+                Items = dto,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
         public async Task<EventDTO> UpdateEventAsync(int eventId, EventDTO updateEvent)
         {
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;

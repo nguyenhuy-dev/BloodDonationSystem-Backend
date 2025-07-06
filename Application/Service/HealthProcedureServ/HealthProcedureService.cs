@@ -1,10 +1,12 @@
 ﻿using Application.DTO;
 using Application.DTO.HealthProcedureDTO;
 using Domain.Entities;
+using Infrastructure.Helper;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.HealthProcedureRepo;
 using Microsoft.AspNetCore.Http;
+using MimeKit.Cryptography;
 
 namespace Application.Service.HealthProcedureServ
 {
@@ -132,6 +134,36 @@ namespace Application.Service.HealthProcedureServ
             await _repoRegis.UpdateAsync(bloodRegistration);
 
             return healthProcedureAdded;
+        }
+
+        public async Task<PaginatedResult<HealthProceduresResponse>?> SearchHealthProceduresByPhoneOrNameAsync(int pageNumber, int pageSize, string keyword)
+        {
+            var healthProcedures = await _repo.SearchHealthProceduresByNameOrPhoneAsync(pageNumber, pageSize, keyword);
+
+            if (healthProcedures == null || !healthProcedures.Any())
+            {
+                return null;
+            }
+
+            var dto = healthProcedures.Select(hp => new HealthProceduresResponse
+            {
+                Id = hp.Id,
+                IsHealth = hp.IsHealth,
+                PerformedAt = hp.PerformedAt,
+                FullName = hp.BloodRegistration?.Member?.LastName + " " + hp.BloodRegistration?.Member?.FirstName,
+                BloodTypeName = hp.BloodRegistration?.Member?.BloodType?.Type,
+                BloodRegisId = hp.BloodRegistration.Id
+            }).ToList();
+
+            return new PaginatedResult<HealthProceduresResponse>
+            {
+                Items = dto,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = await _repo.CountAsync(hp => hp.BloodRegistration.Member.FirstName.Contains(keyword) 
+                    || hp.BloodRegistration.Member.LastName.Contains(keyword) 
+                    || hp.BloodRegistration.Member.Phone.Contains(keyword))
+            };
         }
     }
 }

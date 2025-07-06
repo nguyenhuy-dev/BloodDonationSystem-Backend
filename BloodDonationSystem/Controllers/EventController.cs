@@ -160,5 +160,26 @@ namespace BloodDonationSystem.Controllers
                 Data = events
             });
         }
+
+        [HttpGet("api/events/search")]
+        public async Task<IActionResult> SearchEventFromDayToDay([FromQuery]int pageNumber = 1, [FromQuery]int pageSize = 10,[FromQuery]DateOnly? startDay = null,[FromQuery]DateOnly? endDay = null)
+        {
+            var events = await _eventService.SearchEventByDayAsync(pageNumber, pageSize, startDay, endDay);
+            if (events == null)
+            {
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "Cannot found any events"
+                });
+            }
+
+            return Ok(new
+            {
+                IsSuccess = true,
+                Message = "Event retrieved successfully",
+                Data = events
+            });
+        }
     }
 }

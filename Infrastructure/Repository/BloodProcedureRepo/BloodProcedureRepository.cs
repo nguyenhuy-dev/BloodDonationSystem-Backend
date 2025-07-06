@@ -38,6 +38,36 @@ namespace Infrastructure.Repository.BloodProcedureRepo
             };
             return pagedResult;
         }
+
+        public async Task<List<BloodProcedure>> SearchBloodCollectionsByPhoneOrNameAsync(int pageNumber, int pageSize, string keyword)
+        {
+            IQueryable<BloodProcedure> query = _context.BloodProcedures
+                .Include(bc => bc.BloodRegistration)
+                    .ThenInclude(br => br.Member)
+                        .ThenInclude(mem => mem.BloodType)
+                .Include(bc => bc.BloodRegistration)
+                    .ThenInclude(br => br.Event);
+
+            if (IsPhone(keyword))
+            {
+                query = query.Where(bc => bc.BloodRegistration.Member.Phone.Contains(keyword));
+            }
+            else
+            {
+                query = query.Where(bc => bc.BloodRegistration.Member.LastName.Contains(keyword) || 
+                                        bc.BloodRegistration.Member.FirstName.Contains(keyword));
+            }
+            return await query
+                .OrderBy(bc => bc.PerformedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        private bool IsPhone(string keyword)
+        {
+            return keyword.All(char.IsDigit);
+        }
     }
 }
 

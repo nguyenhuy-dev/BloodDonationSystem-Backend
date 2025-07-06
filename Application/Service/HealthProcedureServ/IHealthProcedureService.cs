@@ -1,6 +1,7 @@
 ﻿using Application.DTO;
 using Application.DTO.HealthProcedureDTO;
 using Domain.Entities;
+using Infrastructure.Helper;
 
 namespace Application.Service.HealthProcedureServ
 {
@@ -8,6 +9,7 @@ namespace Application.Service.HealthProcedureServ
     {
         Task<HealthProcedure?> RecordHealthProcedureAsync(int id, HealthProcedureRequest request);
         Task<object?> GetHealthProceduresByPagedAsync(int id, int pageNumber, int pageSize);
+        Task<PaginatedResult<HealthProceduresResponse>?> SearchHealthProceduresByPhoneOrNameAsync(int pageNumber, int pageSize, string keyword);
         Task<ApiResponse<HealthProcedure>?> CancelHealthProcessAsync(int bloodRegisId);
     }
 }
