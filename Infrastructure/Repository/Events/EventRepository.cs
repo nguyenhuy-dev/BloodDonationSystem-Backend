@@ -177,7 +177,7 @@ namespace Infrastructure.Repository.Events
             return await _context.Events
                 .Include(e => e.BloodType)
                 .Include(e => e.BloodRegistrations)
-                .Where(e => e.EventTime >= startDay && e.EventTime <= endDay)
+                .Where(e => e.EventTime >= startDay && e.EventTime <= endDay && e.IsExpired == false)
                 .ToListAsync();
         }
 
