@@ -30,7 +30,7 @@ namespace Infrastructure.Repository.Events
         Task<List<Event>> GetEventListDoBloodProcedure(int pageNumber, int pageSize);
         Task<int> CountEventListDoBloodProcedure();
 
-        Task<List<Event>> SearchEventByDayAsync(DateOnly? startDay, DateOnly? endDay);
+        Task<List<Event>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay);
 
         Task<int> EventExpiredAsync();
     }

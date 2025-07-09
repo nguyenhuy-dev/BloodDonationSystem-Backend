@@ -59,9 +59,9 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpGet("api/blood-procedures/search")]
-        public async Task<IActionResult> SearchBloodProcedures([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string keyword = null)
+        public async Task<IActionResult> SearchBloodProcedures([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string keyword = null, [FromQuery] int? eventId = null)
         {
-            var pagedResult = await _service.SearchBloodCollectionsByPhoneOrName(pageNumber, pageSize, keyword);
+            var pagedResult = await _service.SearchBloodCollectionsByPhoneOrName(pageNumber, pageSize, keyword, eventId);
             if (pagedResult == null || !pagedResult.Items.Any())
                 return NotFound(new
                 {

@@ -29,9 +29,9 @@ public class User
     public DateTime? LastDonation { get; set; }
     public AccountStatus Status { get; set; }
 
-    public decimal? Longitude { get; set; }
     public decimal? Latitude { get; set; }
-
+    public decimal? Longitude { get; set; }
+    
     public Guid? UpdateBy { get; set; }
     public int RoleId { get; set; }
     public int? BloodTypeId { get; set; }

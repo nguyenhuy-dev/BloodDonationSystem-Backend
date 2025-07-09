@@ -8,6 +8,10 @@ namespace Domain.Entities
         public int Id { get; set; }
         public float Volume { get; set; }
         public bool? IsQualified { get; set; }
+        public bool? HIV { get; set; }
+        public bool? HCV { get; set; }
+        public bool? Syphilis { get; set; }
+        public float? Hematocrit { get; set; }
         public DateTime PerformedAt { get; set; }
         public string? Description { get; set; }
 

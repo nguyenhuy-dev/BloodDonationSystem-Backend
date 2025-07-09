@@ -8,7 +8,7 @@ namespace Infrastructure.Repository.HealthProcedureRepo
     {
         Task<PaginatedResult<HealthProcedure>> GetHealthProceduresByPaged(int id, int pageNumber, int pageSize);
 
-        Task<List<HealthProcedure>> SearchHealthProceduresByNameOrPhoneAsync(int pageNumber, int pageSize, string keyword);
+        Task<List<HealthProcedure>> SearchHealthProceduresByNameOrPhoneAsync(int pageNumber, int pageSize, string keyword, int? eventId = null);
 
         Task<HealthProcedure?> GetIncludeByIdAsync(int id);
     }

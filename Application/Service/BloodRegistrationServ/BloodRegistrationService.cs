@@ -36,6 +36,15 @@ namespace Application.Service.BloodRegistrationServ
                 return apiResponse;
             }
 
+            // Không được đăng ký khi đạt tới MaxOfDonor
+            var bloodRegisList = await _repository.GetByEventAsync(eventId);
+            if (bloodRegisList.Count() >= existingEvent.MaxOfDonor)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Event reached max of donor";
+                return apiResponse;
+            }
+
             // Lấy thông tin user đang thao tác form
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
@@ -47,19 +56,23 @@ namespace Application.Service.BloodRegistrationServ
                 return null;
 
 
-            // Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
-            var checkedRegis = _repository.GetAllAsync().Result
-                .FirstOrDefault(br => br.MemberId == user.Id);
-            if (checkedRegis != null)
-            {
-                apiResponse.IsSuccess = false;
-                apiResponse.Message = "Already registered in this event.";
-                return apiResponse;
-            }
-                
+            //// Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
+            //var checkedRegis = _repository.GetByEventAsync(eventId).Result
+            //    .FirstOrDefault(br => br.MemberId == user.Id);
+            //if (checkedRegis != null)
+            //{
+            //    apiResponse.IsSuccess = false;
+            //    apiResponse.Message = "Already registered in this event.";
+            //    return apiResponse;
+            //}
+
             // Kiểm tra người dùng đã từng hiến máu ở hệ thống lần nào chưa
+            bool changedLastDonation = false;
             if (user.LastDonation == null)
+            {
                 user.LastDonation = request.LastDonation;
+                changedLastDonation = true;
+            }
 
             // Kiểm tra xem lần cuối hiến máu có phù hợp
             if (user.LastDonation >= DateTime.Now.AddDays(-90))
@@ -68,9 +81,8 @@ namespace Application.Service.BloodRegistrationServ
                 apiResponse.Message = "Last donation time not suitable.";
                 return apiResponse;  // Request xuống đều có LastDonation nên không cần xét trong hệ thống
             }
-
-
-            await _repoUser.UpdateUserProfileAsync(user);
+            if (changedLastDonation == true)
+                await _repoUser.UpdateUserProfileAsync(user);
 
             var bloodRegis = new BloodRegistration
             {
@@ -86,11 +98,26 @@ namespace Application.Service.BloodRegistrationServ
 
         }
 
-        public async Task<BloodRegistration?> RejectBloodRegistration(int bloodRegisId)
+        public async Task<ApiResponse<BloodRegistration>?> RejectBloodRegistration(int bloodRegisId)
         {
+            ApiResponse<BloodRegistration> apiResponse = new();
+
+            // Đơn đăng ký không tồn tại hoặc đã bị reject rồi thì thôi
             var bloodRegistration = await _repository.GetByIdAsync(bloodRegisId);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false)
-                return null;
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Blood registration not exist or be rejected before.";
+                return apiResponse;
+            }
+            
+            // Khi đã lấy máu rồi thì không được hủy nữa
+            if (bloodRegistration.BloodProcedureId != null)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Collected blood, so can't reject.";
+                return apiResponse;
+            }
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
@@ -103,7 +130,9 @@ namespace Application.Service.BloodRegistrationServ
             bloodRegistration.StaffId = creatorId;
             await _repository.UpdateAsync(bloodRegistration);
             
-            return bloodRegistration;
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "Reject blood registration successfully.";
+            return apiResponse;
         }
 
         public async Task<ApiResponse<BloodRegistration>?> CancelOwnRegistration(int id)
@@ -189,8 +218,8 @@ namespace Application.Service.BloodRegistrationServ
                     Id = bloodRegis.Id,
                     MemberName = member.LastName + " " + member.FirstName,
                     Phone = member.Phone,
-                    Type = bloodType?.Type,
-                    EventTime = eventExists.EventTime
+                    Dob = member.Dob,
+                    Type = bloodType?.Type
                 });
             }
 
@@ -202,29 +231,38 @@ namespace Application.Service.BloodRegistrationServ
             return await _repository.BloodRegistrationExpiredAsync();
         }
 
-        public async Task<PaginatedResult<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword)
+        public async Task<PaginatedResultWithEventTime<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
             if(string.IsNullOrEmpty(keyword))
             {
                 return null; // Return null if keyword is empty or null
             }
 
-            var pagedBloodRegisRaw = await _repository.SearchBloodRegistration(pageNumber, pageSize, keyword);
+            var pagedBloodRegisRaw = await _repository.SearchBloodRegistration(pageNumber, pageSize, keyword, eventId);
+
+            var eventTime = pagedBloodRegisRaw.FirstOrDefault()?.Event?.EventTime;
+
             var dto = pagedBloodRegisRaw.Select(br => new BloodRegistrationResponse
             {
                 Id = br.Id,
                 MemberName = br.Member.LastName + " " + br.Member.FirstName,
                 Phone = br.Member.Phone,
                 Type = br.Member.BloodType.Type,
-                EventTime = br.Event.EventTime
             }).ToList();
 
-            return new PaginatedResult<BloodRegistrationResponse>
+            var totalItems = await _repository.CountAsync(br =>
+                                               (br.Member.FirstName.Contains(keyword)
+                                               || br.Member.LastName.Contains(keyword)
+                                               || br.Member.Phone.Contains(keyword))
+                                               && br.IsApproved == null);
+
+            return new PaginatedResultWithEventTime<BloodRegistrationResponse>
             {
-                Items = dto,
-                PageNumber = 1, // Assuming this is a search, so we can set page number to 1
-                PageSize = dto.Count, // All results are returned in one page
-                TotalItems = dto.Count
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                EventTime = eventTime,
+                Items = dto
             };
         }
     }

@@ -29,19 +29,11 @@ namespace BloodDonationSystem.Controllers
         [HttpPut("api/blood-registrations/{bloodRegisId}/reject")]
         public async Task<IActionResult> RejectBloodRegistration(int bloodRegisId)
         {
-            var bloodRegistration = await _service.RejectBloodRegistration(bloodRegisId);
-            if (bloodRegistration == null)
-                return BadRequest(new ApiResponse<BloodRegistrationRequest>()
-                {
-                    IsSuccess = false,
-                    Message = "Reject blood registration unsuccessfully"
-                });
+            var apiResponse = await _service.RejectBloodRegistration(bloodRegisId);
+            if (apiResponse?.IsSuccess == false)
+                return BadRequest(apiResponse);
 
-            return Ok(new ApiResponse<BloodRegistrationRequest>()
-            {
-                IsSuccess = true,
-                Message = "Reject blood registration successfully"
-            });
+            return Ok(apiResponse);
         }
 
         [Authorize(Roles = "Member")]
@@ -121,10 +113,10 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpGet("api/blood-registrations/search")]
-        public async Task<IActionResult> SearchBloodRegistrationsByPhoneOrName([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = null)
+        public async Task<IActionResult> SearchBloodRegistrationsByPhoneOrName([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? keyword = null, [FromQuery] int? eventId = null)
         {
-            var bloodRegistrations = await _service.SearchBloodRegistrationsByPhoneOrName(pageNumber, pageSize, keyword);
-            if (bloodRegistrations == null)
+            var bloodRegistrations = await _service.SearchBloodRegistrationsByPhoneOrName(pageNumber, pageSize, keyword, eventId);
+            if (bloodRegistrations == null || !bloodRegistrations.Items.Any())
             {
                 return NotFound(new
                 {

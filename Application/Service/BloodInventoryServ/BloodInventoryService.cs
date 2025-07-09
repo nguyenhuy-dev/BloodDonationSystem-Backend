@@ -16,11 +16,12 @@ namespace Application.Service.BloodInventoryServ
         {
             ApiResponse<BloodInventory> apiResponse = new();
 
+            // Kiểm tra blood unit có sẵn sàng hay không
             var bloodUnit = await _repo.GetByIdAsync(id);
             if (bloodUnit == null || bloodUnit.IsAvailable == false)
             {
                 apiResponse.IsSuccess = false;
-                apiResponse.Message = "Blood unit not found or not available";
+                apiResponse.Message = "Blood unit not found or not available.";
                 return apiResponse;
             }
 
@@ -41,24 +42,17 @@ namespace Application.Service.BloodInventoryServ
 
         public async Task<PaginatedResult<BloodInventoryResponse>> GetBloodUnitsByPagedAsync(int pageNumber, int pageSize)
         {
-            var bloodUnits = (await _repo.GetAllAsync())
-                .OrderBy(bu => bu.IsAvailable == true)
-                    .ThenBy(bu => bu.CreateAt)
-                .OrderBy(bu => bu.IsAvailable == false)
-                    .ThenBy(bu => bu.CreateAt)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            var bloodUnitsPagedRaw = await _repo.GetBloodUnitsByPagedAsync(pageNumber, pageSize);
 
             var pagedResult = new PaginatedResult<BloodInventoryResponse>()
             {
                 Items = new List<BloodInventoryResponse>(),
-                TotalItems = (await _repo.GetAllAsync()).Count(),
+                TotalItems = bloodUnitsPagedRaw.TotalItems,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
 
-            foreach (var bu in bloodUnits)
+            foreach (var bu in bloodUnitsPagedRaw.Items)
             {
                 var bloodUnitResponse = new BloodInventoryResponse
                 {

@@ -12,26 +12,32 @@ namespace Infrastructure.Repository.HealthProcedureRepo
         {
         }
 
+        // Hàm list ra hàng đợi để lấy máu
         public async Task<PaginatedResult<HealthProcedure>> GetHealthProceduresByPaged(int id, int pageNumber, int pageSize)
         {
-            var healthProcedures = await _dbSet
+            var healthProceduresCount = await _dbSet
                 .Include(hp => hp.BloodRegistration)
                     .ThenInclude(br => br.Member)
                         .ThenInclude(mem => mem.BloodType)
                 .Include(hp => hp.BloodRegistration)
                     .ThenInclude(br => br.Event)
-                .Where(hp => hp.BloodRegistration.EventId == id)
+                .Where(hp => hp.BloodRegistration.EventId == id && 
+                            hp.BloodRegistration.IsApproved == true && 
+                            hp.BloodRegistration.BloodProcedureId == null)
+                .ToListAsync();
+
+            var healthProcedures = healthProceduresCount
                 .OrderBy(hp => hp.PerformedAt)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
-                .ToListAsync();
+                .ToList();
 
             var pagedHealthProcedure = new PaginatedResult<HealthProcedure>
             {
                 Items = healthProcedures,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                TotalItems = await _dbSet.CountAsync(hp => hp.BloodRegistration.EventId == id)
+                TotalItems = healthProceduresCount.Count
             };
             return pagedHealthProcedure;
         }
@@ -43,14 +49,15 @@ namespace Infrastructure.Repository.HealthProcedureRepo
                 .FirstOrDefaultAsync(hp => hp.Id == id);
         }
 
-        public async Task<List<HealthProcedure>> SearchHealthProceduresByNameOrPhoneAsync(int pageNumber, int pageSize, string keyword)
+        public async Task<List<HealthProcedure>> SearchHealthProceduresByNameOrPhoneAsync(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
             IQueryable<HealthProcedure> query = _context.HealthProcedures
-                .Include(hp => hp.BloodRegistration)
-                    .ThenInclude(br => br.Member)
-                    .ThenInclude(m => m.BloodType)
-                .Include(hp => hp.BloodRegistration)
-                    .ThenInclude(br => br.Event);
+                                            .Include(hp => hp.BloodRegistration)
+                                                .ThenInclude(br => br.Member)
+                                                .ThenInclude(m => m.BloodType)
+                                            .Include(hp => hp.BloodRegistration)
+                                                .ThenInclude(br => br.Event)
+                                            .Where(h => h.BloodRegistration.IsApproved == true && h.BloodRegistration.BloodProcedureId == null);
 
             if (IsPhone(keyword))
             {
@@ -62,8 +69,13 @@ namespace Infrastructure.Repository.HealthProcedureRepo
                 || hp.BloodRegistration.Member.LastName.Contains(keyword));
             }
 
+            if(eventId != null)
+            {
+                query = query.Where(hp => hp.BloodRegistration.EventId == eventId);
+            }
+
             return await query
-                .OrderByDescending(hp => hp.PerformedAt)
+                .OrderBy(hp => hp.PerformedAt)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();

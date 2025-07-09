@@ -172,12 +172,14 @@ namespace Infrastructure.Repository.Events
             //return totalCount;
         }
 
-        public async Task<List<Event>> SearchEventByDayAsync(DateOnly? startDay, DateOnly? endDay)
+        public async Task<List<Event>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay)
         {
             return await _context.Events
                 .Include(e => e.BloodType)
                 .Include(e => e.BloodRegistrations)
                 .Where(e => e.EventTime >= startDay && e.EventTime <= endDay && e.IsExpired == false)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
@@ -186,7 +188,7 @@ namespace Infrastructure.Repository.Events
             return await _context.Events
                 .Include(e => e.BloodType)
                 .Include(e => e.BloodRegistrations)
-                .Where(e => e.EventTime >= startDay && e.EventTime <= endDay)
+                .Where(e => e.EventTime >= startDay && e.EventTime <= endDay && e.IsExpired == false)
                 .CountAsync();
         }
     }

@@ -5,6 +5,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit.Tnef;
 
 namespace BloodDonationSystem.Controllers
 {
@@ -69,9 +70,9 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpGet("api/health-procedures/search")]
-        public async Task<IActionResult> SearchHealthProcedures([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string keyword = null)
+        public async Task<IActionResult> SearchHealthProcedures([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string keyword = null, [FromQuery]int? eventId = null)
         {
-            var healthProcedures = await _service.SearchHealthProceduresByPhoneOrNameAsync(pageNumber, pageSize, keyword);
+            var healthProcedures = await _service.SearchHealthProceduresByPhoneOrNameAsync(pageNumber, pageSize, keyword, eventId);
             if (healthProcedures == null || !healthProcedures.Items.Any())
             {
                 return NotFound(new
