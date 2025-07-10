@@ -145,7 +145,7 @@ namespace Application.Service.Events
             return eventItem;
         }
 
-        public async Task<PaginatedResultWithEventTime<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetEventListDoBloodProcedure(pageNumber, pageSize);
             var totalItems = await _eventRepository.CountEventListDoBloodProcedure();
@@ -156,20 +156,20 @@ namespace Application.Service.Events
                 Id = e.Id,
                 Name = e.Title,
                 Total = e.BloodRegistrations.Count,
+                EventTime = e.EventTime
             }).Where(e => e.Total > 0)
               .ToList();
 
-            return new PaginatedResultWithEventTime<ListWaiting>
+            return new PaginatedResult<ListWaiting>
             {
                 TotalItems = totalItems,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                EventTime = eventTime,
                 Items = dto,
             };
         }
 
-        public async Task<PaginatedResultWithEventTime<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetPassedHealthProcedureAsync(pageNumber, pageSize);
             var totalItems = await _eventRepository.CountEventPassedHealthProcedureAsync();
@@ -180,15 +180,16 @@ namespace Application.Service.Events
                 Id = e.Id,
                 Name = e.Title,
                 Total = e.BloodRegistrations.Count,
+                EventTime = e.EventTime
+                
             }).Where(e => e.Total > 0)
               .ToList();
 
-            return new PaginatedResultWithEventTime<ListWaiting>
+            return new PaginatedResult<ListWaiting>
             {
                 TotalItems = totalItems,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                EventTime = eventTime,
                 Items = dto,
             };
         }

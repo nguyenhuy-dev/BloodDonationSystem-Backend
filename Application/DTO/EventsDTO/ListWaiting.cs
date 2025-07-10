@@ -11,5 +11,6 @@ namespace Application.DTO.EventsDTO
         public int Id { get; set; }
         public string Name { get; set; }
         public int Total { get; set; }
+        public DateOnly EventTime { get; set; }
     }
 }
