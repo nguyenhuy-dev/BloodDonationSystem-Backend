@@ -66,7 +66,16 @@ namespace Application.Service.BloodRegistrationServ
             //    return apiResponse;
             //}
 
-            // Kiểm tra người dùng đã từng hiến máu ở hệ thống lần nào chưa
+            // Kiểm tra xem nếu đăng ký vào urgent event, thì blood type phải hợp lệ 
+            if (existingEvent.IsUrgent == true &&
+                existingEvent.BloodTypeId != user.BloodTypeId)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Not suitable blood type for urgent event.";
+                return apiResponse;
+            }
+
+            // Kiểm tra member đã từng hiến máu ở hệ thống lần nào chưa
             bool changedLastDonation = false;
             if (user.LastDonation == null)
             {
@@ -95,7 +104,6 @@ namespace Application.Service.BloodRegistrationServ
             apiResponse.IsSuccess = true;
             apiResponse.Message = "Register donation successfully.";
             return apiResponse;
-
         }
 
         public async Task<ApiResponse<BloodRegistration>?> RejectBloodRegistration(int bloodRegisId)

@@ -1,6 +1,7 @@
 ﻿using Application.DTO;
 using Application.DTO.VolunteerDTO;
 using Application.Service.EmailServ;
+using Application.Service.Events;
 using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
@@ -16,9 +17,10 @@ namespace Application.Service.VolunteerServ
     public class VolunteerService(IVolunteerRepository _repoVolun, IHttpContextAccessor _contextAccessor,
         IUserRepository _repoUser, IBloodTypeRepository _repoBloodType,
         IEventRepository _repoEvent, IBloodRegistrationRepository _repoRegis,
-        IEmailService _repoMail, IFacilityRepository _repoFacility) : IVolunteerService
+        IEmailService _servMail, IFacilityRepository _repoFacility, 
+        IEventService _servEvent) : IVolunteerService
     {
-        public async Task<ApiResponse<Volunteer>?> RegisterVolunteerDonation(RegisterVolunteerDonation request)
+        public async Task<ApiResponse<Volunteer>?> RegisterVolunteerDonationAsync(RegisterVolunteerDonation request)
         {
             ApiResponse<Volunteer> apiResponse = new();
 
@@ -71,7 +73,7 @@ namespace Application.Service.VolunteerServ
             return apiResponse;
         }
 
-        public async Task<Volunteer?> UpdateVolunteerDonation(int id, UpdateVolunteerDonation request)
+        public async Task<Volunteer?> UpdateVolunteerDonationAsync(int id, UpdateVolunteerDonation request)
         {
             // Kiểm tra đơn tình nguyện có tồn tại
             var existingVolunteer = await _repoVolun.GetByIdAsync(id);
@@ -98,12 +100,12 @@ namespace Application.Service.VolunteerServ
             return existingVolunteer;
         }
 
-        public async Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPaged(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPagedAsync(int facilityId, int pageNumber, int pageSize)
         {
             var pagedVolunteerRaw = await _repoVolun.GetPagedAsync(pageNumber, pageSize);
-            var facility = await _repoFacility.GetByIdAsync(1);  // hard code cho cơ sở y tế
+            var facility = await _repoFacility.GetByIdAsync(facilityId);  // hard code cho cơ sở y tế
             if (facility == null)
-                throw new ArgumentNullException("Facility not existed");
+                return null;
 
             var pagedVolunteer = new PaginatedResult<VolunteersResponse>
             {
@@ -117,7 +119,7 @@ namespace Application.Service.VolunteerServ
             {
                 var member = await _repoUser.GetUserByIdAsync(volunteer.MemberId);
                 if (member == null)
-                    throw new ArgumentNullException("Member cannot be null");
+                    throw new ArgumentNullException("Member cannot be null.");
 
                 var bloodType = await _repoBloodType.GetBloodTypeByIdAsync(member.BloodTypeId);
 
@@ -137,9 +139,57 @@ namespace Application.Service.VolunteerServ
             return pagedVolunteer;
         }
 
-        public async Task<ApiResponse<Volunteer>?> AddDonationRegistrationWithVolunteer(int eventId, int id)
+        public async Task<ApiResponseFindDonors> AddDonationRegistrationWithVolunteersAsync(UrgentEventVolunteer urgentEventVolunteer)
         {
-            ApiResponse<Volunteer> apiResponse = new();
+            ApiResponseFindDonors apiResponseFind = new();
+
+            // Kiểm tra xem có volunteers nào tồn tại không
+            // Nâng cấp: Unit of Work để kiểm tra có ít nhất 1 volunteer phù hợp
+            if (!urgentEventVolunteer.VolunteerIds.Any())
+            {
+                apiResponseFind.IsSuccess = false;
+                apiResponseFind.Message = "No volunteers at all.";
+                return apiResponseFind;
+            }
+
+            var urgentEvent = await _servEvent.AddUrgentEventAsync(urgentEventVolunteer);
+            if (urgentEvent == null)
+                throw new ArgumentNullException(nameof(urgentEvent));
+
+            apiResponseFind.Data = new();
+            foreach (var volunteerId in urgentEventVolunteer.VolunteerIds)
+            {
+                var apiResponseAdd = await AddDonationRegistrationWithVolunteerAsync(urgentEvent.Id, volunteerId);
+
+                if (apiResponseAdd.IsSuccess == false)
+                {
+                    apiResponseFind.FailedVolunteersCount++;
+                    apiResponseFind.Data.Add(new VolunteerFindDonorsResponse
+                    {
+                        Id = volunteerId,
+                        IsSucceded = false,
+                        Message = apiResponseAdd.Message
+                    });
+                    continue;
+                }
+
+                apiResponseFind.SucceededVolunteersCount++;
+                apiResponseFind.Data.Add(new VolunteerFindDonorsResponse
+                {
+                    Id = volunteerId,
+                    IsSucceded = true,
+                    Message = apiResponseAdd.Message
+                });
+            }
+
+            apiResponseFind.IsSuccess = true;
+            apiResponseFind.Message = "Find donor(s) successfully.";
+            return apiResponseFind;
+        }
+
+        private async Task<ApiResponse<Volunteer>> AddDonationRegistrationWithVolunteerAsync(int eventId, int id)
+        {
+            ApiResponse<Volunteer> apiResponse = new();  
 
             // Kiểm tra xem event tồn tại, hay đã hết hạn, hay có phải là urgent hay không
             var existingEvent = await _repoEvent.GetEventByIdAsync(eventId);
@@ -148,7 +198,7 @@ namespace Application.Service.VolunteerServ
                 existingEvent.IsUrgent == false)
             {
                 apiResponse.IsSuccess = false;
-                apiResponse.Message = "Event not found or be expired or not urgent";
+                apiResponse.Message = "Event not found or be expired or not urgent.";
                 return apiResponse;
             }
 
@@ -157,7 +207,7 @@ namespace Application.Service.VolunteerServ
             if (existingEvent.MaxOfDonor <= bloodRegistrations.Count())
             {
                 apiResponse.IsSuccess = false;
-                apiResponse.Message = "Event reached max of donor";
+                apiResponse.Message = "Event reached max of donor.";
                 return apiResponse;
             }
 
@@ -166,7 +216,18 @@ namespace Application.Service.VolunteerServ
             if (existingVolunteer == null || existingVolunteer.IsExpired == true)
             {
                 apiResponse.IsSuccess = false;
-                apiResponse.Message = "Volunteer not existed or be expired";
+                apiResponse.Message = "Volunteer not existed or be expired.";
+                return apiResponse;
+            }
+
+            var member = await _repoUser.GetUserByIdAsync(existingVolunteer.MemberId);
+            if (member == null)
+                throw new ArgumentNullException(nameof(member));
+            // Kiểm tra blood type của volunteer có phù hợp
+            if (existingEvent.BloodTypeId != member.BloodTypeId)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Not suitable blood type for urgent event.";
                 return apiResponse;
             }
 
@@ -184,13 +245,13 @@ namespace Application.Service.VolunteerServ
             if (checkedVolunteer != null)
             {
                 apiResponse.IsSuccess = false;
-                apiResponse.Message = "Volunteer was existed in event";
+                apiResponse.Message = "Volunteer was existed in event.";
                 return apiResponse;
             }
 
-            var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
-            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
-                throw new UnauthorizedAccessException("User not found or invalid");
+            var staffId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(staffId) || !Guid.TryParse(staffId, out Guid staffIdOut))
+                throw new UnauthorizedAccessException("User not found or invalid.");
 
             var bloodRegis = new BloodRegistration
             {
@@ -198,18 +259,19 @@ namespace Application.Service.VolunteerServ
                 CreateAt = DateTime.Now,
                 VolunteerId = id,
                 MemberId = existingVolunteer.MemberId,
-                StaffId = creatorId,
+                StaffId = staffIdOut,
                 EventId = eventId
             };
             await _repoRegis.AddAsync(bloodRegis);
 
             existingVolunteer.IsExpired = true;
+            existingVolunteer.UpdateAt = DateTime.Now;
             await _repoVolun.UpdateAsync(existingVolunteer);
 
-            await _repoMail.SendEmailFindDonorsAsync(bloodRegis);
+            await _servMail.SendEmailFindDonorsAsync(bloodRegis);
 
             apiResponse.IsSuccess = true;
-            apiResponse.Message = "Find donor(s) successfully";
+            apiResponse.Message = "Find donor(s) successfully.";
             return apiResponse;
         }
 

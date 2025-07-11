@@ -1,5 +1,6 @@
 ﻿using Application.DTO;
 using Application.DTO.BloodHistoryDTO;
+using Application.DTO.EventsDTO;
 using Application.DTO.VolunteerDTO;
 using Application.Service.BloodHistoryServ;
 using Application.Service.VolunteerServ;
@@ -19,7 +20,7 @@ namespace BloodDonationSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterVolunteerDonation([FromBody] RegisterVolunteerDonation request)
         {
-            var apiResponse = await _service.RegisterVolunteerDonation(request);
+            var apiResponse = await _service.RegisterVolunteerDonationAsync(request);
             if (apiResponse?.IsSuccess == false)
                 return BadRequest(apiResponse);
 
@@ -30,7 +31,7 @@ namespace BloodDonationSystem.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateVolunteerDonation(int id, [FromBody] UpdateVolunteerDonation request)
         {
-            var volunteerRegis = await _service.UpdateVolunteerDonation(id, request);
+            var volunteerRegis = await _service.UpdateVolunteerDonationAsync(id, request);
 
             if (volunteerRegis == null)
                 return BadRequest(new ApiResponse<UpdateVolunteerDonation>
@@ -47,24 +48,30 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpGet("paged")]
-        public async Task<IActionResult> GetVolunteersByPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [HttpGet("{facilityId}/paged")]
+        public async Task<IActionResult> GetVolunteersByPaged(int facilityId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var pagedVolunteer = await _service.GetVolunteersByPaged(pageNumber, pageSize);
+            var pagedVolunteer = await _service.GetVolunteersByPagedAsync(facilityId, pageNumber, pageSize);
+            if (pagedVolunteer == null)
+                return NotFound(new
+                {
+                    IsSuccess = false,
+                    Message = "Facility not found."
+                });
 
             return Ok(new ApiResponse<PaginatedResult<VolunteersResponse>>
             {
                 IsSuccess = true,
-                Message = "Get paged volunteers successfully",
+                Message = "Get paged volunteers successfully.",
                 Data = pagedVolunteer
             });
         }
 
         [Authorize(Roles = "Staff")]
         [HttpPut("find-donors")]
-        public async Task<IActionResult> AddDonationRegistrationWithVolunteer(int eventId, int id)
+        public async Task<IActionResult> AddDonationRegistrationWithVolunteer(UrgentEventVolunteer urgentEventVolunteer)
         {
-            var apiResponse = await _service.AddDonationRegistrationWithVolunteer(eventId, id);
+            var apiResponse = await _service.AddDonationRegistrationWithVolunteersAsync(urgentEventVolunteer);
 
             if (apiResponse?.IsSuccess == false)
                 return BadRequest(apiResponse);

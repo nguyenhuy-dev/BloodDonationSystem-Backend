@@ -7,10 +7,11 @@ namespace Application.Service.VolunteerServ
 {
     public interface IVolunteerService
     {
-        Task<ApiResponse<Volunteer>?> RegisterVolunteerDonation(RegisterVolunteerDonation request);
-        Task<Volunteer?> UpdateVolunteerDonation(int id, UpdateVolunteerDonation request);
-        Task<ApiResponse<Volunteer>?> AddDonationRegistrationWithVolunteer(int eventId, int id);
-        Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPaged(int pageNumber, int pageSize);
+        Task<ApiResponse<Volunteer>?> RegisterVolunteerDonationAsync(RegisterVolunteerDonation request);
+        Task<Volunteer?> UpdateVolunteerDonationAsync(int id, UpdateVolunteerDonation request);
+        Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPagedAsync(int facilityId, int pageNumber, int pageSize);
+        //Task<ApiResponse<Volunteer>> AddDonationRegistrationWithVolunteerAsync(int eventId, int id);
+        Task<ApiResponseFindDonors> AddDonationRegistrationWithVolunteersAsync(UrgentEventVolunteer urgentEventVolunteer);
 
         Task<int> VolunteerEndDateExpiredAsync();
     }
