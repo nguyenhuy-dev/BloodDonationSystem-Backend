@@ -103,7 +103,7 @@ namespace Application.Service.VolunteerServ
         public async Task<PaginatedResult<VolunteersResponse>?> GetVolunteersByPagedAsync(int facilityId, int pageNumber, int pageSize)
         {
             var pagedVolunteerRaw = await _repoVolun.GetPagedAsync(pageNumber, pageSize);
-            var facility = await _repoFacility.GetByIdAsync(facilityId);  // hard code cho cơ sở y tế
+            var facility = await _repoFacility.GetByIdAsync(facilityId);
             if (facility == null)
                 return null;
 
@@ -128,6 +128,8 @@ namespace Application.Service.VolunteerServ
                     Id = volunteer.Id,
                     BloodTypeName = bloodType?.Type,
                     Distance = Math.Round((decimal)GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, member.Latitude, member.Longitude), 1),
+                    Latitude = member.Latitude,
+                    Longitude = member.Longitude, 
                     StartVolunteerDate = volunteer.StartVolunteerDate,
                     EndVolunteerDate = volunteer.EndVolunteerDate,
                     FullName = member.LastName + " " + member.FirstName,

@@ -8,7 +8,7 @@ namespace Application.DTO.EventsDTO
         public int MaxOfDonor { get; set; }
         public double EstimatedVolume { get; set; }
         public DateOnly EventTime { get; set; }
-        public string BloodType { get; set; }
+        public int BloodTypeId { get; set; }
         public BloodComponent BloodComponent { get; set; }
     }
 }

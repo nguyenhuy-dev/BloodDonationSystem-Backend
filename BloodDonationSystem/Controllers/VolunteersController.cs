@@ -49,7 +49,7 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize(Roles = "Staff")]
         [HttpGet("{facilityId}/paged")]
-        public async Task<IActionResult> GetVolunteersByPaged(int facilityId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetVolunteersByPaged(int facilityId = 1, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var pagedVolunteer = await _service.GetVolunteersByPagedAsync(facilityId, pageNumber, pageSize);
             if (pagedVolunteer == null)
@@ -68,7 +68,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("find-donors")]
+        [HttpPost("find-donors")]
         public async Task<IActionResult> AddDonationRegistrationWithVolunteer(UrgentEventVolunteer urgentEventVolunteer)
         {
             var apiResponse = await _service.AddDonationRegistrationWithVolunteersAsync(urgentEventVolunteer);
@@ -79,24 +79,24 @@ namespace BloodDonationSystem.Controllers
             return Ok(apiResponse);
         }
 
-        [Authorize]
-        [HttpPut("{id}/date")]
-        public async Task<IActionResult> UpdateAvailableDateForVolunteer(int id, [FromBody]UpdateAvailableDateDTO request)
-        {
-            var update = await _bloodHistory.UpdateAvailableDateVolunteerAsync(id, request);
-            if (!update)
-            {
-                return BadRequest(new
-                {
-                    IsSuccess = false,
-                    Message = "Failed to update"
-                });
-            }
-            return Ok(new
-            {
-                IsSuccess = true,
-                Message = "Update successfully"
-            });
-        }
+        //[Authorize]
+        //[HttpPut("{id}/date")]
+        //public async Task<IActionResult> UpdateAvailableDateForVolunteer(int id, [FromBody]UpdateAvailableDateDTO request)
+        //{
+        //    var update = await _bloodHistory.UpdateAvailableDateVolunteerAsync(id, request);
+        //    if (!update)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Failed to update"
+        //        });
+        //    }
+        //    return Ok(new
+        //    {
+        //        IsSuccess = true,
+        //        Message = "Update successfully"
+        //    });
+        //}
     }
 }
