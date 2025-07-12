@@ -61,8 +61,8 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("find-donors")]
-        public async Task<IActionResult> AddDonationRegistrationWithVolunteer(int eventId, int id)
+        [HttpPost("find-donors")]
+        public async Task<IActionResult> AddDonationRegistrationWithVolunteer(UrgentEventVolunteer urgentEventVolunteer)
         {
             var apiResponse = await _service.AddDonationRegistrationWithVolunteer(eventId, id);
 
@@ -72,24 +72,24 @@ namespace BloodDonationSystem.Controllers
             return Ok(apiResponse);
         }
 
-        [Authorize]
-        [HttpPut("{id}/date")]
-        public async Task<IActionResult> UpdateAvailableDateForVolunteer(int id, [FromBody]UpdateAvailableDateDTO request)
-        {
-            var update = await _bloodHistory.UpdateAvailableDateVolunteerAsync(id, request);
-            if (!update)
-            {
-                return BadRequest(new
-                {
-                    IsSuccess = false,
-                    Message = "Failed to update"
-                });
-            }
-            return Ok(new
-            {
-                IsSuccess = true,
-                Message = "Update successfully"
-            });
-        }
+        //[Authorize]
+        //[HttpPut("{id}/date")]
+        //public async Task<IActionResult> UpdateAvailableDateForVolunteer(int id, [FromBody]UpdateAvailableDateDTO request)
+        //{
+        //    var update = await _bloodHistory.UpdateAvailableDateVolunteerAsync(id, request);
+        //    if (!update)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Failed to update"
+        //        });
+        //    }
+        //    return Ok(new
+        //    {
+        //        IsSuccess = true,
+        //        Message = "Update successfully"
+        //    });
+        //}
     }
 }
