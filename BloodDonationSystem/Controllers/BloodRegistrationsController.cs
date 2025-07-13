@@ -1,5 +1,4 @@
 ﻿using Application.DTO;
-using Application.DTO.BloodRegistration;
 using Application.DTO.BloodRegistrationDTO;
 using Application.Service.BloodHistoryServ;
 using Application.Service.BloodRegistrationServ;

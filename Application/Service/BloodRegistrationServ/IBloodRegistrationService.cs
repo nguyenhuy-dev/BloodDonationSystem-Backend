@@ -1,5 +1,4 @@
 ﻿using Application.DTO;
-using Application.DTO.BloodRegistration;
 using Application.DTO.BloodRegistrationDTO;
 using Domain.Entities;
 using Infrastructure.Helper;

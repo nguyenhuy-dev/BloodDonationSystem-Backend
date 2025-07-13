@@ -63,11 +63,12 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
             var bloodRegistrationsCount = await _dbSet
                                     .Include(br => br.Event)
-                                    .Where(br => br.EventId == eventId && br.IsApproved == null)
+                                    .Where(br => br.EventId == eventId)
                                     .ToListAsync();
 
             var bloodRegistrations = bloodRegistrationsCount
-                                    .OrderBy(e => e.CreateAt)
+                                    .OrderBy(br => br.IsApproved == null ? 0 : 1)
+                                        .ThenByDescending(br => br.CreateAt)
                                     .Skip(pageSize * (pageNumber - 1))
                                     .Take(pageSize)
                                     .ToList();
@@ -98,8 +99,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             IQueryable<BloodRegistration> query = _context.BloodRegistrations
                                                   .Include(br => br.Member)
                                                   .ThenInclude(br => br.BloodType)
-                                                  .Include(br => br.Event)
-                                                  .Where(br => br.IsApproved == null);
+                                                  .Include(br => br.Event);
 
             if (IsPhoneNumber(keyword))
             {
@@ -116,7 +116,8 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             }
 
             return await query
-                .OrderByDescending(br => br.CreateAt)
+                .OrderBy(br => br.IsApproved == null ? 0 : 1)
+                    .ThenByDescending(br => br.CreateAt)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();

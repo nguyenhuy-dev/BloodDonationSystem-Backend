@@ -120,11 +120,11 @@ namespace Infrastructure.Repository.Events
 
             var filtered = events.Select(e => new Event
             {
-            Id = e.Id,
-            Title = e.Title,
-            EventTime = e.EventTime,
-            Facility = e.Facility,
-            BloodRegistrations = e.BloodRegistrations
+                Id = e.Id,
+                Title = e.Title,
+                EventTime = e.EventTime,
+                Facility = e.Facility,
+                BloodRegistrations = e.BloodRegistrations
                 .Where(br =>
                     br.HealthId != null &&
                     br.IsApproved == true &&

@@ -31,14 +31,15 @@ namespace Application.Service.VolunteerServ
             if (user == null)
                 throw new UnauthorizedAccessException("User not found or invalid");
 
-            //// Nếu đã đăng ký tình nguyện thì không được đăng ký nữa
-            //var checkedVolunteer = await _repoVolun.GetVolunteerByMemberIdAsync(creatorId);
-            //if (checkedVolunteer != null)
-            //{
-            //    apiResponse.IsSuccess = false;
-            //    apiResponse.Message = "Having a registered volunteer.";
-            //    return apiResponse;
-            //}
+            // Khi có tồn tại đơn tình nguyện mà chưa hết hạn thì không cho đăng ký mới
+            var checkedVolunteerList = await _repoVolun.GetVolunteerByMemberIdAsync(creatorId);
+            var checkedVolunteer = checkedVolunteerList?.FirstOrDefault(v => v.IsExpired == false);
+            if (checkedVolunteer != null)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Having a registered volunteer.";
+                return apiResponse;
+            }
 
             // Kiểm tra đã hiến máu ở hệ thống lần nào chưa
             bool changedLastDonation = false;
@@ -154,15 +155,20 @@ namespace Application.Service.VolunteerServ
                 return apiResponseFind;
             }
 
-            var urgentEvent = await _servEvent.AddUrgentEventAsync(urgentEventVolunteer);
-            if (urgentEvent == null)
-                throw new ArgumentNullException(nameof(urgentEvent));
+            // Kiểm tra xem có chọn số Volunteer hợp lệ với MaxDonor hay không
+            if (urgentEventVolunteer.MaxOfDonor < urgentEventVolunteer.VolunteerIds.Count())
+            {
+                apiResponseFind.IsSuccess = false;
+                apiResponseFind.Message = "Already reached max of donor.";
+                return apiResponseFind;
+            }
 
             apiResponseFind.Data = new();
             foreach (var volunteerId in urgentEventVolunteer.VolunteerIds)
             {
-                var apiResponseAdd = await AddDonationRegistrationWithVolunteerAsync(urgentEvent.Id, volunteerId);
+                var apiResponseAdd = await AddDonationRegistrationWithVolunteerAsync(urgentEventVolunteer, volunteerId);
 
+                // Volunteer không hợp lệ với nhiều lí do ở hàm private
                 if (apiResponseAdd.IsSuccess == false)
                 {
                     apiResponseFind.FailedVolunteersCount++;
@@ -175,6 +181,7 @@ namespace Application.Service.VolunteerServ
                     continue;
                 }
 
+                var urgentEvent = await _servEvent.AddUrgentEventAsync(urgentEventVolunteer);
                 apiResponseFind.SucceededVolunteersCount++;
                 apiResponseFind.Data.Add(new VolunteerFindDonorsResponse
                 {
@@ -182,6 +189,17 @@ namespace Application.Service.VolunteerServ
                     IsSucceded = true,
                     Message = apiResponseAdd.Message
                 });
+                apiResponseAdd.Data.BloodRegistration.EventId = urgentEvent.Id;
+                await _repoRegis.AddAsync(apiResponseAdd.Data.BloodRegistration);
+                await _repoVolun.UpdateAsync(apiResponseAdd.Data.Volunteer);
+                await _servMail.SendEmailFindDonorsAsync(apiResponseAdd.Data.BloodRegistration);
+            }
+
+            if (apiResponseFind.SucceededVolunteersCount == 0)
+            {
+                apiResponseFind.IsSuccess = false;
+                apiResponseFind.Message = "Find donor(s) unsuccessfully.";
+                return apiResponseFind;
             }
 
             apiResponseFind.IsSuccess = true;
@@ -189,29 +207,31 @@ namespace Application.Service.VolunteerServ
             return apiResponseFind;
         }
 
-        private async Task<ApiResponse<Volunteer>> AddDonationRegistrationWithVolunteerAsync(int eventId, int id)
+        private async Task<ApiResponse<VolunteerAddBloodRegis>> AddDonationRegistrationWithVolunteerAsync(UrgentEventVolunteer urgentEvent, int id)
         {
-            ApiResponse<Volunteer> apiResponse = new();  
+            ApiResponse<VolunteerAddBloodRegis> apiResponse = new();
 
-            // Kiểm tra xem event tồn tại, hay đã hết hạn, hay có phải là urgent hay không
-            var existingEvent = await _repoEvent.GetEventByIdAsync(eventId);
-            if (existingEvent == null || 
-                existingEvent.IsExpired == true || 
-                existingEvent.IsUrgent == false)
-            {
-                apiResponse.IsSuccess = false;
-                apiResponse.Message = "Event not found or be expired or not urgent.";
-                return apiResponse;
-            }
+            //// Kiểm tra xem event tồn tại, hay đã hết hạn, hay có phải là urgent hay không
+            //var existingEvent = await _repoEvent.GetEventByIdAsync(eventId);
+            //if (existingEvent == null ||
+            //    existingEvent.IsExpired == true ||
+            //    existingEvent.IsUrgent == false)
+            //{
+            //    apiResponse.IsSuccess = false;
+            //    apiResponse.Message = "Event not found or be expired or not urgent.";
+            //    return apiResponse;
+            //}
 
-            // Kiểm tra event đã đạt tối đa số người hiến máu
-            var bloodRegistrations = await _repoRegis.GetByEventAsync(eventId);
-            if (existingEvent.MaxOfDonor <= bloodRegistrations.Count())
-            {
-                apiResponse.IsSuccess = false;
-                apiResponse.Message = "Event reached max of donor.";
-                return apiResponse;
-            }
+            //// Kiểm tra event đã đạt tối đa số người hiến máu  (ở trên) ***
+            //var bloodRegistrations = await _repoRegis.GetByEventAsync(eventId);
+            //if (existingEvent.MaxOfDonor <= bloodRegistrations.Count())
+            //{
+            //    apiResponse.IsSuccess = false;
+            //    apiResponse.Message = "Event reached max of donor.";
+            //    return apiResponse;
+            //}
+
+            var existingEvent = urgentEvent;
 
             // Kiểm tra volunteer có tồn tại hay không, hoặc đã quá hạn
             var existingVolunteer = await _repoVolun.GetByIdAsync(id);
@@ -225,7 +245,7 @@ namespace Application.Service.VolunteerServ
             var member = await _repoUser.GetUserByIdAsync(existingVolunteer.MemberId);
             if (member == null)
                 throw new ArgumentNullException(nameof(member));
-            // Kiểm tra blood type của volunteer có phù hợp
+            // Kiểm tra blood type của volunteer có phù hợp với blood type của Event
             if (existingEvent.BloodTypeId != member.BloodTypeId)
             {
                 apiResponse.IsSuccess = false;
@@ -242,14 +262,14 @@ namespace Application.Service.VolunteerServ
                 return apiResponse;
             }
 
-            // Kiểm tra volunteer đã được add hay chưa
-            var checkedVolunteer = bloodRegistrations.FirstOrDefault(br => br.VolunteerId == id);
-            if (checkedVolunteer != null)
-            {
-                apiResponse.IsSuccess = false;
-                apiResponse.Message = "Volunteer was existed in event.";
-                return apiResponse;
-            }
+            //// Kiểm tra volunteer đã được add hay chưa
+            //var checkedVolunteer = bloodRegistrations.FirstOrDefault(br => br.VolunteerId == id);
+            //if (checkedVolunteer != null)
+            //{
+            //    apiResponse.IsSuccess = false;
+            //    apiResponse.Message = "Volunteer was existed in event.";
+            //    return apiResponse;
+            //}
 
             var staffId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(staffId) || !Guid.TryParse(staffId, out Guid staffIdOut))
@@ -257,23 +277,27 @@ namespace Application.Service.VolunteerServ
 
             var bloodRegis = new BloodRegistration
             {
-                IsApproved = true,
                 CreateAt = DateTime.Now,
                 VolunteerId = id,
                 MemberId = existingVolunteer.MemberId,
                 StaffId = staffIdOut,
-                EventId = eventId
+                //EventId = existingEvent.Id (ở trên) ***
             };
-            await _repoRegis.AddAsync(bloodRegis);
+            //await _repoRegis.AddAsync(bloodRegis);
 
             existingVolunteer.IsExpired = true;
             existingVolunteer.UpdateAt = DateTime.Now;
-            await _repoVolun.UpdateAsync(existingVolunteer);
+            //await _repoVolun.UpdateAsync(existingVolunteer);
 
-            await _servMail.SendEmailFindDonorsAsync(bloodRegis);
+            //await _servMail.SendEmailFindDonorsAsync(bloodRegis);
 
             apiResponse.IsSuccess = true;
             apiResponse.Message = "Find donor(s) successfully.";
+            apiResponse.Data = new VolunteerAddBloodRegis
+            {
+                BloodRegistration = bloodRegis,
+                Volunteer = existingVolunteer,
+            };
             return apiResponse;
         }
 

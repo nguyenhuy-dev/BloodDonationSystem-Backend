@@ -1,4 +1,4 @@
-﻿namespace Application.DTO.BloodRegistration
+﻿namespace Application.DTO.BloodRegistrationDTO
 {
     public class BloodRegistrationRequest
     {
