@@ -126,5 +126,12 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
             return keyword.All(char.IsDigit);
         }
+
+        public async Task<int> CountBloodRegisteredEvents(int eventId)
+        {
+            return await _context.BloodRegistrations
+                .Where(br => br.EventId == eventId)
+                .CountAsync();
+        }
     }
 }

@@ -17,5 +17,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         Task<List<BloodRegistration>> SearchBloodRegistration(int pageNumber, int pageSize, string keyword, int? eventId = null);
 
         Task<int> BloodRegistrationExpiredAsync();
+
+        Task<int> CountBloodRegisteredEvents(int eventId);
     }
 }

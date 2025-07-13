@@ -238,10 +238,14 @@ namespace Application.Service.Events
             }
 
             var existEvent = await _eventRepository.GetEventByIdAsync(eventId);
-            if (existEvent == null)
+            var currentRegisterd = await _bloodRegisRepo.CountBloodRegisteredEvents(eventId);
+
+            if (existEvent == null || updateEvent.MaxOfDonor < currentRegisterd)
             {
-                throw new KeyNotFoundException($"Event with ID {eventId} not found.");
+                return null;
             }
+
+
             existEvent.Title = updateEvent.Title;
             existEvent.MaxOfDonor = updateEvent.MaxOfDonor;
             existEvent.EstimatedVolume = updateEvent.EstimatedVolume;

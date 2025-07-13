@@ -92,10 +92,15 @@ namespace BloodDonationSystem.Controllers
             var eventItem = await _eventService.UpdateEventAsync(eventId, updateEvent);
             if (eventItem == null)
             {
-                return BadRequest("Cannot update event");
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "Cannot update event"
+                });
             }
             return Ok(new
             {
+                IsSuccess = true,
                 Message = "Event updated successfully",
                 EventDTO = eventItem
             });
