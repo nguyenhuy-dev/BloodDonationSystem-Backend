@@ -47,7 +47,8 @@ builder.Services.AddCors(options =>
             "https://cors-test.codehappy.dev/",
             "http://localhost:5173",
             "https://localhost:5173",
-            "https://Blood-Donation-Support-System.somee.com")    // your React app
+            "https://Blood-Donation-Support-System.somee.com",
+            "https://blood-donation-support-system-fe.vercel.app/")    // your React app
                                                                   //.AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod()
