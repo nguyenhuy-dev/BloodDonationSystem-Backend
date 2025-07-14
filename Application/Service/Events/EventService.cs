@@ -77,7 +77,7 @@ namespace Application.Service.Events
             var today = DateOnly.FromDateTime(DateTime.Now);
 
             var existEvent = await _eventRepository.GetEventByIdAsync(eventId);
-            if (existEvent == null || existEvent.EventTime == today)
+            if (existEvent == null || existEvent.EventTime == today || existEvent.IsExpired == true)
             {
                 return null;
             }

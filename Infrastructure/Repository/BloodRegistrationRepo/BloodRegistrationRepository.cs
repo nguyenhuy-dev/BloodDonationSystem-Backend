@@ -19,7 +19,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                 .Where(br => 
                 (br.Event.EventTime < today &&
                 (br.IsApproved == null || (br.IsApproved == true && br.BloodProcedureId == null)))
-                && br.Event.IsExpired == true)
+                || br.Event.IsExpired == true)
                 .ToListAsync();
 
             foreach (var expiredRegistration in expiredRegistrations.Result)
