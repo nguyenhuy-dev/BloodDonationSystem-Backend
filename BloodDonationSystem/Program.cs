@@ -48,7 +48,7 @@ builder.Services.AddCors(options =>
             "http://localhost:5173",
             "https://localhost:5173",
             "https://Blood-Donation-Support-System.somee.com",
-            "https://blood-donation-support-system-fe.vercel.app/")    // your React app
+            "https://blood-donation-support-system-fe.vercel.app")    // your React app
                                                                   //.AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod()
