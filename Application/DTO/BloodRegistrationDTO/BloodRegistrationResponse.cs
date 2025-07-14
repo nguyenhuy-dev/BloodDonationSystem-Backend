@@ -6,6 +6,7 @@
         public string MemberName { get; set; }
         public string? Phone { get; set; }
         public DateOnly? Dob {  get; set; }
-        public string? Type { get; set; }
+        public string? BloodType { get; set; }
+        public bool? IsApproved { get; set; }
     }
 }

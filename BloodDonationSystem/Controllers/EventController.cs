@@ -92,10 +92,15 @@ namespace BloodDonationSystem.Controllers
             var eventItem = await _eventService.UpdateEventAsync(eventId, updateEvent);
             if (eventItem == null)
             {
-                return BadRequest("Cannot update event");
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "Cannot update event"
+                });
             }
             return Ok(new
             {
+                IsSuccess = true,
                 Message = "Event updated successfully",
                 EventDTO = eventItem
             });
@@ -109,10 +114,20 @@ namespace BloodDonationSystem.Controllers
             {
                 return BadRequest("Invalid event ID.");
             }
-            await _eventService.DeleteEventAsync(eventId);
+            var updateEvent = await _eventService.DeleteEventAsync(eventId);
+
+            if(updateEvent == null)
+            {
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "Invalid event id or cannot delete on event day"
+                });
+            }
+
             return Ok(new
             {
-                Success = true,
+                IsSuccess = true,
                 Message = "Event deleted successfully"
             });
         }

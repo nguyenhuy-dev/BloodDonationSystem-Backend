@@ -1,5 +1,4 @@
 ﻿using Application.DTO;
-using Application.DTO.BloodRegistration;
 using Application.DTO.BloodRegistrationDTO;
 using Domain.Entities;
 using Infrastructure.Helper;
@@ -227,7 +226,8 @@ namespace Application.Service.BloodRegistrationServ
                     MemberName = member.LastName + " " + member.FirstName,
                     Phone = member.Phone,
                     Dob = member.Dob,
-                    Type = bloodType?.Type
+                    BloodType = bloodType?.Type,
+                    IsApproved = bloodRegis.IsApproved
                 });
             }
 
@@ -255,14 +255,15 @@ namespace Application.Service.BloodRegistrationServ
                 Id = br.Id,
                 MemberName = br.Member.LastName + " " + br.Member.FirstName,
                 Phone = br.Member.Phone,
-                Type = br.Member.BloodType.Type,
+                BloodType = br.Member.BloodType.Type,
+                IsApproved = br.IsApproved
             }).ToList();
 
             var totalItems = await _repository.CountAsync(br =>
                                                (br.Member.FirstName.Contains(keyword)
                                                || br.Member.LastName.Contains(keyword)
                                                || br.Member.Phone.Contains(keyword))
-                                               && br.IsApproved == null);
+                                               && br.EventId == eventId);
 
             return new PaginatedResultWithEventTime<BloodRegistrationResponse>
             {

@@ -16,8 +16,10 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
             var expiredRegistrations = _context.BloodRegistrations
-                .Where(br => br.Event.EventTime < today &&
+                .Where(br => 
+                (br.Event.EventTime < today &&
                 (br.IsApproved == null || (br.IsApproved == true && br.BloodProcedureId == null)))
+                && br.Event.IsExpired == true)
                 .ToListAsync();
 
             foreach (var expiredRegistration in expiredRegistrations.Result)
@@ -61,11 +63,12 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
             var bloodRegistrationsCount = await _dbSet
                                     .Include(br => br.Event)
-                                    .Where(br => br.EventId == eventId && br.IsApproved == null)
+                                    .Where(br => br.EventId == eventId)
                                     .ToListAsync();
 
             var bloodRegistrations = bloodRegistrationsCount
-                                    .OrderBy(e => e.CreateAt)
+                                    .OrderBy(br => br.IsApproved == null ? 0 : 1)
+                                        .ThenByDescending(br => br.CreateAt)
                                     .Skip(pageSize * (pageNumber - 1))
                                     .Take(pageSize)
                                     .ToList();
@@ -96,8 +99,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             IQueryable<BloodRegistration> query = _context.BloodRegistrations
                                                   .Include(br => br.Member)
                                                   .ThenInclude(br => br.BloodType)
-                                                  .Include(br => br.Event)
-                                                  .Where(br => br.IsApproved == null);
+                                                  .Include(br => br.Event);
 
             if (IsPhoneNumber(keyword))
             {
@@ -114,7 +116,8 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             }
 
             return await query
-                .OrderByDescending(br => br.CreateAt)
+                .OrderBy(br => br.IsApproved == null ? 0 : 1)
+                    .ThenByDescending(br => br.CreateAt)
                 .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();
@@ -123,6 +126,13 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         private bool IsPhoneNumber(string keyword)
         {
             return keyword.All(char.IsDigit);
+        }
+
+        public async Task<int> CountBloodRegisteredEvents(int eventId)
+        {
+            return await _context.BloodRegistrations
+                .Where(br => br.EventId == eventId)
+                .CountAsync();
         }
     }
 }

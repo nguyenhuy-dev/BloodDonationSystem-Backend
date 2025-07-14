@@ -73,10 +73,11 @@ namespace Infrastructure.Repository.VolunteerRepo
             return pagedResult;
         }
 
-        public async Task<Volunteer?> GetVolunteerByMemberIdAsync(Guid memberId)
+        public async Task<IEnumerable<Volunteer>?> GetVolunteerByMemberIdAsync(Guid memberId)
         {
             return await _dbSet
-                        .FirstOrDefaultAsync(v => v.MemberId == memberId);
+                        .Where(v => v.MemberId == memberId)
+                        .ToListAsync();
         }
 
         public async Task<bool> UpdateAvailableDateAsync(int id, DateTime startDate, DateTime endDate)

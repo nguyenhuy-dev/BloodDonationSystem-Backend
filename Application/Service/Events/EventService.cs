@@ -74,15 +74,18 @@ namespace Application.Service.Events
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
             var existEvent = await _eventRepository.GetEventByIdAsync(eventId);
-            if (existEvent == null)
+            if (existEvent == null || existEvent.EventTime == today)
             {
-                throw new KeyNotFoundException($"Event with ID {eventId} not found.");
+                return null;
             }
 
             existEvent.UpdateBy = updaterId; // Set the updater ID
             existEvent.UpdateAt = DateTime.Now; // Update the timestamp
             existEvent.IsExpired = true; // Update the expired status
+
             await _eventRepository.UpdateEventAsync(existEvent);
             return existEvent;
         }
@@ -235,10 +238,14 @@ namespace Application.Service.Events
             }
 
             var existEvent = await _eventRepository.GetEventByIdAsync(eventId);
-            if (existEvent == null)
+            var currentRegisterd = await _bloodRegisRepo.CountBloodRegisteredEvents(eventId);
+
+            if (existEvent == null || updateEvent.MaxOfDonor < currentRegisterd)
             {
-                throw new KeyNotFoundException($"Event with ID {eventId} not found.");
+                return null;
             }
+
+
             existEvent.Title = updateEvent.Title;
             existEvent.MaxOfDonor = updateEvent.MaxOfDonor;
             existEvent.EstimatedVolume = updateEvent.EstimatedVolume;
