@@ -1,5 +1,6 @@
 ﻿using Application.DTO;
 using Application.DTO.BloodRegistrationDTO;
+using Application.Service.EmailServ;
 using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
@@ -12,7 +13,7 @@ namespace Application.Service.BloodRegistrationServ
 {
     public class BloodRegistrationService(IBloodRegistrationRepository _repository, IHttpContextAccessor _contextAccessor,
         IEventRepository _repoEvent, IUserRepository _repoUser, 
-        IBloodTypeRepository _repoBloodType) : IBloodRegistrationService
+        IBloodTypeRepository _repoBloodType, IEmailService _servEmail) : IBloodRegistrationService
     {
 
         public async Task<ApiResponse<BloodRegistration>?> RegisterDonation(int eventId, BloodRegistrationRequest request)
