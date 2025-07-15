@@ -275,5 +275,15 @@ namespace Application.Service.BloodRegistrationServ
                 Items = dto
             };
         }
+
+        public async Task SendReminderMailBeforeRegistration()
+        {
+            var registration = await _repository.GetAllBloodRegistrationTomorrowAsync();
+
+            foreach(var reg in registration)
+            {
+                await _servEmail.SendEmailRemindBloodDonation(reg);
+            }
+        }
     }
 }

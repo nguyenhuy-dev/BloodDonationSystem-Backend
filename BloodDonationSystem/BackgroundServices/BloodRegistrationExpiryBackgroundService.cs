@@ -24,7 +24,7 @@ namespace BloodDonationSystem.BackgroundServices
                 }
 
                 // Run daily (or change to run hourly: TimeSpan.FromHours(1))
-                await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
             }
         }
     }
