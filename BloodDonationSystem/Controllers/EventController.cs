@@ -121,7 +121,7 @@ namespace BloodDonationSystem.Controllers
                 return BadRequest(new
                 {
                     IsSuccess = false,
-                    Message = "Invalid event id or cannot delete on event day"
+                    Message = "Cannot delete event."
                 });
             }
 
