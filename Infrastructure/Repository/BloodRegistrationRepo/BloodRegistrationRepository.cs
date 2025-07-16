@@ -134,5 +134,16 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
                 .Where(br => br.EventId == eventId)
                 .CountAsync();
         }
+
+        public async Task<List<BloodRegistration>> GetAllBloodRegistrationTomorrowAsync()
+        {
+            var tomorrow = DateOnly.FromDateTime(DateTime.Today.AddDays(1));
+
+            return await _context.BloodRegistrations
+                .Include(br => br.Member)
+                .Include(br => br.Event)
+                .Where(br => br.Event.EventTime == tomorrow && br.IsApproved == null)
+                .ToListAsync();
+        }
     }
 }

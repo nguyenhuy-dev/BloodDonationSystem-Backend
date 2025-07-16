@@ -1,8 +1,9 @@
-﻿using Application.Service.Events;
+﻿using Application.Service.BloodRegistrationServ;
+using Application.Service.Events;
 
 namespace BloodDonationSystem.BackgroundServices
 {
-    public class EventExpiryBackgroundService(IServiceProvider _serviceProvider,
+    public class ReminderMailBackgroundService(IServiceProvider _serviceProvider,
                                               ILogger<EventExpiryBackgroundService> _logger) : BackgroundService
     {
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -12,10 +13,10 @@ namespace BloodDonationSystem.BackgroundServices
                 try
                 {
                     using var scope = _serviceProvider.CreateScope();
-                    var eventService = scope.ServiceProvider.GetRequiredService<IEventService>();
+                    var bloodRegistrationServ = scope.ServiceProvider.GetRequiredService<IBloodRegistrationService>();
 
-                    var expiredCount = await eventService.ExpireEventsAsync();
-                    _logger.LogInformation($"[{DateTime.Now}] Marked {expiredCount} events as expired.");
+                    await bloodRegistrationServ.SendReminderMailBeforeRegistration();
+                    _logger.LogInformation($"[{DateTime.Now}] Marked email send successfully.");
                 }
                 catch (Exception ex)
                 {
