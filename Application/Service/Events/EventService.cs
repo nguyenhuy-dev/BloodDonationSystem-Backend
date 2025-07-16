@@ -87,6 +87,7 @@ namespace Application.Service.Events
             existEvent.IsExpired = true; // Update the expired status
 
             await _eventRepository.UpdateEventAsync(existEvent);
+            await _bloodRegisRepo.BloodRegistrationExpiredWithEventExpireAsync(eventId);
             return existEvent;
         }
 
