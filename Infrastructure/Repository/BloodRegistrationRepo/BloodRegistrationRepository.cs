@@ -28,6 +28,19 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             }
             return await _context.SaveChangesAsync();
         }
+        public async Task<int> BloodRegistrationExpiredWithEventExpireAsync(int eventId)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var expiredRegistrations = _context.BloodRegistrations
+                .Where(br => br.EventId == eventId && br.Event.IsExpired == true)
+                .ToListAsync();
+
+            foreach (var expiredRegistration in expiredRegistrations.Result)
+            {
+                expiredRegistration.IsApproved = false;
+            }
+            return await _context.SaveChangesAsync();
+        }
 
         public async Task<List<BloodRegistration>> GetBloodRegistrationHistoryAsync(Guid userId)
         {
