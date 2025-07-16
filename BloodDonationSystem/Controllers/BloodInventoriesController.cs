@@ -34,5 +34,17 @@ namespace BloodDonationSystem.Controllers
 
             return Ok(apiResponse);
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("api/blood-inventories/alert")]
+        public async Task<IActionResult> AlertAboutBloodInventoryAsync()
+        {
+            var apiResponse = await _service.AlertAboutBloodInventoryAsync();
+
+            if (apiResponse?.IsSuccess == false)
+                return BadRequest(apiResponse);
+
+            return Ok(apiResponse);
+        }
     }
 }

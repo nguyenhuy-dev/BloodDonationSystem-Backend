@@ -33,5 +33,7 @@ namespace Infrastructure.Repository.Events
         Task<List<Event>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay);
 
         Task<int> EventExpiredAsync();
+
+        Task<IEnumerable<Event>> GetAllEventNotPagedAsync();
     }
 }

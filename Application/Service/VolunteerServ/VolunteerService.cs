@@ -15,8 +15,7 @@ using Microsoft.AspNetCore.Http;
 namespace Application.Service.VolunteerServ
 {
     public class VolunteerService(IVolunteerRepository _repoVolun, IHttpContextAccessor _contextAccessor,
-        IUserRepository _repoUser, IBloodTypeRepository _repoBloodType,
-        IEventRepository _repoEvent, IBloodRegistrationRepository _repoRegis,
+        IUserRepository _repoUser, IBloodTypeRepository _repoBloodType, IBloodRegistrationRepository _repoRegis,
         IEmailService _servMail, IFacilityRepository _repoFacility, 
         IEventService _servEvent) : IVolunteerService
     {

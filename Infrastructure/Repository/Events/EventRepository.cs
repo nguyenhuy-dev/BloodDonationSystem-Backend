@@ -191,5 +191,11 @@ namespace Infrastructure.Repository.Events
                 .Where(e => e.EventTime >= startDay && e.EventTime <= endDay && e.IsExpired == false)
                 .CountAsync();
         }
+
+        public async Task<IEnumerable<Event>> GetAllEventNotPagedAsync()
+        {
+            return await _context.Events
+                .ToListAsync();
+        }
     }
 }

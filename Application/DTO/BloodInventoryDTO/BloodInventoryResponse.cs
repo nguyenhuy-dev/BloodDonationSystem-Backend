@@ -1,7 +1,4 @@
-﻿using Domain.Entities;
-using Domain.Enums;
-
-namespace Application.DTO.BloodInventoryDTO
+﻿namespace Application.DTO.BloodInventoryDTO
 {
     public class BloodInventoryResponse
     {
@@ -13,6 +10,6 @@ namespace Application.DTO.BloodInventoryDTO
         public int BloodAge { get; set; }
         public bool IsAvailable { get; set; }
         public string ExpiredDate { get; set; }
-        public string Description { get; set; }
+        public float Volume { get; set; }
     }
 }

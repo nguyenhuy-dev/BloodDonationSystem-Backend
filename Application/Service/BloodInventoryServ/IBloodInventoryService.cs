@@ -9,5 +9,6 @@ namespace Application.Service.BloodInventoryServ
     {
         Task<PaginatedResult<BloodInventoryResponse>> GetBloodUnitsByPagedAsync(int pageNumber, int pageSize);  
         Task<ApiResponse<BloodInventory>> DeleteABloodUnitAsync(int id);
+        Task<ApiResponse<List<BloodInventoryAlertResponse>>> AlertAboutBloodInventoryAsync();
     }
 }
