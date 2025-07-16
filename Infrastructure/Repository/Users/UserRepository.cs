@@ -61,5 +61,12 @@ namespace Infrastructure.Repository.Users
                 .Where(u => u.Id == id && u.Status == AccountStatus.Active)
                 .ExecuteUpdateAsync(u => u.SetProperty(x => x.Status, AccountStatus.Banned));
         }
+
+        public async Task<bool> IsPhoneOrEmailInUseByAnotherUserAsync(string phone, string gmail, Guid currentUserId)
+        {
+            return await _context.Users.AnyAsync(u =>
+                u.Id != currentUserId &&
+                (u.Phone == phone || u.Gmail == gmail));
+        }
     }
 }
