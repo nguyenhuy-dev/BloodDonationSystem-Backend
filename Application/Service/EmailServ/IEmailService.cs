@@ -8,5 +8,6 @@ namespace Application.Service.EmailServ
         Task SendEmailFindDonorsAsync(BloodRegistration bloodRegistration);
         Task SendEmailBloodRegistrationReject(BloodRegistration bloodRegistration);
         Task SendEmailRemindBloodDonation(BloodRegistration bloodRegistration);
+        Task SendEmailChangeTimeBloodDonation(BloodRegistration bloodRegistration);
     }
 }

@@ -208,7 +208,7 @@ namespace Application.Service.EmailServ
             await client.DisconnectAsync(true);
         }
 
-        public async Task SendEmailRemindBloodDonation(BloodRegistration bloodRegistration)
+        public async Task SendEmailChangeTimeBloodDonation(BloodRegistration bloodRegistration)
         {
             var (member, eventObj, facility) = await GetNecessariesForSendEmail(bloodRegistration);
             var bloodType = await _repoBloodType.GetBloodTypeByIdAsync(eventObj?.BloodTypeId);
@@ -251,6 +251,74 @@ namespace Application.Service.EmailServ
         Nếu bạn không thể tham gia với thời gian cập nhật này, bạn có thể:<br />
         👉 <a href='' style=""color: #0066cc; text-decoration: none; font-weight: bold;"">Chọn lịch khác hoặc huỷ đăng ký</a>
     </p>
+
+    <p>
+        Nếu có bất kỳ thay đổi nào hoặc bạn cần hỗ trợ, đừng ngần ngại liên hệ với chúng tôi qua <strong>{_settings.From}</strong>.
+    </p>
+
+    <p>
+        Một lần nữa, cảm ơn bạn – hành động của bạn thật sự mang lại sự sống!<br />
+        <strong>Hẹn gặp bạn vào ngày mai nhé 🌟</strong>
+    </p>
+
+    <p>
+        Trân trọng,<br />
+        <strong>{facility?.Name ?? "Đội ngũ tổ chức"}</strong>
+    </p>
+</body>
+</html>";
+
+            message.Body = builder.ToMessageBody();
+
+            using var client = new SmtpClient();
+            await client.ConnectAsync(_settings.Host, _settings.Port, MailKit.Security.SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync(_settings.Username, _settings.Password);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
+        }
+
+        public async Task SendEmailRemindBloodDonation(BloodRegistration bloodRegistration)
+        {
+            var (member, eventObj, facility) = await GetNecessariesForSendEmail(bloodRegistration);
+            var bloodType = await _repoBloodType.GetBloodTypeByIdAsync(eventObj?.BloodTypeId);
+
+            // Nếu member chưa có gmail thì khỏi gửi
+            if (member?.Gmail == null)
+                return;
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Trung tâm Hiến Máu Nhân Đạo Ép Pê Tê", _settings.From));
+            message.To.Add(MailboxAddress.Parse(member?.Gmail));
+            message.Subject = $"Chuẩn bị cho buổi hiến máu ngày mai – Cảm ơn bạn vì sự sẻ chia! ❤️";
+
+            var builder = new BodyBuilder();
+            builder.HtmlBody = $@"<html>
+<body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
+    <p>Chào <strong>{member?.FirstName}</strong>,</p>
+
+    <p>
+        Chúng tôi rất vui khi bạn đã đăng ký tham gia hiến máu – ngày mai là thời điểm quan trọng ấy!<br />
+        Cảm ơn bạn vì đã dành thời gian và lòng tốt để giúp đỡ những người đang cần.
+    </p>
+
+    <p>
+        Mỗi đơn vị máu bạn cho đi không chỉ là một hành động nhân ái, mà còn là nguồn sống thiết thực cho những bệnh nhân đang điều trị khẩn cấp.
+        Nếu bạn đang đủ điều kiện sức khỏe và sẵn sàng tiếp tục hành trình sẻ chia này, hãy để chúng tôi biết nhé.
+    </p>
+
+    <h3>📅 Thông tin buổi hiến máu:</h3>
+    <ul>
+        <li><strong>Thời gian:</strong> {eventObj?.EventTime:dd/MM/yyyy}</li>
+        <li><strong>Địa điểm:</strong> {facility?.Address} (không thay đổi)</li>
+    </ul>
+
+    <h3>🌿 Một vài lưu ý để chuẩn bị tốt:</h3>
+    <ul>
+        <li>Ăn nhẹ và đầy đủ trước khi đến hiến máu (tránh nhịn đói).</li>
+        <li>Uống nhiều nước hôm nay và trước buổi hiến máu.</li>
+        <li>Tránh thức khuya hoặc sử dụng rượu bia trước ngày hiến.</li>
+        <li>Mang theo CMND/CCCD hoặc giấy tờ tùy thân có ảnh.</li>
+    </ul>
 
     <p>
         Nếu có bất kỳ thay đổi nào hoặc bạn cần hỗ trợ, đừng ngần ngại liên hệ với chúng tôi qua <strong>{_settings.From}</strong>.

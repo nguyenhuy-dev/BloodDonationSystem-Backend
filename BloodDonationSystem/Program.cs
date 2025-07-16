@@ -83,6 +83,7 @@ builder.Services.AddScoped<IBloodCompatibilityService, BloodCompatibilityService
 builder.Services.AddHostedService<EventExpiryBackgroundService>();
 builder.Services.AddHostedService<BloodRegistrationExpiryBackgroundService>();
 builder.Services.AddHostedService<VolunteerExpiryBackgroundService>();
+builder.Services.AddHostedService<ReminderMailBackgroundService>();
 
 
 // Add configuration for email service

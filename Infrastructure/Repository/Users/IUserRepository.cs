@@ -20,5 +20,7 @@ namespace Infrastructure.Repository.Users
 
         Task<int> BanUserAsync(Guid id);
         Task<int> DeactiveUserAsync(Guid id);
+
+        Task<bool> IsPhoneOrEmailInUseByAnotherUserAsync(string phone, string gmail, Guid currentUserId);
     }
 }
