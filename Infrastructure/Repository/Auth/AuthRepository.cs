@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,7 @@ namespace Infrastructure.Repository.Auth
         {
             return await _context.Users
                 .Include(u => u.Role)
+                .Where(u => u.Status == null || u.Status == AccountStatus.Active || u.Status == AccountStatus.Pending)
                 .FirstOrDefaultAsync(u => u.Gmail == email);
         }
 
