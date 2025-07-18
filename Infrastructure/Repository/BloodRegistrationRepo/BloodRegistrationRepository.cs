@@ -17,9 +17,8 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
             var today = DateOnly.FromDateTime(DateTime.Now);
             var expiredRegistrations = _context.BloodRegistrations
                 .Where(br => 
-                (br.Event.EventTime < today &&
+                (br.Event.EventTime < today || br.Event.IsExpired == true) &&
                 (br.IsApproved == null || (br.IsApproved == true && br.BloodProcedureId == null)))
-                || br.Event.IsExpired == true)
                 .ToListAsync();
 
             foreach (var expiredRegistration in expiredRegistrations.Result)
@@ -32,7 +31,8 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
             var expiredRegistrations = _context.BloodRegistrations
-                .Where(br => br.EventId == eventId && br.Event.IsExpired == true)
+                .Where(br => br.EventId == eventId && br.Event.IsExpired == true &&
+                                (br.IsApproved == null || (br.IsApproved == true && br.BloodProcedureId == null)))
                 .ToListAsync();
 
             foreach (var expiredRegistration in expiredRegistrations.Result)

@@ -6,7 +6,6 @@ using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.BloodRegistrationRepo;
-using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
 using Infrastructure.Repository.Users;
 using Infrastructure.Repository.VolunteerRepo;
@@ -244,7 +243,7 @@ namespace Application.Service.VolunteerServ
             var member = await _repoUser.GetUserByIdAsync(existingVolunteer.MemberId);
             if (member == null)
                 throw new ArgumentNullException(nameof(member));
-            // Kiểm tra blood type của volunteer có phù hợp với blood type của Event
+            // Kiểm tra blood type của volunteer có phù hợp với blood type của urgent event
             if (existingEvent.BloodTypeId != member.BloodTypeId)
             {
                 apiResponse.IsSuccess = false;
