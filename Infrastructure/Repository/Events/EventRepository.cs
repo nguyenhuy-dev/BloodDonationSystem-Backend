@@ -103,7 +103,10 @@ namespace Infrastructure.Repository.Events
             var events = await _context.Events
                 .Where(e => e.IsExpired == false)
                 .Include(e => e.BloodRegistrations.Where(br => br.HealthId != null && br.IsApproved == true && br.BloodProcedureId == null))
-                .OrderByDescending(e => e.CreateAt)
+                .Where(e => e.BloodRegistrations
+                    .Where(br => br.HealthId != null && br.IsApproved == true && br.BloodProcedureId == null)
+                    .Any())
+                .OrderBy(e => e.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -190,6 +193,12 @@ namespace Infrastructure.Repository.Events
                 .Include(e => e.BloodRegistrations)
                 .Where(e => e.EventTime >= startDay && e.EventTime <= endDay && e.IsExpired == false)
                 .CountAsync();
+        }
+
+        public async Task<IEnumerable<Event>> GetAllEventNotPagedAsync()
+        {
+            return await _context.Events
+                .ToListAsync();
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Infrastructure.Repository.VolunteerRepo
                     Volunteer = vr,
                     Distance = GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, vr.Member.Latitude, vr.Member.Longitude)
                 })
-                .Where(vr => vr.Distance <= 5 && vr.Volunteer.IsExpired == false);
+                .Where(vr => vr.Distance <= 5 && vr.Volunteer.IsExpired == false);  //hard code 5km
 
             var volunteersPaged = volunteers
                 .OrderBy(vr => vr.Distance)

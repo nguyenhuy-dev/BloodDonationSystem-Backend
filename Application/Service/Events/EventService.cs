@@ -186,7 +186,7 @@ namespace Application.Service.Events
                 Total = e.BloodRegistrations.Count,
                 EventTime = e.EventTime
                 
-            }).Where(e => e.Total > 0)
+            })
               .ToList();
 
             return new PaginatedResult<ListWaiting>

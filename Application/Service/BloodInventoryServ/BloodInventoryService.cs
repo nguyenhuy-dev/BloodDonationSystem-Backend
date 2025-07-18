@@ -5,12 +5,13 @@ using Domain.Enums;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.BloodInventoryRepo;
+using Infrastructure.Repository.Events;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Service.BloodInventoryServ
 {
     public class BloodInventoryService(IBloodInventoryRepository _repo, IBloodTypeRepository _repoBloodType,
-        IHttpContextAccessor _contextAccessor) : IBloodInventoryService
+        IHttpContextAccessor _contextAccessor, IEventRepository _repoEvent) : IBloodInventoryService
     {
         public async Task<ApiResponse<BloodInventory>> DeleteABloodUnitAsync(int id)
         {
@@ -61,7 +62,8 @@ namespace Application.Service.BloodInventoryServ
                     BloodTypeName = (await _repoBloodType.GetBloodTypeByIdAsync(bu.BloodTypeId))?.Type,
                     BloodRegisId = bu.RegistrationId,
                     BloodAge = (bu.ExpiredDate - DateTime.Now).Days,
-                    IsAvailable = bu.IsAvailable
+                    IsAvailable = bu.IsAvailable,
+                    Volume = bu.Volume
                 };
                 if (bu.BloodComponent == BloodComponent.WholeBlood || bu.BloodComponent == BloodComponent.RedBloodCells)
                 {
@@ -83,8 +85,133 @@ namespace Application.Service.BloodInventoryServ
 
                 pagedResult.Items.Add(bloodUnitResponse);
             }
-            
+
             return pagedResult;
+        }
+
+        public async Task<ApiResponse<List<BloodInventoryAlertResponse>>> AlertAboutBloodInventoryAsync()
+        {
+            var bloodUnits = await _repo.GetAllAsync();
+
+            var apiResponse = new ApiResponse<List<BloodInventoryAlertResponse>>
+            {
+                IsSuccess = true,
+                Message = "Alter executed successfully.",
+                Data = new List<BloodInventoryAlertResponse>()
+            };
+
+            if (bloodUnits == null || !bloodUnits.Any())
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "No blood units found.";
+                return apiResponse;
+            }
+
+            var urgentEvents = await _repoEvent.GetAllEventNotPagedAsync();
+            var existingUrgentEventSet = new HashSet<(int? bloodTypeId, BloodComponent? bloodComponent)>(
+                urgentEvents
+                    .Where(e => e.IsExpired == false && e.IsUrgent == true)
+                    .Select(e => (e.BloodTypeId, e.BloodComponent))
+            );
+
+            var bloodTypeIds = (await _repoBloodType.GetAllBloodTypeAsync())
+                    .Select(bt => bt.Id)
+                    .ToList();
+            // Real'
+            List<(int bloodTypeId, BloodComponent bloodComponent, float Volume)> allCombinations = bloodTypeIds
+                    .SelectMany(bloodTypeId => Enum.GetValues(typeof(BloodComponent))
+                        .Cast<BloodComponent>()
+                        .Select(bloodComponent => (bloodTypeId, bloodComponent, Volume: 0f)))
+                    .ToList();
+
+            var bloodTypeDict = (await _repoBloodType.GetAllBloodTypeAsync())
+                .ToDictionary(bt => bt.Id, bt => bt.Type);
+
+            // Real
+            apiResponse.Data = allCombinations
+                .GroupJoin(
+                    bloodUnits,
+                    combo => (combo.bloodTypeId, combo.bloodComponent),
+                    inv => (inv.BloodTypeId, inv.BloodComponent),
+                    (combo, group) => new
+                    {
+                        combo.bloodTypeId,
+                        combo.bloodComponent,
+                        Volume = group.Sum(bu => bu.Volume)
+                    })
+                .Where(x => x.Volume < 500)
+                .Where(x => !existingUrgentEventSet.Contains((x.bloodTypeId, x.bloodComponent)))
+                .Select(x => new BloodInventoryAlertResponse
+                {
+                    BloodTypeName = bloodTypeDict.GetValueOrDefault(x.bloodTypeId, "Unknown"),
+                    BloodComponentName = x.bloodComponent.ToString(),
+                    Volume = x.Volume
+                })
+                .ToList();
+
+            // Test
+            //apiResponse.Data = bloodTypeIds
+            //    .GroupJoin(
+            //        bloodUnits,
+            //        combo => (combo),
+            //        inv => (inv.BloodTypeId),
+            //        (combo, group) => new
+            //        {
+            //            combo,
+            //            Volume = group.Sum(bu => bu.Volume)
+            //        })
+            //    .Where(x => x.Volume < 500)
+            //    .Where(x => !existingUrgentEventSet.Contains(x.combo))
+            //    .Select(x => new BloodInventoryAlertResponse
+            //    {
+            //        BloodTypeName = bloodTypeDict.GetValueOrDefault(x.combo, "Unknown")
+            //    })
+            //    .ToList();
+
+            if (!apiResponse.Data.Any())
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "No blood inventory alerts found.";
+            }
+
+            return apiResponse;
+        }
+
+        public async Task<ApiResponse<List<BloodInventorySum>>> SummarizeBloodUnitsAsync()
+        {
+            var bloodTypeIds = (await _repoBloodType.GetAllBloodTypeAsync())
+                .Select(bt => bt.Id)
+                .ToList();
+
+            var bloodUnits = (await _repo.GetAllAsync())
+                .Where(bu => bu.IsAvailable);
+
+            var bloodTypeDict = (await _repoBloodType.GetAllBloodTypeAsync())
+                .ToDictionary(bt => bt.Id, bt => bt.Type);
+
+            var apiResponse = new ApiResponse<List<BloodInventorySum>>
+            {
+                IsSuccess = true,
+                Message = "Summarization executed successfully.",
+                Data = bloodTypeIds
+                        .GroupJoin(
+                            bloodUnits,
+                            bt => bt, 
+                            bu => bu.BloodTypeId,
+                            (bt, group) => new
+                            {
+                                BloodTypeId = bt,
+                                Volume = group.Sum(bu => bu.Volume)
+                            })
+                        .Select(x => new BloodInventorySum
+                        {
+                            BloodTypeName = bloodTypeDict.GetValueOrDefault(x.BloodTypeId, "Unknow"),
+                            BloodUnitCount = (int)Math.Round(x.Volume / 200)
+                        })
+                        .ToList()
+            };
+
+            return apiResponse;
         }
     }
 }

@@ -119,7 +119,7 @@ namespace Application.Service.BloodRegistrationServ
                 return apiResponse;
             }
             
-            // Khi đã lấy máu rồi thì không được hủy nữa
+            // Khi đã lấy máu rồi thì staff không được reject nữa
             if (bloodRegistration.BloodProcedureId != null)
             {
                 apiResponse.IsSuccess = false;
@@ -169,7 +169,7 @@ namespace Application.Service.BloodRegistrationServ
                 return apiResponse;
             }
 
-            // Check đơn đã khám hay chưa
+            // Khi đã khám rồi thì member không được tự hủy nữa
             if (bloodRegistration.HealthId != null)
             {
                 apiResponse.IsSuccess = false;
@@ -177,7 +177,7 @@ namespace Application.Service.BloodRegistrationServ
                 return apiResponse;
             }
 
-            // Không được hủy vào ngày diễn ra sự kiện
+            // Vào ngày diễn ra sự kiện thì member không được tự hủy nữa
             var checkedEvent = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
             if (checkedEvent != null && checkedEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
             {
