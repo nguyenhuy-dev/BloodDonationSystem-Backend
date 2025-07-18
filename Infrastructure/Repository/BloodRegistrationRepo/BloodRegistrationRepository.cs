@@ -16,8 +16,23 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         {
             var today = DateOnly.FromDateTime(DateTime.Now);
             var expiredRegistrations = _context.BloodRegistrations
-                .Where(br => br.Event.EventTime < today &&
+                .Where(br => 
+                (br.Event.EventTime < today || br.Event.IsExpired == true) &&
                 (br.IsApproved == null || (br.IsApproved == true && br.BloodProcedureId == null)))
+                .ToListAsync();
+
+            foreach (var expiredRegistration in expiredRegistrations.Result)
+            {
+                expiredRegistration.IsApproved = false;
+            }
+            return await _context.SaveChangesAsync();
+        }
+        public async Task<int> BloodRegistrationExpiredWithEventExpireAsync(int eventId)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var expiredRegistrations = _context.BloodRegistrations
+                .Where(br => br.EventId == eventId && br.Event.IsExpired == true &&
+                                (br.IsApproved == null || (br.IsApproved == true && br.BloodProcedureId == null)))
                 .ToListAsync();
 
             foreach (var expiredRegistration in expiredRegistrations.Result)
@@ -124,6 +139,24 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         private bool IsPhoneNumber(string keyword)
         {
             return keyword.All(char.IsDigit);
+        }
+
+        public async Task<int> CountBloodRegisteredEvents(int eventId)
+        {
+            return await _context.BloodRegistrations
+                .Where(br => br.EventId == eventId)
+                .CountAsync();
+        }
+
+        public async Task<List<BloodRegistration>> GetAllBloodRegistrationTomorrowAsync()
+        {
+            var tomorrow = DateOnly.FromDateTime(DateTime.Today.AddDays(1));
+
+            return await _context.BloodRegistrations
+                .Include(br => br.Member)
+                .Include(br => br.Event)
+                .Where(br => br.Event.EventTime == tomorrow && br.IsApproved == null)
+                .ToListAsync();
         }
     }
 }

@@ -46,5 +46,14 @@ namespace BloodDonationSystem.Controllers
 
             return Ok(apiResponse);
         }
+
+        [Authorize(Roles = "Staff")]
+        [HttpGet("api/blood-inventories/summarize")]
+        public async Task<IActionResult> SummarizeBloodUnitsAsync()
+        {
+            var apiResponse = await _service.SummarizeBloodUnitsAsync();
+
+            return Ok(apiResponse);
+        }
     }
 }

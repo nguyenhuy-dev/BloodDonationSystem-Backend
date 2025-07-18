@@ -20,6 +20,7 @@ namespace Infrastructure.Repository.BloodProcedureRepo
                     .ThenInclude(br => br.Event)
                 .Include(bc => bc.BloodRegistration)
                     .ThenInclude(br => br.Member)
+                    .ThenInclude(m => m.BloodType)
                 .Where(bc => bc.BloodRegistration.EventId == eventId &&
                                 bc.IsQualified == null)
                 .ToListAsync();

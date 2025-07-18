@@ -15,5 +15,7 @@ namespace Application.Service.BloodRegistrationServ
         Task<PaginatedResultWithEventTime<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null);
 
         Task<int> GetBloodRegistrationExpiredAsync();
+
+        Task SendReminderMailBeforeRegistration();
     }
 }

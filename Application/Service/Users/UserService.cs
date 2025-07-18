@@ -206,11 +206,15 @@ namespace Application.Service.Users
             }
 
             var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null || existingUser.Phone == updateUser.Phone || existingUser.Gmail == updateUser.Gmail)
+            if (existingUser == null)
             {
-                return null; // User not found or already has the same phone or email
+                return null; // User not found
             }
-            //var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(updateUser.BloodTypeId);
+
+            if (await _userRepository.IsPhoneOrEmailInUseByAnotherUserAsync(updateUser.Phone, updateUser.Gmail, userId))
+            {
+                return null; // Phone or email already used by another user
+            }
 
             existingUser.FirstName = updateUser.FirstName;
             existingUser.LastName = updateUser.LastName;
