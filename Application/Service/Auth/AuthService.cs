@@ -103,7 +103,7 @@ namespace Application.Service.Auth
             var claims = new List<Claim>
             {
                 new Claim("UserId", user.Id.ToString()),  // Thêm UserId vào trong Token
-                    new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
+                    new Claim(ClaimTypes.Name, user.LastName + " " + user.FirstName),
                     new Claim(ClaimTypes.Role, user.Role.RoleName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
