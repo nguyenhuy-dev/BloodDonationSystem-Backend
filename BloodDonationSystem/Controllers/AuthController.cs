@@ -74,29 +74,37 @@ namespace BloodDonationSystem.Controllers
                     LastName = lastName,
                     Gmail = email,
                     Status = AccountStatus.Pending, //Cannot use yet
+                    CreateAt = DateTime.Now,
                     RoleId = 3 // Assuming 3 is the default role ID for a user
                 };
-                await _authService.RegisterWithGoogleAsync(user);
-            }
 
-            if (user != null)
-            {
-                // User already exists, generate token
-                var token = _authService.GenerateToken(user);
-                SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
-                return Ok(new
-                {
-                    Message = "Login successful",
-                    Gmail = email,
-                    Name = name,
-                    Token = token.AccessToken
-                });
+                await _authService.RegisterWithGoogleAsync(user);
+                user = await _authService.GetUserByEmailAsync(email);
             }
+            var token = _authService.GenerateToken(user);
+            SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
+
+            //if (user != null)
+            //{
+            //    // User already exists, generate token
+            //    var token = _authService.GenerateToken(user);
+            //    SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
+            //    return Ok(new
+            //    {
+            //        Message = "Login successful",
+            //        Gmail = email,
+            //        Name = name,
+            //        Token = token.AccessToken
+            //    });
+            //}
 
             return Ok(new
             {
+                IsSuccess = true,
+                Message = "Login successful",
                 Gmail = email,
-                Name = name
+                Name = name,
+                Token = token.AccessToken
             });
         }
 
