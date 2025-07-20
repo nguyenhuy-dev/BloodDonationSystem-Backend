@@ -32,7 +32,6 @@ namespace Infrastructure.Repository.Auth
         {
             return await _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Status == null || u.Status == AccountStatus.Active || u.Status == AccountStatus.Pending)
                 .FirstOrDefaultAsync(u => u.Gmail == email);
         }
 
