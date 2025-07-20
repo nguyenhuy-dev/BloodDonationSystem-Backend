@@ -226,6 +226,8 @@ namespace Application.Service.Users
             existingUser.Gender = updateUser.Gender;
             existingUser.Dob = updateUser.Dob;
             existingUser.BloodTypeId = updateUser.BloodTypeId;
+            existingUser.Longitude = updateUser.Longitude;
+            existingUser.Latitude = updateUser.Latitude;
 
             var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(updateUser.BloodTypeId);
 
@@ -238,7 +240,9 @@ namespace Application.Service.Users
                 Gmail = existingUser.Gmail,
                 Gender = existingUser.Gender,
                 Dob = existingUser.Dob,
-                BloodType = bloodType.Type
+                BloodType = bloodType.Type,
+                Longitude = existingUser.Longitude,
+                Latitude = existingUser.Latitude,
             };
         }
     }
