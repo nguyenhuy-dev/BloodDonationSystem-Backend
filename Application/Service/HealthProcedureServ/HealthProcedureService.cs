@@ -48,12 +48,12 @@ namespace Application.Service.HealthProcedureServ
                 throw new UnauthorizedAccessException("User not found or invalid");
 
             healthProcedure.IsHealth = false;
-            healthProcedure.PerformedAt = DateTime.Now;
+            healthProcedure.PerformedAt = TimeHelper.NowVietnam;
             healthProcedure.PerformedBy = creatorId;
             await _repo.UpdateAsync(healthProcedure);
 
             healthProcedure.BloodRegistration.IsApproved = false;
-            healthProcedure.BloodRegistration.UpdateAt = DateTime.Now;
+            healthProcedure.BloodRegistration.UpdateAt = TimeHelper.NowVietnam;
             healthProcedure.BloodRegistration.StaffId = creatorId;
             await _repoRegis.UpdateAsync(healthProcedure.BloodRegistration);
 
@@ -120,7 +120,7 @@ namespace Application.Service.HealthProcedureServ
                 Weight = request.Weight,
                 Height = request.Height,
                 IsHealth = request.IsHealth,
-                PerformedAt = DateTime.Now,
+                PerformedAt = TimeHelper.NowVietnam,
                 Description = request.Description,
                 PerformedBy = creatorId
             };
@@ -131,7 +131,7 @@ namespace Application.Service.HealthProcedureServ
             else
                 bloodRegistration.IsApproved = false;
             bloodRegistration.HealthId = healthProcedureAdded.Id;
-            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.UpdateAt = TimeHelper.NowVietnam;
             bloodRegistration.StaffId = creatorId;
             await _repoRegis.UpdateAsync(bloodRegistration);
 
