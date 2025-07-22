@@ -1,9 +1,12 @@
-﻿using Application.DTO.EventsDTO;
+﻿using Application.DTO;
+using Application.DTO.EventsDTO;
 using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
+using Infrastructure.Repository.Facilities;
+using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
@@ -12,7 +15,9 @@ namespace Application.Service.Events
     public class EventService(IEventRepository _eventRepository, 
                             IHttpContextAccessor _contextAccessor,
                             IBloodTypeRepository _bloodRepository,
-                            IBloodRegistrationRepository _bloodRegisRepo) : IEventService
+                            IBloodRegistrationRepository _bloodRegisRepo,
+                            IUserRepository _userRepo, 
+                            IFacilityRepository _faciRepo) : IEventService
     {
         public async Task<Event?> AddEventAsync(NormalEventDTO eventRequest)
         {
@@ -196,6 +201,50 @@ namespace Application.Service.Events
                 PageSize = pageSize,
                 Items = dto,
             };
+        }
+
+        public async Task<ApiResponse<List<UrgentEventResponse>>> GetUrgentEventsAsync()
+        {
+            var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid memberId))
+                throw new UnauthorizedAccessException("User not found or invalid");
+
+            var member = await _userRepo.GetUserByIdAsync(memberId);
+            if (member == null)
+                return null;
+
+            var urgentEvents = (await _eventRepository.GetAllEventNotPagedAsync())
+                .Where(e => !e.IsExpired &&
+                            e.IsUrgent &&
+                            e.BloodTypeId == member.BloodTypeId &&
+                            ((decimal)GeographyHelper.CalculateDistanceKm(e.Facility.Latitude, e.Facility.Longitude, member.Latitude, member.Longitude)) <= 10)
+                .OrderBy(e => e.EventTime)
+                .ToList();
+
+            var apiResponse = new ApiResponse<List<UrgentEventResponse>>
+            {
+                Data = urgentEvents.Select(e => new UrgentEventResponse
+                {
+                    EventId = e.Id,
+                    Title = e.Title,
+                    EstimatedVolume = e.EstimatedVolume,
+                    EventTime = e.EventTime,
+                    CreateAt = e.CreateAt,
+                    BloodTypeName = e.BloodType?.Type ?? "Unknown",
+                    Distance = Math.Round((decimal)GeographyHelper.CalculateDistanceKm(e.Facility.Latitude, e.Facility.Longitude, member.Latitude, member.Longitude), 1),
+
+                }).ToList(),
+                IsSuccess = true,
+                Message = "Urgent events retrieved successfully."
+            };
+            
+            if (apiResponse.Data == null || !apiResponse.Data.Any())
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "No urgent events found.";
+            }
+
+            return apiResponse;
         }
 
         public async Task<PaginatedResult<EventDTO>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay)

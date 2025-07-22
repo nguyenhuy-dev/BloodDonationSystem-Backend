@@ -198,6 +198,8 @@ namespace Infrastructure.Repository.Events
         public async Task<IEnumerable<Event>> GetAllEventNotPagedAsync()
         {
             return await _context.Events
+                .Include(e => e.Facility)
+                .Include(e => e.BloodType)
                 .ToListAsync();
         }
     }
