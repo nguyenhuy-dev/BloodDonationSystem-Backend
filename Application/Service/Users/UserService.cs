@@ -159,12 +159,14 @@ namespace Application.Service.Users
 
             return new ProfileDTO
             {
+                Id = id,
                 Name = $"{user.LastName} {user.FirstName}",
                 Phone = user.Phone,
                 Gmail = user.Gmail,
                 Gender = user.Gender,
                 Dob = user.Dob,
-                BloodType = bloodType.Type
+                BloodType = bloodType.Type,
+                Role = user.Role.RoleName
             };
         }
 
