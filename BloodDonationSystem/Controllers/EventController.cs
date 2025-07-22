@@ -196,5 +196,16 @@ namespace BloodDonationSystem.Controllers
                 Data = events
             });
         }
+
+        [HttpGet("api/events/urgent")]
+        public async Task<IActionResult> GetUrgentEvents()
+        {
+            var apiResponse = await _eventService.GetUrgentEventsAsync();
+            
+            if (apiResponse.IsSuccess == false)
+                return NotFound(apiResponse);
+
+            return Ok(apiResponse);
+        }
     }
 }
