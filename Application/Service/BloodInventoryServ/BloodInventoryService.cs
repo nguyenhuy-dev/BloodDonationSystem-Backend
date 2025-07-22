@@ -31,7 +31,7 @@ namespace Application.Service.BloodInventoryServ
                 throw new UnauthorizedAccessException("User not found or invalid");
 
             bloodUnit.RemoveBy = creatorId;
-            bloodUnit.UpdateAt = DateTime.Now;
+            bloodUnit.UpdateAt = TimeHelper.NowVietnam;
             bloodUnit.IsAvailable = false;
             await _repo.UpdateAsync(bloodUnit);
 
@@ -61,7 +61,7 @@ namespace Application.Service.BloodInventoryServ
                     CreateAt = bu.CreateAt,
                     BloodTypeName = (await _repoBloodType.GetBloodTypeByIdAsync(bu.BloodTypeId))?.Type,
                     BloodRegisId = bu.RegistrationId,
-                    BloodAge = (bu.ExpiredDate - DateTime.Now).Days,
+                    BloodAge = (bu.ExpiredDate - TimeHelper.NowVietnam).Days,
                     IsAvailable = bu.IsAvailable,
                     Volume = bu.Volume
                 };

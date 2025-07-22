@@ -4,6 +4,7 @@ using Application.DTO.UserDTO;
 using Application.Service.Auth;
 using Domain.Entities;
 using Domain.Enums;
+using Infrastructure.Helper;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -271,7 +272,7 @@ namespace BloodDonationSystem.Controllers
             {
                 HttpOnly = true, // Prevents JavaScript access to the cookie
                 Secure = true, // Use HTTPS in production
-                Expires = DateTime.UtcNow.AddDays(7), // Set expiration for the cookie
+                Expires = TimeHelper.NowVietnam.AddDays(7), // Set expiration for the cookie
                 SameSite = SameSiteMode.Strict // Prevent CSRF attacks
             };
             _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);

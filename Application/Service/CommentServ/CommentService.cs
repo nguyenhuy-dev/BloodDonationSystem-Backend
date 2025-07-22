@@ -23,6 +23,9 @@ namespace Application.Service.CommentServ
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
+            TimeZoneInfo vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+
             var blog = await _blogRepository.GetBlogByIdAsync(blogId);
             if (blog == null)
             {
@@ -32,7 +35,7 @@ namespace Application.Service.CommentServ
             var comment = new Comment
             { 
                 Text = requestComment.Text,
-                CreateAt = DateTime.Now,
+                CreateAt = vietnamTime,
                 IsLegit = true,
                 MemberId = userId,
                 BlogId = blog.Id
