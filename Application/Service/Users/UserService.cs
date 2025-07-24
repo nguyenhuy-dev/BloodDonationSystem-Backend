@@ -164,6 +164,7 @@ namespace Application.Service.Users
                 Longitude = user.Longitude,
                 Latitude = user.Latitude,
                 Role = user.Role.RoleName,
+                LastDonation = user.LastDonation
             };
         }
 

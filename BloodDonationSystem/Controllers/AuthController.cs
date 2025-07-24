@@ -169,7 +169,7 @@ namespace BloodDonationSystem.Controllers
             return Ok(new 
             { 
                 IsSuccess = true,
-                Message = "Password reset successful" 
+                Message = "Password reset successful",
             });
         }
 

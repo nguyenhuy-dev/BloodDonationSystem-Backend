@@ -18,5 +18,6 @@ namespace Application.DTO.UserDTO
         public bool? Gender { get; set; }
         public decimal? Longitude { get; set; }
         public decimal? Latitude { get; set; }
+        public DateTime? LastDonation { get; set; }
     }
 }
