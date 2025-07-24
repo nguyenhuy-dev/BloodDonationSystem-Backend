@@ -121,7 +121,7 @@ namespace BloodDonationSystem.Controllers
 
         [Authorize]
         [HttpPut("/api/users/profile")]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] UserDTO profileDto)
+        public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateProfileDTO profileDto)
         {
             if (profileDto == null)
             {

@@ -15,7 +15,7 @@ namespace Application.Service.Users
         Task<PaginatedResult<ListUserDTO>> GetAllUserAsync(int pageNumber, int pageSize);
 
         //Task<User> AssignUserRole(Guid userId, int roleId);
-        Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser);
+        Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UpdateProfileDTO updateUser);
         Task<bool> DeactiveUserAsync();
         Task<bool> BanUserAsync(Guid userId);
 

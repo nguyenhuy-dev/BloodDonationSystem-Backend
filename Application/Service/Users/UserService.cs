@@ -198,7 +198,7 @@ namespace Application.Service.Users
             };
         }
 
-        public async Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser)
+        public async Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UpdateProfileDTO updateUser)
         {
             var id = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (id == null || !Guid.TryParse(id, out Guid parsedUserId) || parsedUserId != userId)
