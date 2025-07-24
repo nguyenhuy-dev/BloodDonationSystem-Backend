@@ -1,10 +1,12 @@
-﻿using Application.DTO.GoogleDTO;
+﻿using Application.DTO.AuthDTO;
+using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.DTO.UserDTO;
 using Application.Service.Auth;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -138,6 +140,36 @@ namespace BloodDonationSystem.Controllers
             {
                 Message = "Update successfully",
                 Token = token.AccessToken,
+            });
+        }
+
+        [Authorize]
+        [HttpPut("api/auth/reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordDTO request)
+        {
+
+            var userIdClaim = User.FindFirst("UserId")?.Value;
+
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out Guid userId))
+                return Unauthorized(new 
+                { 
+                    IsSuccess = false,
+                    Message = "Invalid or missing user identity" 
+                });
+
+            var result = await _authService.ResetPasswordAsync(userId, request.NewPassword);
+
+            if (!result)
+                return BadRequest(new 
+                { 
+                    IsSuccess = false,
+                    Message = "Password reset failed" 
+                });
+
+            return Ok(new 
+            { 
+                IsSuccess = true,
+                Message = "Password reset successful" 
             });
         }
 

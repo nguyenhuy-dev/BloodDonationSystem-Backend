@@ -90,5 +90,19 @@ namespace Infrastructure.Repository.Auth
             await _context.SaveChangesAsync();
             return refreshToken; // Return the updated refresh token
         }
+
+        public async Task<bool> ResetPasswordAsync(Guid userId, string newPassword)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return false;
+
+            var passwordHasher = new PasswordHasher<User>();
+            user.HashPass = passwordHasher.HashPassword(user, newPassword);
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
