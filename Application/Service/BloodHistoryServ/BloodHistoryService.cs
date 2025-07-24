@@ -26,7 +26,7 @@ namespace Application.Service.BloodHistoryServ
 
             var bloodRegistrations = await _bloodRegistration.GetBloodRegistrationHistoryAsync(userId);
 
-            var volunteerRegistrations = await _bloodRegistration.GetVolunteerRegistrationHistoryAsync(userId);
+            var volunteerRegistrations = await _volunteerRepository.GetVolunteerByMemberIdAsync(userId);
 
             var result = new List<UnifiedBloodHistory>();
 
@@ -54,13 +54,15 @@ namespace Application.Service.BloodHistoryServ
                 {
                     Id = v.Id,
                     Type = "Volunteer",
-                    FacilityName = v.Event.Facility.Name,
-                    Longitude = v.Event.Facility.Longitude,
-                    Latitude = v.Event.Facility.Latitude,
+                    //FacilityName = v.Event.Facility.Name,
+                    //Longitude = v.Event.Facility.Longitude,
+                    Longitude = v.Member.Longitude,
+                    //Latitude = v.Event.Facility.Latitude,
+                    Latitude = v.Member.Latitude,
                     RegisterDate = DateOnly.FromDateTime(v.CreateAt),
-                    StartDate = DateOnly.FromDateTime(v.Volunteer.StartVolunteerDate),
-                    EndDate = DateOnly.FromDateTime(v.Volunteer.EndVolunteerDate),
-                    IsExpired = v.Volunteer.IsExpired
+                    StartDate = DateOnly.FromDateTime(v.StartVolunteerDate),
+                    EndDate = DateOnly.FromDateTime(v.EndVolunteerDate),
+                    IsExpired = v.IsExpired
                 });
                 result.AddRange(volunteerHistory);
             }

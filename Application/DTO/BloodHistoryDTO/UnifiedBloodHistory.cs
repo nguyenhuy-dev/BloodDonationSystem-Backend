@@ -13,8 +13,8 @@ namespace Application.DTO.BloodHistoryDTO
         public string FacilityName { get; set; } = string.Empty;
         public string? EventName { get; set; }
         public DateOnly? EventDate { get; set; }
-        public decimal Longitude { get; set; }
-        public decimal Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+        public decimal? Latitude { get; set; }
         public DateOnly RegisterDate { get; set; }
 
         // Only for volunteer

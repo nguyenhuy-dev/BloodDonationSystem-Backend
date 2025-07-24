@@ -76,6 +76,7 @@ namespace Infrastructure.Repository.VolunteerRepo
         public async Task<IEnumerable<Volunteer>?> GetVolunteerByMemberIdAsync(Guid memberId)
         {
             return await _dbSet
+                        .Include(v => v.Member)
                         .Where(v => v.MemberId == memberId)
                         .ToListAsync();
         }
