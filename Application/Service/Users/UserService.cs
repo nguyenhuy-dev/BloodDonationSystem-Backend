@@ -150,7 +150,7 @@ namespace Application.Service.Users
                 return null; // User not found
             }
 
-            var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(user.BloodTypeId);
+            //var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(user.BloodTypeId);
 
             return new ProfileDTO
             {
@@ -160,7 +160,7 @@ namespace Application.Service.Users
                 Gmail = user.Gmail,
                 Gender = user.Gender,
                 Dob = user.Dob,
-                BloodType = bloodType.Type,
+                BloodType = user.BloodType?.Type,
                 Longitude = user.Longitude,
                 Latitude = user.Latitude,
                 Role = user.Role.RoleName,

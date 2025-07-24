@@ -38,6 +38,7 @@ namespace Infrastructure.Repository.Users
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
             var user = await _context.Users
+                .Include(u => u.BloodType)
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == id);
             return user;
