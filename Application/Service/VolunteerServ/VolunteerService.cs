@@ -15,7 +15,7 @@ namespace Application.Service.VolunteerServ
 {
     public class VolunteerService(IVolunteerRepository _repoVolun, IHttpContextAccessor _contextAccessor,
         IUserRepository _repoUser, IBloodTypeRepository _repoBloodType, IBloodRegistrationRepository _repoRegis,
-        IEmailService _servMail, IFacilityRepository _repoFacility, 
+        IEmailService _servMail, IFacilityRepository _repoFacility,
         IEventService _servEvent) : IVolunteerService
     {
         public async Task<ApiResponse<Volunteer>?> RegisterVolunteerDonationAsync(RegisterVolunteerDonation request)
@@ -28,6 +28,19 @@ namespace Application.Service.VolunteerServ
             var user = await _repoUser.GetUserByIdAsync(creatorId);
             if (user == null)
                 throw new UnauthorizedAccessException("User not found or invalid");
+
+            // Khi tồn tại đơn đăng ký hiến máu thì không được đăng ký tình nguyện
+            var bloodRegistrations = (await _repoRegis.GetAllAsync())
+                                        .Where(br => (br.IsApproved == null ||
+                                                        (br.IsApproved == true && br.BloodProcedureId == null)) &&
+                                                        br.MemberId == creatorId)
+                                        .ToList();
+            if (bloodRegistrations.Any())
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Having a registered blood registration or in pending.";
+                return apiResponse;
+            }
 
             // Khi có tồn tại đơn tình nguyện mà chưa hết hạn thì không cho đăng ký mới
             var checkedVolunteerList = await _repoVolun.GetVolunteerByMemberIdAsync(creatorId);
@@ -128,7 +141,7 @@ namespace Application.Service.VolunteerServ
                     BloodTypeName = bloodType?.Type,
                     Distance = Math.Round((decimal)GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, member.Latitude, member.Longitude), 1),
                     Latitude = member.Latitude,
-                    Longitude = member.Longitude, 
+                    Longitude = member.Longitude,
                     StartVolunteerDate = volunteer.StartVolunteerDate,
                     EndVolunteerDate = volunteer.EndVolunteerDate,
                     FullName = member.LastName + " " + member.FirstName,
