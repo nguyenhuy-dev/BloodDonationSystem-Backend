@@ -13,7 +13,7 @@ namespace Infrastructure.Repository.Auth
         Task<User?> RegisterAsync(User user);
 
         Task<User> UpdateGoogleLogin(User user);
-        Task<bool> ResetPasswordAsync(Guid userId, string newPassword);
+        Task<bool> ResetPasswordAsync(string phone, string newPassword);
 
         Task<bool> UserExistsByPhoneAsync(string phone);
         Task<bool> UserExistsByEmailAsync(string email);

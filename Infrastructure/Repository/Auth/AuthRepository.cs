@@ -91,9 +91,9 @@ namespace Infrastructure.Repository.Auth
             return refreshToken; // Return the updated refresh token
         }
 
-        public async Task<bool> ResetPasswordAsync(Guid userId, string newPassword)
+        public async Task<bool> ResetPasswordAsync(string phone, string newPassword)
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Phone == phone);
             if (user == null)
                 return false;
 

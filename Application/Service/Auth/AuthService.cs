@@ -226,14 +226,10 @@ namespace Application.Service.Auth
             return refreshToken; // Return the updated refresh token
         }
 
-        public async Task<bool> ResetPasswordAsync(Guid userId, string newPassword)
+        public async Task<bool> ResetPasswordAsync(string phone, string newPassword)
         {
-            var id = _httpContext.HttpContext?.User?.FindFirst("UserId")?.Value;
-            if (id == null || !Guid.TryParse(id, out Guid parsedUserId) || parsedUserId != userId)
-            {
-                return false; // Unauthorized access or invalid user ID
-            }
-            var changePassword = await _authRepository.ResetPasswordAsync(userId, newPassword);
+
+            var changePassword = await _authRepository.ResetPasswordAsync(phone, newPassword);
             return changePassword;
         }
     }

@@ -8,6 +8,7 @@ namespace Application.DTO.AuthDTO
 {
     public class ResetPasswordDTO
     {
+        public string Phone { get; set; }
         public string NewPassword { get; set; }
     }
 }

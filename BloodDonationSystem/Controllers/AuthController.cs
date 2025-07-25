@@ -143,21 +143,10 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [Authorize]
         [HttpPut("api/auth/reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordDTO request)
         {
-
-            var userIdClaim = User.FindFirst("UserId")?.Value;
-
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out Guid userId))
-                return Unauthorized(new 
-                { 
-                    IsSuccess = false,
-                    Message = "Invalid or missing user identity" 
-                });
-
-            var result = await _authService.ResetPasswordAsync(userId, request.NewPassword);
+            var result = await _authService.ResetPasswordAsync(request.Phone, request.NewPassword);
 
             if (!result)
                 return BadRequest(new 
