@@ -6,10 +6,7 @@ using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Org.BouncyCastle.Crypto.Macs;
-using System.Numerics;
 using System.Security.Claims;
 
 namespace Application.Service.Users
@@ -35,7 +32,7 @@ namespace Application.Service.Users
                 Phone = request.Phone,
                 Gmail = request.Gmail,
                 BloodTypeId = request.BloodTypeId,
-                CreateAt = DateTime.UtcNow,
+                CreateAt = TimeHelper.NowVietnam,
                 Status = AccountStatus.Active,
                 RoleId = 2
             };
@@ -69,8 +66,6 @@ namespace Application.Service.Users
         //    var assignedRole = await _userRepository.AssignUserRole(user);
         //    return assignedRole;
         //}
-
-
 
         public async Task<bool> BanUserAsync(Guid userId)
         {
@@ -159,14 +154,16 @@ namespace Application.Service.Users
 
             return new ProfileDTO
             {
+                Id = userId,
                 Name = $"{user.LastName} {user.FirstName}",
                 Phone = user.Phone,
                 Gmail = user.Gmail,
                 Gender = user.Gender,
                 Dob = user.Dob,
-                BloodType = bloodType?.Type,
+                BloodType = bloodType.Type,
                 Longitude = user.Longitude,
-                Latitude = user.Latitude
+                Latitude = user.Latitude,
+                Role = user.Role.RoleName,
             };
         }
 
@@ -189,7 +186,7 @@ namespace Application.Service.Users
             existingUser.LastName = update.LastName;
             existingUser.Dob = update.Dob;
             existingUser.UpdateBy = parsedUserId;
-            existingUser.UpdateAt = DateTime.Now;
+            existingUser.UpdateAt = TimeHelper.NowVietnam;
 
             var updated = await _userRepository.UpdateUserProfileAsync(existingUser);
             return new UpdateUserDTO
@@ -226,6 +223,8 @@ namespace Application.Service.Users
             existingUser.Gender = updateUser.Gender;
             existingUser.Dob = updateUser.Dob;
             existingUser.BloodTypeId = updateUser.BloodTypeId;
+            existingUser.Longitude = updateUser.Longitude;
+            existingUser.Latitude = updateUser.Latitude;
 
             var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(updateUser.BloodTypeId);
 
@@ -234,11 +233,13 @@ namespace Application.Service.Users
             return new ProfileDTO
             {
                 Name = $"{existingUser.LastName} {existingUser.FirstName}",
-                Phone = existingUser.Phone, 
+                Phone = existingUser.Phone,
                 Gmail = existingUser.Gmail,
                 Gender = existingUser.Gender,
                 Dob = existingUser.Dob,
-                BloodType = bloodType.Type
+                BloodType = bloodType.Type,
+                Longitude = existingUser.Longitude,
+                Latitude = existingUser.Latitude,
             };
         }
     }

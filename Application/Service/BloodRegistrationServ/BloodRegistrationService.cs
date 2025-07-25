@@ -95,7 +95,7 @@ namespace Application.Service.BloodRegistrationServ
 
             var bloodRegis = new BloodRegistration
             {
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 MemberId = creatorId,
                 EventId = eventId
             };
@@ -134,7 +134,7 @@ namespace Application.Service.BloodRegistrationServ
             }
 
             bloodRegistration.IsApproved = false;
-            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.UpdateAt = TimeHelper.NowVietnam;
             bloodRegistration.StaffId = creatorId;
             await _repository.UpdateAsync(bloodRegistration);
             
@@ -179,7 +179,7 @@ namespace Application.Service.BloodRegistrationServ
 
             // Vào ngày diễn ra sự kiện thì member không được tự hủy nữa
             var checkedEvent = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
-            if (checkedEvent != null && checkedEvent.EventTime == DateOnly.FromDateTime(DateTime.Now))
+            if (checkedEvent != null && checkedEvent.EventTime == DateOnly.FromDateTime(TimeHelper.NowVietnam))
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.Message = "Event being started.";

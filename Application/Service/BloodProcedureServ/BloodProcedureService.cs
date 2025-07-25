@@ -97,7 +97,7 @@ namespace Application.Service.BloodProcedureServ
             var bloodCollection = new BloodProcedure
             {
                 Volume = request.Volume,
-                PerformedAt = DateTime.Now,
+                PerformedAt = TimeHelper.NowVietnam,
                 Description = request.Description,
                 PerformedBy = creatorId
             };
@@ -110,7 +110,7 @@ namespace Application.Service.BloodProcedureServ
 
             // Update lại cho table BloodRegistrations
             bloodRegistration.BloodProcedureId = bloodCollectionAdded.Id;
-            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.UpdateAt = TimeHelper.NowVietnam;
             bloodRegistration.StaffId = creatorId;
             await _repoRegis.UpdateAsync(bloodRegistration);
 

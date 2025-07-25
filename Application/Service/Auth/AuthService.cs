@@ -4,6 +4,7 @@ using Application.DTO.Token;
 using Application.DTO.UserDTO;
 using Domain.Entities;
 using Domain.Enums;
+using Infrastructure.Helper;
 using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Blood;
 using Microsoft.AspNetCore.Http;
@@ -84,7 +85,7 @@ namespace Application.Service.Auth
                 Gmail = userDTO.Gmail,
                 Gender = userDTO.Gender,
                 Status = AccountStatus.Active,
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 RoleId = 3, // Assuming 3 is the default role ID for a user
             };
 
@@ -139,7 +140,7 @@ namespace Application.Service.Auth
                 UserId = user.Id,
                 IsUsed = false,
                 IsRevoked = false,
-                ExpiredAt = DateTime.UtcNow.AddDays(7) // Set expiration for the refresh token
+                ExpiredAt = TimeHelper.NowVietnam.AddDays(7) // Set expiration for the refresh token
             };
             _authRepository.SaveRefreshTokenAsync(refreshTokenEntity);
 

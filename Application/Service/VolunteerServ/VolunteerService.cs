@@ -59,7 +59,7 @@ namespace Application.Service.VolunteerServ
 
             var volunteer = new Volunteer
             {
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 StartVolunteerDate = request.StartVolunteerDate,
                 EndVolunteerDate = request.EndVolunteerDate,
                 IsExpired = false,
@@ -93,7 +93,7 @@ namespace Application.Service.VolunteerServ
 
             existingVolunteer.StartVolunteerDate = request.StartVolunteerDate;
             existingVolunteer.EndVolunteerDate = request.EndVolunteerDate;
-            existingVolunteer.UpdateAt = DateTime.Now;
+            existingVolunteer.UpdateAt = TimeHelper.NowVietnam;
             await _repoVolun.UpdateAsync(existingVolunteer);
 
             return existingVolunteer;
@@ -275,7 +275,7 @@ namespace Application.Service.VolunteerServ
 
             var bloodRegis = new BloodRegistration
             {
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 VolunteerId = id,
                 MemberId = existingVolunteer.MemberId,
                 StaffId = staffIdOut,
@@ -284,7 +284,7 @@ namespace Application.Service.VolunteerServ
             //await _repoRegis.AddAsync(bloodRegis);
 
             existingVolunteer.IsExpired = true;
-            existingVolunteer.UpdateAt = DateTime.Now;
+            existingVolunteer.UpdateAt = TimeHelper.NowVietnam;
             //await _repoVolun.UpdateAsync(existingVolunteer);
 
             //await _servMail.SendEmailFindDonorsAsync(bloodRegis);
