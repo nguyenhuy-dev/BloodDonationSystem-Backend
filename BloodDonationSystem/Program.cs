@@ -102,6 +102,7 @@ builder.Services.AddHostedService<EventExpiryBackgroundService>();
 builder.Services.AddHostedService<BloodRegistrationExpiryBackgroundService>();
 builder.Services.AddHostedService<VolunteerExpiryBackgroundService>();
 builder.Services.AddHostedService<ReminderMailBackgroundService>();
+builder.Services.AddHostedService<BloodUnitsExpiryBackgroundService>();
 
 
 // Add configuration for email service

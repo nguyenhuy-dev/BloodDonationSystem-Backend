@@ -48,7 +48,7 @@ namespace Application.Service.VolunteerServ
             }
 
             // Kiểm tra lần cuối hiến máu có phù hợp
-            if (user.LastDonation >= DateTime.Now.AddDays(-90))
+            if (user.LastDonation >= request.StartVolunteerDate.AddDays(-90))
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.Message = "Last donation not suitable.";
@@ -296,6 +296,41 @@ namespace Application.Service.VolunteerServ
                 BloodRegistration = bloodRegis,
                 Volunteer = existingVolunteer,
             };
+            return apiResponse;
+        }
+
+        public async Task<ApiResponse<Volunteer>> CancelOwnVolunteerAsync(int volunteerId)
+        {
+            ApiResponse<Volunteer> apiResponse = new();
+
+            // Kiểm tra volunteer có tồn tại hay không, hoặc đã quá hạn rồi
+            var volunteer = await _repoVolun.GetByIdAsync(volunteerId);
+            if (volunteer == null || volunteer.IsExpired == true)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Volunteer not found or be expired.";
+                return apiResponse;
+            }
+
+            var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid memberId))
+                throw new UnauthorizedAccessException("User not found or invalid");
+
+            // Kiểm tra xem member có sở hữu volunteer hay không
+            if (volunteer.MemberId != memberId)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "This member not own volunteer.";
+                return apiResponse;
+            }
+
+            volunteer.IsExpired = true;
+            volunteer.UpdateAt = DateTime.Now;
+            await _repoVolun.UpdateAsync(volunteer);
+
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "Cancel own volunteer successfully.";
+
             return apiResponse;
         }
 

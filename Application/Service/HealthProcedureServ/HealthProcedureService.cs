@@ -5,13 +5,14 @@ using Infrastructure.Helper;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.HealthProcedureRepo;
+using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
-using MimeKit.Cryptography;
 
 namespace Application.Service.HealthProcedureServ
 {
     public class HealthProcedureService(IHealthProcedureRepository _repo, IBloodRegistrationRepository _repoRegis,
-        IHttpContextAccessor _contextAccessor, IEventRepository _repoEvent) : IHealthProcedureService
+        IHttpContextAccessor _contextAccessor, IEventRepository _repoEvent, 
+        IUserRepository _repoUser) : IHealthProcedureService
     {
         public async Task<ApiResponse<HealthProcedure>?> CancelHealthProcessAsync(int id)
         {
@@ -97,18 +98,28 @@ namespace Application.Service.HealthProcedureServ
             return pagedResult;
         }
 
-        public async Task<HealthProcedure?> RecordHealthProcedureAsync(int id, HealthProcedureRequest request)
+        public async Task<ApiResponse<HealthProcedure>> RecordHealthProcedureAsync(int id, HealthProcedureRequest request)
         {
+            ApiResponse<HealthProcedure> apiResponse = new();
+
             // Nếu đơn đăng ký Not Found hoặc đã khám thì không được record
             var bloodRegistration = await _repoRegis.GetByIdAsync(id);
             if (bloodRegistration == null || bloodRegistration.IsApproved != null)
-                return null;
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Blood registration not found or already processed.";
+                return apiResponse;
+            }
 
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
             {
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
+
+            var member = await _repoUser.GetUserByIdAsync(bloodRegistration.MemberId);
+            if (member == null)
+                throw new UnauthorizedAccessException("Member not found or invalid");
 
             var healthProcedure = new HealthProcedure
             {
@@ -135,7 +146,11 @@ namespace Application.Service.HealthProcedureServ
             bloodRegistration.StaffId = creatorId;
             await _repoRegis.UpdateAsync(bloodRegistration);
 
-            return healthProcedureAdded;
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "Health procedure recorded successfully.";
+            apiResponse.Data = healthProcedure;
+
+            return apiResponse;
         }
 
         public async Task<PaginatedResultWithEventTime<SearchHealthProcedureDTO>?> SearchHealthProceduresByPhoneOrNameAsync(int pageNumber, int pageSize, string keyword, int? eventId = null)

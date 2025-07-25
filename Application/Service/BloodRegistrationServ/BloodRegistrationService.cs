@@ -56,15 +56,15 @@ namespace Application.Service.BloodRegistrationServ
                 return null;
 
 
-            //// Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
-            //var checkedRegis = _repository.GetByEventAsync(eventId).Result
-            //    .FirstOrDefault(br => br.MemberId == user.Id);
-            //if (checkedRegis != null)
-            //{
-            //    apiResponse.IsSuccess = false;
-            //    apiResponse.Message = "Already registered in this event.";
-            //    return apiResponse;
-            //}
+            // Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
+            var checkedRegis = _repository.GetByEventAsync(eventId).Result
+                .FirstOrDefault(br => br.MemberId == user.Id);
+            if (checkedRegis != null)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Already registered in this event.";
+                return apiResponse;
+            }
 
             // Kiểm tra xem nếu đăng ký vào urgent event, thì blood type phải hợp lệ 
             if (existingEvent.IsUrgent == true &&

@@ -79,6 +79,17 @@ namespace BloodDonationSystem.Controllers
             return Ok(apiResponse);
         }
 
+        [Authorize(Roles = "Member")]
+        [HttpPut("cancel/{volunteerId}")]
+        public async Task<IActionResult> CancelOwnVolunteer(int volunteerId)
+        {
+            var apiResponse = await _service.CancelOwnVolunteerAsync(volunteerId);
+            if (apiResponse.IsSuccess == false)
+                return BadRequest(apiResponse);
+
+            return Ok(apiResponse);
+        }
+
         //[Authorize]
         //[HttpPut("{id}/date")]
         //public async Task<IActionResult> UpdateAvailableDateForVolunteer(int id, [FromBody]UpdateAvailableDateDTO request)
