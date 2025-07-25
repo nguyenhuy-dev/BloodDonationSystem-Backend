@@ -213,5 +213,10 @@ namespace Application.Service.BloodInventoryServ
 
             return apiResponse;
         }
+
+        public async Task<int> GetBloodUnitsExpiredAsync()
+        {
+            return await _repo.GetBloodUnitsExpiredAsync();
+        }
     }
 }

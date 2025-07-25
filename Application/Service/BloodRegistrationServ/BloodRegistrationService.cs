@@ -7,15 +7,16 @@ using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Users;
+using Infrastructure.Repository.VolunteerRepo;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Service.BloodRegistrationServ
 {
     public class BloodRegistrationService(IBloodRegistrationRepository _repository, IHttpContextAccessor _contextAccessor,
-        IEventRepository _repoEvent, IUserRepository _repoUser, 
-        IBloodTypeRepository _repoBloodType, IEmailService _servEmail) : IBloodRegistrationService
+        IEventRepository _repoEvent, IUserRepository _repoUser,
+        IBloodTypeRepository _repoBloodType, IEmailService _servEmail,
+        IVolunteerRepository _repoVolun) : IBloodRegistrationService
     {
-
         public async Task<ApiResponse<BloodRegistration>?> RegisterDonation(int eventId, BloodRegistrationRequest request)
         {
             ApiResponse<BloodRegistration> apiResponse = new();
@@ -55,16 +56,39 @@ namespace Application.Service.BloodRegistrationServ
             if (user == null)
                 return null;
 
+            // Kiểm tra member chỉ được đăng ký vào duy nhất 1 đơn đăng ký hoặc đơn tình nguyện
+            var bloodRegistrations = (await _repository.GetAllAsync())
+                                        .Where(br => (br.IsApproved == null ||
+                                                    (br.IsApproved == true && br.BloodProcedureId == null)) &&
+                                                    br.MemberId == creatorId)
+                                        .ToList();
+            if (bloodRegistrations.Any())
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Already registered another blood registration or in pending another blood registration";
+                return apiResponse;
+            }
 
-            //// Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
-            //var checkedRegis = _repository.GetByEventAsync(eventId).Result
-            //    .FirstOrDefault(br => br.MemberId == user.Id);
-            //if (checkedRegis != null)
-            //{
-            //    apiResponse.IsSuccess = false;
-            //    apiResponse.Message = "Already registered in this event.";
-            //    return apiResponse;
-            //}
+            // Kiểm tra member chỉ được đăng ký vào duy nhất 1 đơn đăng ký hoặc đơn tình nguyện
+            var volunteerRegistrations = (await _repoVolun.GetVolunteerByMemberIdAsync(creatorId))?
+                                            .Where(v => v.IsExpired == false)
+                                            .ToList();
+            if (volunteerRegistrations != null)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Already registered another volunteer.";
+                return apiResponse;
+            }
+
+            // Kiểm tra member chỉ được đăng ký hiến máu 1 lần vào 1 event 
+            var checkedRegis = _repository.GetByEventAsync(eventId).Result
+            .FirstOrDefault(br => br.MemberId == user.Id);
+            if (checkedRegis != null)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Already registered in this event.";
+                return apiResponse;
+            }
 
             // Kiểm tra xem nếu đăng ký vào urgent event, thì blood type phải hợp lệ 
             if (existingEvent.IsUrgent == true &&
@@ -83,8 +107,8 @@ namespace Application.Service.BloodRegistrationServ
                 changedLastDonation = true;
             }
 
-            // Kiểm tra xem lần cuối hiến máu có phù hợp
-            if (user.LastDonation >= DateTime.Now.AddDays(-90))
+            // Kiểm tra xem lần cuối hiến máu có phù hợp (phải so với EventTime kia, chứ không phải so với now là khi đăng ký)
+            if (user.LastDonation >= existingEvent.EventTime.ToDateTime(TimeOnly.MinValue).AddDays(-90))
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.Message = "Last donation time not suitable.";
@@ -118,7 +142,7 @@ namespace Application.Service.BloodRegistrationServ
                 apiResponse.Message = "Blood registration not exist or be rejected before.";
                 return apiResponse;
             }
-            
+
             // Khi đã lấy máu rồi thì staff không được reject nữa
             if (bloodRegistration.BloodProcedureId != null)
             {
@@ -137,7 +161,7 @@ namespace Application.Service.BloodRegistrationServ
             bloodRegistration.UpdateAt = TimeHelper.NowVietnam;
             bloodRegistration.StaffId = creatorId;
             await _repository.UpdateAsync(bloodRegistration);
-            
+
             apiResponse.IsSuccess = true;
             apiResponse.Message = "Reject blood registration successfully.";
             return apiResponse;
@@ -145,7 +169,7 @@ namespace Application.Service.BloodRegistrationServ
 
         public async Task<ApiResponse<BloodRegistration>?> CancelOwnRegistration(int id)
         {
-            ApiResponse<BloodRegistration> apiResponse = new(); 
+            ApiResponse<BloodRegistration> apiResponse = new();
 
             // Check đơn có tồn tại, bị hủy, hay bị từ chối
             var bloodRegistration = await _repository.GetByIdAsync(id);
@@ -242,7 +266,7 @@ namespace Application.Service.BloodRegistrationServ
 
         public async Task<PaginatedResultWithEventTime<BloodRegistrationResponse>?> SearchBloodRegistrationsByPhoneOrName(int pageNumber, int pageSize, string keyword, int? eventId = null)
         {
-            if(string.IsNullOrEmpty(keyword))
+            if (string.IsNullOrEmpty(keyword))
             {
                 return null; // Return null if keyword is empty or null
             }
@@ -280,7 +304,7 @@ namespace Application.Service.BloodRegistrationServ
         {
             var registration = await _repository.GetAllBloodRegistrationTomorrowAsync();
 
-            foreach(var reg in registration)
+            foreach (var reg in registration)
             {
                 await _servEmail.SendEmailRemindBloodDonation(reg);
             }

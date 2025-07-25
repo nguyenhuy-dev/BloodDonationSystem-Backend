@@ -8,5 +8,6 @@ namespace Infrastructure.Repository.BloodInventoryRepo
     {
         Task<BloodInventory?> GetByBloodRegisIdAsync(int id);
         Task<PaginatedResult<BloodInventory>> GetBloodUnitsByPagedAsync(int pageNumber, int pageSize);
+        Task<int> GetBloodUnitsExpiredAsync();
     }
 }
