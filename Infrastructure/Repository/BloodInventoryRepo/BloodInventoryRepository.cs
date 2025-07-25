@@ -12,7 +12,19 @@ namespace Infrastructure.Repository.BloodInventoryRepo
         {
 
         }
-        
+
+        public async Task<int> GetBloodUnitsExpiredAsync()
+        {
+            var expiredBloodUnits = await _dbSet
+                .Where(bu => bu.IsAvailable == true && bu.ExpiredDate <= DateTime.Now)
+                .ToListAsync();
+
+            foreach (var bu in expiredBloodUnits)
+                bu.IsAvailable = false;
+
+            return await _context.SaveChangesAsync();
+        }
+
         public async Task<PaginatedResult<BloodInventory>> GetBloodUnitsByPagedAsync(int pageNumber, int pageSize)
         {
             var bloodUnitsCount = await _dbSet

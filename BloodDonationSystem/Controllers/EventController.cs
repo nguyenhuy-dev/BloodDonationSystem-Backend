@@ -197,6 +197,7 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
+        [Authorize(Roles = "Member")]
         [HttpGet("api/events/urgent")]
         public async Task<IActionResult> GetUrgentEvents()
         {

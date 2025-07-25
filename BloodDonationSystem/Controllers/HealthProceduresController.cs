@@ -1,11 +1,9 @@
 ﻿using Application.DTO;
 using Application.DTO.HealthProcedureDTO;
 using Application.Service.HealthProcedureServ;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using MimeKit.Tnef;
 
 namespace BloodDonationSystem.Controllers
 {
@@ -17,23 +15,12 @@ namespace BloodDonationSystem.Controllers
         [HttpPost("api/blood-registrations/{bloodRegisId}/health-procedures")]
         public async Task<IActionResult> RecordHealthProcedure(int bloodRegisId, [FromBody] HealthProcedureRequest request)
         {
-            var healthProcedure = await _service.RecordHealthProcedureAsync(bloodRegisId, request);
+            var apiResponse = await _service.RecordHealthProcedureAsync(bloodRegisId, request);
 
-            if (healthProcedure == null)
-            {
-                return BadRequest(new ApiResponse<HealthProcedureRequest>()
-                {
-                    IsSuccess = false,
-                    Message = "Health procedure recorded unsuccessfully." 
-                });
-            }
+            if (apiResponse.IsSuccess == false)
+                return BadRequest(apiResponse);
 
-            return Ok(new ApiResponse<HealthProcedureRequest>()
-            {
-                IsSuccess = true,
-                Message = "Health procedure recorded successfully.",
-                Data = request
-            });
+            return Ok(apiResponse);
         }
 
         [Authorize(Roles = "Staff")]

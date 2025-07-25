@@ -211,8 +211,9 @@ namespace Application.Service.Events
 
             var member = await _userRepo.GetUserByIdAsync(memberId);
             if (member == null)
-                return null;
+                throw new UnauthorizedAccessException("Member not found or invalid");
 
+            // Kiểm tra các urgent events có tương ứng với "blood type" hay "vị trí" của member
             var urgentEvents = (await _eventRepository.GetAllEventNotPagedAsync())
                 .Where(e => !e.IsExpired &&
                             e.IsUrgent &&
