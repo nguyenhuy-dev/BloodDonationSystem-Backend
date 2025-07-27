@@ -73,8 +73,10 @@ namespace Application.Service.BloodHistoryServ
                 var volunteerHistory = volunteerRegistrations.Select(v => new UnifiedBloodHistory
                 {
                     Id = v.Id,
-                    Type = "Volunteer",
+                    Type = "Donation",
                     FacilityName = v.Event.Facility.Name,
+                    EventName = v.Event.Title,
+                    EventDate = v.Event.EventTime,
                     Longitude = v.Event.Facility.Longitude,
                     //Longitude = v.Member.Longitude,
                     Latitude = v.Event.Facility.Latitude,
