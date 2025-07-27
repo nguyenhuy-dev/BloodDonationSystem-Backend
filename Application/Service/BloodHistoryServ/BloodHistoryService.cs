@@ -84,7 +84,6 @@ namespace Application.Service.BloodHistoryServ
                     RegisterDate = DateOnly.FromDateTime(v.CreateAt),
                     StartDate = DateOnly.FromDateTime(v.Volunteer.StartVolunteerDate),
                     EndDate = DateOnly.FromDateTime(v.Volunteer.EndVolunteerDate),
-                    IsExpired = v.Volunteer.IsExpired
                 });
                 result.AddRange(volunteerHistory);
             }
