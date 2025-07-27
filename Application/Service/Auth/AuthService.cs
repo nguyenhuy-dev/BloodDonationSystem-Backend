@@ -199,8 +199,8 @@ namespace Application.Service.Auth
             {
                 return null;
             }
-            var hashPassword = new PasswordHasher<User>();
-            existUser.HashPass = hashPassword.HashPassword(existUser, request.Password);
+            //var hashPassword = new PasswordHasher<User>();
+            //existUser.HashPass = hashPassword.HashPassword(existUser, request.Password);
 
             existUser.FirstName = request.FirstName;
             existUser.LastName = request.LastName;

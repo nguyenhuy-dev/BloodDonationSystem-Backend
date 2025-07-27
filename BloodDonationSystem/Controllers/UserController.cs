@@ -1,4 +1,5 @@
-﻿using Application.DTO.UserDTO;
+﻿using Application.DTO;
+using Application.DTO.UserDTO;
 using Application.Service.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -139,18 +140,9 @@ namespace BloodDonationSystem.Controllers
             var updatedProfile = await _userService.UpdateUserProfileAsync(Guid.Parse(userId), profileDto);
             if (updatedProfile == null)
             {
-                return NotFound(new
-                {
-                    IsSuccess = false,
-                    Message = "User profile not found or could not be updated."
-                });
+                return BadRequest(updatedProfile);
             }
-            return Ok(new
-            {
-                IsSuccess = true,
-                Message = "User profile updated successfully.",
-                Data = updatedProfile
-            });
+            return Ok(updatedProfile);
         }
 
         [Authorize(Roles = "Admin")]

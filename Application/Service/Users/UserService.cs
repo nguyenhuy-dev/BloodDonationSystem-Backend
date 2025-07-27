@@ -1,4 +1,5 @@
-﻿using Application.DTO.UserDTO;
+﻿using Application.DTO;
+using Application.DTO.UserDTO;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Helper;
@@ -7,7 +8,10 @@ using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Org.BouncyCastle.Crypto.Macs;
+using System.Numerics;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.Service.Users
 {
@@ -198,23 +202,30 @@ namespace Application.Service.Users
             };
         }
 
-        public async Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UpdateProfileDTO updateUser)
+        public async Task<ApiResponse<ProfileDTO>> UpdateUserProfileAsync(Guid userId, UpdateProfileDTO updateUser)
         {
+            ApiResponse<ProfileDTO> apiResponse = new();
             var id = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (id == null || !Guid.TryParse(id, out Guid parsedUserId) || parsedUserId != userId)
             {
-                return null; // Unauthorized access or invalid user ID
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "User not valid";
+                return apiResponse; // Unauthorized access or invalid user ID
             }
 
             var existingUser = await _userRepository.GetUserByIdAsync(userId);
             if (existingUser == null)
             {
-                return null; // User not found
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "User not valid";
+                return apiResponse; // User not found
             }
 
             if (await _userRepository.IsPhoneOrEmailInUseByAnotherUserAsync(updateUser.Phone, updateUser.Gmail, userId))
             {
-                return null; // Phone or email already used by another user
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Phone or gmail already exist";
+                return apiResponse; // Phone or email already used by another user
             }
 
             existingUser.FirstName = updateUser.FirstName;
@@ -230,18 +241,21 @@ namespace Application.Service.Users
             var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(updateUser.BloodTypeId);
 
             var updatedUser = await _userRepository.UpdateUserProfileAsync(existingUser);
-
-            return new ProfileDTO
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "User profile updated successfully.";
+            apiResponse.Data = new ProfileDTO
             {
                 Name = $"{existingUser.LastName} {existingUser.FirstName}",
                 Phone = existingUser.Phone,
                 Gmail = existingUser.Gmail,
                 Gender = existingUser.Gender,
                 Dob = existingUser.Dob,
-                BloodType = bloodType.Type,
+                BloodType = bloodType?.Type,
                 Longitude = existingUser.Longitude,
-                Latitude = existingUser.Latitude,
+                Latitude = existingUser.Latitude
             };
+
+            return apiResponse;
         }
     }
 }
