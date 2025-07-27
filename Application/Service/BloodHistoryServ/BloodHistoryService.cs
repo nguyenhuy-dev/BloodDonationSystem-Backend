@@ -26,7 +26,9 @@ namespace Application.Service.BloodHistoryServ
 
             var bloodRegistrations = await _bloodRegistration.GetBloodRegistrationHistoryAsync(userId);
 
-            var volunteerRegistrations = await _volunteerRepository.GetVolunteerByMemberIdAsync(userId);
+            var volunteer = await _volunteerRepository.GetVolunteerByMemberIdAsync(userId);
+
+            var volunteerRegistrations = await _bloodRegistration.GetVolunteerRegistrationHistoryAsync(userId);
 
             var result = new List<UnifiedBloodHistory>();
 
@@ -48,9 +50,9 @@ namespace Application.Service.BloodHistoryServ
                 result.AddRange(donationHistory);
             }
 
-            if (volunteerRegistrations != null)
+            if (volunteer != null)
             {
-                var volunteerHistory = volunteerRegistrations.Select(v => new UnifiedBloodHistory
+                var volunteerHistory = volunteer.Select(v => new UnifiedBloodHistory
                 {
                     Id = v.Id,
                     Type = "Volunteer",
@@ -63,6 +65,24 @@ namespace Application.Service.BloodHistoryServ
                     StartDate = DateOnly.FromDateTime(v.StartVolunteerDate),
                     EndDate = DateOnly.FromDateTime(v.EndVolunteerDate),
                     IsExpired = v.IsExpired
+                });
+                result.AddRange(volunteerHistory);
+            }
+            if (volunteerRegistrations != null)
+            {
+                var volunteerHistory = volunteerRegistrations.Select(v => new UnifiedBloodHistory
+                {
+                    Id = v.Id,
+                    Type = "Volunteer",
+                    FacilityName = v.Event.Facility.Name,
+                    Longitude = v.Event.Facility.Longitude,
+                    //Longitude = v.Member.Longitude,
+                    Latitude = v.Event.Facility.Latitude,
+                    //Latitude = v.Member.Latitude,
+                    RegisterDate = DateOnly.FromDateTime(v.CreateAt),
+                    StartDate = DateOnly.FromDateTime(v.Volunteer.StartVolunteerDate),
+                    EndDate = DateOnly.FromDateTime(v.Volunteer.EndVolunteerDate),
+                    IsExpired = v.Volunteer.IsExpired
                 });
                 result.AddRange(volunteerHistory);
             }

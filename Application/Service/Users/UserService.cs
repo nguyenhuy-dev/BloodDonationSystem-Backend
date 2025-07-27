@@ -228,6 +228,7 @@ namespace Application.Service.Users
                 return apiResponse; // Phone or email already used by another user
             }
 
+            existingUser.Id = userId;
             existingUser.FirstName = updateUser.FirstName;
             existingUser.LastName = updateUser.LastName;
             existingUser.Phone = updateUser.Phone;
@@ -245,6 +246,7 @@ namespace Application.Service.Users
             apiResponse.Message = "User profile updated successfully.";
             apiResponse.Data = new ProfileDTO
             {
+                Id = existingUser.Id,
                 Name = $"{existingUser.LastName} {existingUser.FirstName}",
                 Phone = existingUser.Phone,
                 Gmail = existingUser.Gmail,

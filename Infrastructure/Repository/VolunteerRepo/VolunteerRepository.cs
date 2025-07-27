@@ -77,7 +77,7 @@ namespace Infrastructure.Repository.VolunteerRepo
         {
             return await _dbSet
                         .Include(v => v.Member)
-                        .Where(v => v.MemberId == memberId)
+                        .Where(v => v.MemberId == memberId && v.IsExpired == false)
                         .ToListAsync();
         }
 
