@@ -50,19 +50,19 @@ namespace Infrastructure.Data
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Latitude)
-                .HasColumnType("decimal(9,6)");
+                .HasColumnType("decimal(11,8)");
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Longitude)
-                .HasColumnType("decimal(9,6)");
+                .HasColumnType("decimal(11,8)");
 
             modelBuilder.Entity<Facility>()
                 .Property(f => f.Latitude)
-                .HasColumnType("decimal(9,6)");
+                .HasColumnType("decimal(11,8)");
 
             modelBuilder.Entity<Facility>()
                 .Property(f => f.Longitude)
-                .HasColumnType("decimal(9,6)");
+                .HasColumnType("decimal(11,8)");
 
             modelBuilder.Entity<BloodRegistration>()
                 .HasOne(br => br.Volunteer)
