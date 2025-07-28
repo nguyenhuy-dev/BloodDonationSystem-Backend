@@ -7,10 +7,10 @@ namespace Infrastructure.Data
 {
     public class BloodDonationSystemContext : DbContext
     {
-        //public BloodDonationSystemContext(DbContextOptions<BloodDonationSystemContext> options)
-        //    : base(options)
-        //{
-        //}
+        public BloodDonationSystemContext(DbContextOptions<BloodDonationSystemContext> options)
+            : base(options)
+        {
+        }
 
         public DbSet<BloodType> BloodTypes { get; set; }
         public DbSet<BloodCompatibility> BloodCompatibilities { get; set; }
@@ -31,7 +31,7 @@ namespace Infrastructure.Data
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 //Note: Remove this to migrationdotnet
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BloodDonationSystem/"))
+                //.SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BloodDonationSystem/"))
                 .AddJsonFile("appsettings.json")
                 .Build();
 

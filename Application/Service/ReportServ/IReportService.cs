@@ -11,5 +11,6 @@ namespace Application.Service.ReportServ
     {
         Task<DashboardStatsDTO> GetDashboardStatsReportAsync();
         Task<List<BloodStockDTO>> GetDashboardBloodStockReportAsync();
+        Task<List<DonationActivitiesDTO>> GetDashboardDonorsReportAsync();
     }
 }

@@ -2,6 +2,7 @@
 using Infrastructure.Repository.ReportRepository;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,26 @@ namespace Application.Service.ReportServ
                 }).ToList();
 
             return stock;
+        }
+
+        public async Task<List<DonationActivitiesDTO>> GetDashboardDonorsReportAsync()
+        {
+            var donationList = await _repo.GetDonationActivityThisYearAsync();
+            var donation = donationList
+                .GroupBy(dl => dl.CreateAt.Month)
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    Donations = g.Count()
+                });
+
+            var fullData = Enumerable.Range(1, 12).Select(m => new DonationActivitiesDTO
+            {
+                Month = CultureInfo.InvariantCulture.DateTimeFormat.GetAbbreviatedMonthName(m).ToUpper(), // JAN, FEB,...
+                Donations = donation.FirstOrDefault(d => d.Month == m)?.Donations ?? 0
+            }).ToList();
+
+            return fullData;
         }
 
         public async Task<DashboardStatsDTO> GetDashboardStatsReportAsync()

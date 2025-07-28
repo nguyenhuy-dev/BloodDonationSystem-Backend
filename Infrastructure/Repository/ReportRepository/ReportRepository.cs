@@ -19,9 +19,11 @@ namespace Infrastructure.Repository.ReportRepository
                 .ToListAsync();
         }
 
-        public Task<List<BloodRegistration>> GetDonationActivityThisYearAsync()
+        public async Task<List<BloodRegistration>> GetDonationActivityThisYearAsync()
         {
-            throw new NotImplementedException();
+            return await _context.BloodRegistrations
+                .Where(br => br.CreateAt.Year == TimeHelper.NowVietnam.Year)
+                .ToListAsync();
         }
 
         public async Task<int> GetMonthlyEventsAsync()

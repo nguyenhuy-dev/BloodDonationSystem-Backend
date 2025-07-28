@@ -30,5 +30,16 @@ namespace BloodDonationSystem.Controllers
                 Data = result
             });
         }
+        [Authorize(Roles = "Admin")]
+        [HttpGet("api/reports/activities")]
+        public async Task<IActionResult> GetDashboardDonationActivitiesReport()
+        {
+            var result = await _serv.GetDashboardDonorsReportAsync();
+            return Ok(new
+            {
+                IsSuccess = true,
+                Data = result
+            });
+        }
     }
 }
