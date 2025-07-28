@@ -7,10 +7,10 @@ namespace Infrastructure.Data
 {
     public class BloodDonationSystemContext : DbContext
     {
-        public BloodDonationSystemContext(DbContextOptions<BloodDonationSystemContext> options)
-            : base(options)
-        {
-        }
+        //public BloodDonationSystemContext(DbContextOptions<BloodDonationSystemContext> options)
+        //    : base(options)
+        //{
+        //}
 
         public DbSet<BloodType> BloodTypes { get; set; }
         public DbSet<BloodCompatibility> BloodCompatibilities { get; set; }
@@ -31,7 +31,7 @@ namespace Infrastructure.Data
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 //Note: Remove this to migrationdotnet
-                //.SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BloodDonationSystem/"))
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../BloodDonationSystem/"))
                 .AddJsonFile("appsettings.json")
                 .Build();
 
@@ -50,19 +50,19 @@ namespace Infrastructure.Data
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Latitude)
-                .HasColumnType("decimal(9,6)");
+                .HasColumnType("decimal(11,8)");
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Longitude)
-                .HasColumnType("decimal(9,6)");
+                .HasColumnType("decimal(11,8)");
 
             modelBuilder.Entity<Facility>()
                 .Property(f => f.Latitude)
-                .HasColumnType("decimal(9,6)");
+                .HasColumnType("decimal(11,8)");
 
             modelBuilder.Entity<Facility>()
                 .Property(f => f.Longitude)
-                .HasColumnType("decimal(9,6)");
+                .HasColumnType("decimal(11,8)");
 
             modelBuilder.Entity<BloodRegistration>()
                 .HasOne(br => br.Volunteer)
