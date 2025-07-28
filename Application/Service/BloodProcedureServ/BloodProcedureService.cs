@@ -229,7 +229,7 @@ namespace Application.Service.BloodProcedureServ
             var bloodInventory = new BloodInventory
             {
                 Volume = bloodProcedure.Volume,
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 IsAvailable = true,
                 BloodTypeId = (int) bloodProcedure.BloodTypeId,
                 BloodComponent = (BloodComponent) bloodProcedure.BloodComponent,
