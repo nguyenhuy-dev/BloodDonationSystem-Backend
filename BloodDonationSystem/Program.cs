@@ -11,6 +11,7 @@ using Application.Service.CommentServ;
 using Application.Service.EmailServ;
 using Application.Service.Events;
 using Application.Service.HealthProcedureServ;
+using Application.Service.ReportServ;
 using Application.Service.Users;
 using Application.Service.VolunteerServ;
 using BloodDonationSystem.BackgroundServices;
@@ -26,6 +27,7 @@ using Infrastructure.Repository.CommentRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
 using Infrastructure.Repository.HealthProcedureRepo;
+using Infrastructure.Repository.ReportRepository;
 using Infrastructure.Repository.Users;
 using Infrastructure.Repository.VolunteerRepo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -80,6 +82,9 @@ builder.Services.AddScoped<IBloodInventoryService, BloodInventoryService>();
 
 builder.Services.AddScoped<IVolunteerRepository,VolunteerRepository>();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
+
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
 
