@@ -71,9 +71,8 @@ namespace Application.Service.BloodRegistrationServ
 
             // Kiểm tra member chỉ được đăng ký vào duy nhất 1 đơn đăng ký hoặc đơn tình nguyện
             var volunteerRegistrations = (await _repoVolun.GetVolunteerByMemberIdAsync(creatorId))?
-                                            .Where(v => v.IsExpired == false)
                                             .ToList();
-            if (volunteerRegistrations != null)
+            if (volunteerRegistrations?.Count > 0)
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.Message = "Already registered another volunteer.";
