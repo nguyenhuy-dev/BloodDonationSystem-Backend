@@ -72,7 +72,7 @@ namespace Application.Service.BloodRegistrationServ
             // Kiểm tra member chỉ được đăng ký vào duy nhất 1 đơn đăng ký hoặc đơn tình nguyện
             var volunteerRegistrations = (await _repoVolun.GetVolunteerByMemberIdAsync(creatorId))?
                                             .ToList();
-            if (volunteerRegistrations?.Count > 0)
+            if (volunteerRegistrations?.Count > 0)  // SAI: Vì ToList() luôn trả về danh sách khác null
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.Message = "Already registered another volunteer.";

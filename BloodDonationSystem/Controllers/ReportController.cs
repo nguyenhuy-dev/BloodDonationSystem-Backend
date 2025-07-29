@@ -19,6 +19,7 @@ namespace BloodDonationSystem.Controllers
                 Data = result
             });
         }
+
         [Authorize(Roles = "Admin")]
         [HttpGet("api/reports/blood-stock")]
         public async Task<IActionResult> GetDashboardBloodStockReport()
@@ -30,6 +31,7 @@ namespace BloodDonationSystem.Controllers
                 Data = result
             });
         }
+
         [Authorize(Roles = "Admin")]
         [HttpGet("api/reports/activities")]
         public async Task<IActionResult> GetDashboardDonationActivitiesReport()
@@ -40,6 +42,15 @@ namespace BloodDonationSystem.Controllers
                 IsSuccess = true,
                 Data = result
             });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("api/reports/events")]
+        public async Task<IActionResult> GetDashboardEventsReport(int pageNumber, int pageSize)
+        {
+            var apiResponse = await _serv.GetEventsForDashboardAdminAsync(pageNumber, pageSize);
+
+            return Ok(apiResponse);
         }
     }
 }

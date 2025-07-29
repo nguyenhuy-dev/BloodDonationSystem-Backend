@@ -12,12 +12,11 @@ using System.Security.Claims;
 
 namespace Application.Service.Events
 {
-    public class EventService(IEventRepository _eventRepository, 
+    public class EventService(IEventRepository _eventRepository,
                             IHttpContextAccessor _contextAccessor,
                             IBloodTypeRepository _bloodRepository,
                             IBloodRegistrationRepository _bloodRegisRepo,
-                            IUserRepository _userRepo, 
-                            IFacilityRepository _faciRepo) : IEventService
+                            IUserRepository _userRepo) : IEventService
     {
         public async Task<Event?> AddEventAsync(NormalEventDTO eventRequest)
         {
@@ -133,7 +132,7 @@ namespace Application.Service.Events
                                         .Where(br => br.EventId == e.Id).Count()
             }).ToList();
 
-            
+
             return new PaginatedResult<EventDTO>
             {
                 Items = eventDTOs,
@@ -190,7 +189,7 @@ namespace Application.Service.Events
                 Name = e.Title,
                 Total = e.BloodRegistrations.Count,
                 EventTime = e.EventTime
-                
+
             })
               .ToList();
 
@@ -238,7 +237,7 @@ namespace Application.Service.Events
                 IsSuccess = true,
                 Message = "Urgent events retrieved successfully."
             };
-            
+
             if (apiResponse.Data == null || !apiResponse.Data.Any())
             {
                 apiResponse.IsSuccess = false;

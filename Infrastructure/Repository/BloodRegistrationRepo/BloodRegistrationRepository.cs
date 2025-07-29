@@ -68,6 +68,7 @@ namespace Infrastructure.Repository.BloodRegistrationRepo
         public async Task<IEnumerable<BloodRegistration>> GetByEventAsync(int eventId)
         {
             return await _dbSet
+                        .Include(br => br.BloodProcedure)
                         .Where(br => br.EventId == eventId)
                         .ToListAsync();           
         }

@@ -98,9 +98,9 @@ namespace Application.Service.HealthProcedureServ
             return pagedResult;
         }
 
-        public async Task<ApiResponse<HealthProcedure>> RecordHealthProcedureAsync(int id, HealthProcedureRequest request)
+        public async Task<ApiResponse<HealthProcedureRequest>> RecordHealthProcedureAsync(int id, HealthProcedureRequest request)
         {
-            ApiResponse<HealthProcedure> apiResponse = new();
+            ApiResponse<HealthProcedureRequest> apiResponse = new();
 
             // Nếu đơn đăng ký Not Found hoặc đã khám thì không được record
             var bloodRegistration = await _repoRegis.GetByIdAsync(id);
@@ -148,7 +148,7 @@ namespace Application.Service.HealthProcedureServ
 
             apiResponse.IsSuccess = true;
             apiResponse.Message = "Health procedure recorded successfully.";
-            apiResponse.Data = healthProcedure;
+            apiResponse.Data = request;
 
             return apiResponse;
         }

@@ -1,4 +1,7 @@
-﻿using Application.DTO.ReportDTO;
+﻿using Application.DTO.EventsDTO;
+using Application.DTO;
+using Application.DTO.ReportDTO;
+using Infrastructure.Helper;
 using Infrastructure.Repository.ReportRepository;
 using System;
 using System.Collections.Generic;
@@ -6,10 +9,13 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Infrastructure.Repository.Events;
+using Infrastructure.Repository.BloodRegistrationRepo;
 
 namespace Application.Service.ReportServ
 {
-    public class ReportService(IReportRepository _repo) : IReportService
+    public class ReportService(IReportRepository _repo, IEventRepository _eventRepository,
+                                IBloodRegistrationRepository _bloodRegisRepo) : IReportService
     {
         public async Task<List<BloodStockDTO>> GetDashboardBloodStockReportAsync()
         {
@@ -78,6 +84,63 @@ namespace Application.Service.ReportServ
                 Value = $"{rate:+0.00;-0.00}%",
                 Trend = trend
             };
+        }
+
+        public async Task<ApiResponse<PaginatedResult<EventForDashAdminDTO>>> GetEventsForDashboardAdminAsync(int pageNumber, int pageSize)
+        {
+            ApiResponse<PaginatedResult<EventForDashAdminDTO>> apiResponse = new()
+            {
+                IsSuccess = true,
+                Message = "Events retrieved successfully.",
+                Data = new PaginatedResult<EventForDashAdminDTO>
+                {
+                    Items = new List<EventForDashAdminDTO>(),
+                    TotalItems = (await _eventRepository.GetAllEventNotPagedAsync()).Count(),
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                }
+            };
+
+            var events = (await _eventRepository.GetAllEventNotPagedAsync())
+                                            .Skip((pageNumber - 1) * pageSize)
+                                            .Take(pageSize)
+                                            .ToList();
+
+            var eventDTOs = events.Select(e => new EventForDashAdminDTO
+            {
+                Id = e.Id,
+                EventTime = e.EventTime,
+                Address = e.Facility?.Address ?? "Unknown",
+                BloodRegisCount = _bloodRegisRepo.GetByEventAsync(e.Id).Result.Count(),
+                IsExpired = e.IsExpired,
+                IsUrgent = e.IsUrgent,
+                BloodType = e.BloodType?.Type ?? null,
+                BloodComponent = e.BloodComponent?.ToString() ?? null,
+                BloodTypeId = e.BloodTypeId ?? null
+            }).ToList();
+
+            foreach (var eventDTO in eventDTOs)
+            {
+                // Xét số Blood Registrations mà thành công, trong đó đối với urgent event thì cần phải cùng nhóm máu 
+                if (eventDTO.IsUrgent == false)
+                    eventDTO.SuccessfulBloodRegisCount = (await _bloodRegisRepo.GetByEventAsync(eventDTO.Id)).Count(br => br.IsApproved == true &&
+                                                                                            br.BloodProcedure.IsQualified == true);
+                else
+                    eventDTO.SuccessfulBloodRegisCount = (await _bloodRegisRepo.GetByEventAsync(eventDTO.Id)).Count(br => br.IsApproved == true &&
+                                                                                            br.BloodProcedure.IsQualified == true &&
+                                                                                            br.BloodProcedure.BloodTypeId == eventDTO.BloodTypeId);
+
+                if (eventDTO.EventTime > DateOnly.FromDateTime(DateTime.Now))
+                    eventDTO.Status = "Sắp diễn ra";
+                else if (eventDTO.EventTime == DateOnly.FromDateTime(DateTime.Now))
+                    eventDTO.Status = "Đang diễn ra";
+                else
+                    eventDTO.Status = "Đã hoàn thành";
+            }
+
+            apiResponse.Data.Items = eventDTOs.ToList();
+
+            return apiResponse;
         }
     }
 }
