@@ -122,7 +122,7 @@ namespace Application.Service.Auth
             var tokenDescription = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims), //Config token tra ra cai gi
-                Expires = DateTime.UtcNow.AddMinutes(60), //Token expires in 1 min to test
+                Expires = DateTime.UtcNow.AddHours(3),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(secretKeyByte), //Secret key
                     SecurityAlgorithms.HmacSha256)
