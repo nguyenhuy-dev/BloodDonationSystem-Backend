@@ -92,10 +92,15 @@ namespace BloodDonationSystem.Controllers
             var eventItem = await _eventService.UpdateEventAsync(eventId, updateEvent);
             if (eventItem == null)
             {
-                return BadRequest("Cannot update event");
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "Cannot update event"
+                });
             }
             return Ok(new
             {
+                IsSuccess = true,
                 Message = "Event updated successfully",
                 EventDTO = eventItem
             });
@@ -109,10 +114,20 @@ namespace BloodDonationSystem.Controllers
             {
                 return BadRequest("Invalid event ID.");
             }
-            await _eventService.DeleteEventAsync(eventId);
+            var updateEvent = await _eventService.DeleteEventAsync(eventId);
+
+            if(updateEvent == null)
+            {
+                return BadRequest(new
+                {
+                    IsSuccess = false,
+                    Message = "Cannot delete event."
+                });
+            }
+
             return Ok(new
             {
-                Success = true,
+                IsSuccess = true,
                 Message = "Event deleted successfully"
             });
         }
@@ -180,6 +195,18 @@ namespace BloodDonationSystem.Controllers
                 Message = "Event retrieved successfully",
                 Data = events
             });
+        }
+
+        [Authorize(Roles = "Member")]
+        [HttpGet("api/events/urgent")]
+        public async Task<IActionResult> GetUrgentEvents()
+        {
+            var apiResponse = await _eventService.GetUrgentEventsAsync();
+            
+            if (apiResponse.IsSuccess == false)
+                return NotFound(apiResponse);
+
+            return Ok(apiResponse);
         }
     }
 }

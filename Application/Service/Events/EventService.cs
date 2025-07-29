@@ -1,18 +1,22 @@
-﻿using Application.DTO.EventsDTO;
+﻿using Application.DTO;
+using Application.DTO.EventsDTO;
 using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.BloodRegistrationRepo;
 using Infrastructure.Repository.Events;
+using Infrastructure.Repository.Facilities;
+using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
 namespace Application.Service.Events
 {
-    public class EventService(IEventRepository _eventRepository, 
+    public class EventService(IEventRepository _eventRepository,
                             IHttpContextAccessor _contextAccessor,
                             IBloodTypeRepository _bloodRepository,
-                            IBloodRegistrationRepository _bloodRegisRepo) : IEventService
+                            IBloodRegistrationRepository _bloodRegisRepo,
+                            IUserRepository _userRepo) : IEventService
     {
         public async Task<Event?> AddEventAsync(NormalEventDTO eventRequest)
         {
@@ -27,7 +31,7 @@ namespace Application.Service.Events
                 Title = eventRequest.Title,
                 MaxOfDonor = eventRequest.MaxOfDonor,
                 EstimatedVolume = eventRequest.EstimatedVolume,
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 EventTime = eventRequest.EventTime,
                 IsUrgent = false,
                 IsExpired = false,
@@ -46,16 +50,16 @@ namespace Application.Service.Events
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
-            var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(eventRequest.BloodTypeId);
+            //var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(eventRequest.BloodType);
 
             var events = new Event
             {
                 Title = eventRequest.Title,
                 MaxOfDonor = eventRequest.MaxOfDonor,
                 EstimatedVolume = eventRequest.EstimatedVolume,
-                BloodTypeId = bloodType.Id,
+                BloodTypeId = eventRequest.BloodTypeId,
                 BloodComponent = eventRequest.BloodComponent,
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 EventTime = eventRequest.EventTime,
                 IsUrgent = true,
                 IsExpired = false,
@@ -74,16 +78,20 @@ namespace Application.Service.Events
                 throw new UnauthorizedAccessException("User not found or invalid");
             }
 
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
             var existEvent = await _eventRepository.GetEventByIdAsync(eventId);
-            if (existEvent == null)
+            if (existEvent == null || existEvent.EventTime == today || existEvent.IsExpired == true)
             {
-                throw new KeyNotFoundException($"Event with ID {eventId} not found.");
+                return null;
             }
 
             existEvent.UpdateBy = updaterId; // Set the updater ID
-            existEvent.UpdateAt = DateTime.Now; // Update the timestamp
+            existEvent.UpdateAt = TimeHelper.NowVietnam; // Update the timestamp
             existEvent.IsExpired = true; // Update the expired status
+
             await _eventRepository.UpdateEventAsync(existEvent);
+            await _bloodRegisRepo.BloodRegistrationExpiredWithEventExpireAsync(eventId);
             return existEvent;
         }
 
@@ -124,7 +132,7 @@ namespace Application.Service.Events
                                         .Where(br => br.EventId == e.Id).Count()
             }).ToList();
 
-            
+
             return new PaginatedResult<EventDTO>
             {
                 Items = eventDTOs,
@@ -145,7 +153,7 @@ namespace Application.Service.Events
             return eventItem;
         }
 
-        public async Task<PaginatedResultWithEventTime<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetEventListDoBloodProcedure(pageNumber, pageSize);
             var totalItems = await _eventRepository.CountEventListDoBloodProcedure();
@@ -156,20 +164,20 @@ namespace Application.Service.Events
                 Id = e.Id,
                 Name = e.Title,
                 Total = e.BloodRegistrations.Count,
+                EventTime = e.EventTime
             }).Where(e => e.Total > 0)
               .ToList();
 
-            return new PaginatedResultWithEventTime<ListWaiting>
+            return new PaginatedResult<ListWaiting>
             {
                 TotalItems = totalItems,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                EventTime = eventTime,
                 Items = dto,
             };
         }
 
-        public async Task<PaginatedResultWithEventTime<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize)
         {
             var events = await _eventRepository.GetPassedHealthProcedureAsync(pageNumber, pageSize);
             var totalItems = await _eventRepository.CountEventPassedHealthProcedureAsync();
@@ -180,17 +188,63 @@ namespace Application.Service.Events
                 Id = e.Id,
                 Name = e.Title,
                 Total = e.BloodRegistrations.Count,
-            }).Where(e => e.Total > 0)
+                EventTime = e.EventTime
+
+            })
               .ToList();
 
-            return new PaginatedResultWithEventTime<ListWaiting>
+            return new PaginatedResult<ListWaiting>
             {
                 TotalItems = totalItems,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                EventTime = eventTime,
                 Items = dto,
             };
+        }
+
+        public async Task<ApiResponse<List<UrgentEventResponse>>> GetUrgentEventsAsync()
+        {
+            var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid memberId))
+                throw new UnauthorizedAccessException("User not found or invalid");
+
+            var member = await _userRepo.GetUserByIdAsync(memberId);
+            if (member == null)
+                throw new UnauthorizedAccessException("Member not found or invalid");
+
+            // Kiểm tra các urgent events có tương ứng với "blood type" hay "vị trí" của member
+            var urgentEvents = (await _eventRepository.GetAllEventNotPagedAsync())
+                .Where(e => !e.IsExpired &&
+                            e.IsUrgent &&
+                            e.BloodTypeId == member.BloodTypeId &&
+                            ((decimal)GeographyHelper.CalculateDistanceKm(e.Facility.Latitude, e.Facility.Longitude, member.Latitude, member.Longitude)) <= 10)
+                .OrderBy(e => e.EventTime)
+                .ToList();
+
+            var apiResponse = new ApiResponse<List<UrgentEventResponse>>
+            {
+                Data = urgentEvents.Select(e => new UrgentEventResponse
+                {
+                    EventId = e.Id,
+                    Title = e.Title,
+                    EstimatedVolume = e.EstimatedVolume,
+                    EventTime = e.EventTime,
+                    CreateAt = e.CreateAt,
+                    BloodTypeName = e.BloodType?.Type ?? "Unknown",
+                    Distance = Math.Round((decimal)GeographyHelper.CalculateDistanceKm(e.Facility.Latitude, e.Facility.Longitude, member.Latitude, member.Longitude), 1),
+
+                }).ToList(),
+                IsSuccess = true,
+                Message = "Urgent events retrieved successfully."
+            };
+
+            if (apiResponse.Data == null || !apiResponse.Data.Any())
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "No urgent events found.";
+            }
+
+            return apiResponse;
         }
 
         public async Task<PaginatedResult<EventDTO>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay)
@@ -234,16 +288,20 @@ namespace Application.Service.Events
             }
 
             var existEvent = await _eventRepository.GetEventByIdAsync(eventId);
-            if (existEvent == null)
+            var currentRegisterd = await _bloodRegisRepo.CountBloodRegisteredEvents(eventId);
+
+            if (existEvent == null || updateEvent.MaxOfDonor < currentRegisterd)
             {
-                throw new KeyNotFoundException($"Event with ID {eventId} not found.");
+                return null;
             }
+
+
             existEvent.Title = updateEvent.Title;
             existEvent.MaxOfDonor = updateEvent.MaxOfDonor;
             existEvent.EstimatedVolume = updateEvent.EstimatedVolume;
             existEvent.EventTime = updateEvent.EventTime;
             existEvent.IsUrgent = updateEvent.IsUrgent;
-            existEvent.UpdateAt = DateTime.Now;
+            existEvent.UpdateAt = TimeHelper.NowVietnam;
             existEvent.IsExpired = existEvent.IsExpired; // Keep original expired status
             //existEvent.BloodTypeId = updateEvent.BloodTypeId; // Update blood type if provided
             //existEvent.BloodComponent = updateEvent.BloodComponent.; // Update blood component if provided

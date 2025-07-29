@@ -1,11 +1,13 @@
 ﻿using Application.DTO.CommentDTO;
 using Application.Service.CommentServ;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloodDonationSystem.Controllers
 {
+    [EnableCors("LocalPolicy")]
     [ApiController]
 
     public class CommentController(ICommentService _commentService) : ControllerBase

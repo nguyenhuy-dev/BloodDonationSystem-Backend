@@ -31,7 +31,7 @@ namespace Infrastructure.Repository.Events
             return await _context.Events
                 .Where(e => e.IsUrgent)
                 .Include(e => e.BloodType) // Include related BloodType entity if needed
-                .OrderByDescending(e => e.CreateAt)
+                .OrderBy(e => e.EventTime)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -42,7 +42,7 @@ namespace Infrastructure.Repository.Events
             return await _context.Events
                 .Where(e => !e.IsUrgent)
                 .Include(e => e.BloodType) // Include related BloodType entity if needed
-                .OrderByDescending(e => e.CreateAt)
+                .OrderBy(e => e.EventTime)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -52,7 +52,7 @@ namespace Infrastructure.Repository.Events
         {
             return await _context.Events
                 .Include(e => e.BloodType) // Include related BloodType entity if needed
-                .OrderByDescending(e => e.CreateAt)
+                .OrderBy(e => e.EventTime)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -63,7 +63,7 @@ namespace Infrastructure.Repository.Events
             return await _context.Events
                 .Where(e => e.IsExpired == false)
                 .Include(e => e.BloodType) // Include related BloodType entity if needed
-                .OrderByDescending(e => e.CreateAt)
+                .OrderBy(e => e.EventTime)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -103,7 +103,10 @@ namespace Infrastructure.Repository.Events
             var events = await _context.Events
                 .Where(e => e.IsExpired == false)
                 .Include(e => e.BloodRegistrations.Where(br => br.HealthId != null && br.IsApproved == true && br.BloodProcedureId == null))
-                .OrderByDescending(e => e.CreateAt)
+                .Where(e => e.BloodRegistrations
+                    .Where(br => br.HealthId != null && br.IsApproved == true && br.BloodProcedureId == null)
+                    .Any())
+                .OrderBy(e => e.CreateAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -195,6 +198,8 @@ namespace Infrastructure.Repository.Events
         public async Task<IEnumerable<Event>> GetAllEventNotPagedAsync()
         {
             return await _context.Events
+                .Include(e => e.Facility)
+                .Include(e => e.BloodType)
                 .ToListAsync();
         }
     }

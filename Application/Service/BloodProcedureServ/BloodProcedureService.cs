@@ -57,7 +57,7 @@ namespace Application.Service.BloodProcedureServ
         {
             ApiResponse<BloodProcedure> apiResponse = new();
 
-            // Kiểm tra đơn đăng ký hiến máu không tồn tại
+            // Kiểm tra đơn đăng ký hiến máu có tồn tại
             var bloodRegistration = await _repoRegis.GetByIdAsync(id);
             if (bloodRegistration == null || bloodRegistration.IsApproved == false)
             {
@@ -83,6 +83,11 @@ namespace Application.Service.BloodProcedureServ
                 return apiResponse;
             }
 
+            var member = await _repoUser.GetUserByIdAsync(bloodRegistration.MemberId);
+            if (member == null)
+                throw new UnauthorizedAccessException("User not found or invalid");
+
+
             var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid creatorId))
             {
@@ -92,23 +97,20 @@ namespace Application.Service.BloodProcedureServ
             var bloodCollection = new BloodProcedure
             {
                 Volume = request.Volume,
-                PerformedAt = DateTime.Now,
+                PerformedAt = TimeHelper.NowVietnam,
                 Description = request.Description,
                 PerformedBy = creatorId
             };
             var bloodCollectionAdded = await _repo.AddAsync(bloodCollection);
 
             // Update lại lần cuối hiến máu
-            var member = await _repoUser.GetUserByIdAsync(bloodRegistration.MemberId);
-            if (member == null)
-                throw new UnauthorizedAccessException("User not found or invalid");
             var existedEvent = await _repoEvent.GetEventByIdAsync(bloodRegistration.EventId);
             member.LastDonation = existedEvent?.EventTime.ToDateTime(TimeOnly.MinValue);
             await _repoUser.UpdateUserProfileAsync(member);
 
             // Update lại cho table BloodRegistrations
             bloodRegistration.BloodProcedureId = bloodCollectionAdded.Id;
-            bloodRegistration.UpdateAt = DateTime.Now;
+            bloodRegistration.UpdateAt = TimeHelper.NowVietnam;
             bloodRegistration.StaffId = creatorId;
             await _repoRegis.UpdateAsync(bloodRegistration);
 
@@ -227,7 +229,7 @@ namespace Application.Service.BloodProcedureServ
             var bloodInventory = new BloodInventory
             {
                 Volume = bloodProcedure.Volume,
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 IsAvailable = true,
                 BloodTypeId = (int) bloodProcedure.BloodTypeId,
                 BloodComponent = (BloodComponent) bloodProcedure.BloodComponent,

@@ -1,4 +1,5 @@
-﻿using Application.DTO.EventsDTO;
+﻿using Application.DTO;
+using Application.DTO.EventsDTO;
 using Domain.Entities;
 using Infrastructure.Helper;
 
@@ -20,7 +21,9 @@ namespace Application.Service.Events
 
         Task<PaginatedResult<EventDTO>> SearchEventByDayAsync(int pageNumber, int pageSize, DateOnly? startDay, DateOnly? endDay);
 
-        Task<PaginatedResultWithEventTime<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize);
-        Task<PaginatedResultWithEventTime<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize);
+        Task<PaginatedResult<ListWaiting>> GetPassedHealthProcedureAsync(int pageNumber, int pageSize);
+        Task<PaginatedResult<ListWaiting>> GetEventListDoBloodProcedure(int pageNumber, int pageSize);
+
+        Task<ApiResponse<List<UrgentEventResponse>>> GetUrgentEventsAsync();
     }
 }

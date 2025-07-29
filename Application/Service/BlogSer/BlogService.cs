@@ -23,7 +23,7 @@ namespace Application.Service.BlogSer
                 Content = blogDTO.Content,
                 AuthorId = userId,
                 IsActived = true,
-                CreateAt = DateTime.Now
+                CreateAt = TimeHelper.NowVietnam
             };
 
             var created = await _blogRepository.CreateBlogAsync(blog);
@@ -125,7 +125,7 @@ namespace Application.Service.BlogSer
             existingBlog.Title = blogDTO.Title;
             existingBlog.Content = blogDTO.Content;
             existingBlog.IsActived = true;
-            existingBlog.LastUpdate = DateTime.Now;
+            existingBlog.LastUpdate = TimeHelper.NowVietnam;
 
             var updated = await _blogRepository.UpdateBlogAsync(existingBlog);
             return new BlogResponseDTO

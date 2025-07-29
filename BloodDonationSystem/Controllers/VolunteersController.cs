@@ -68,7 +68,7 @@ namespace BloodDonationSystem.Controllers
         }
 
         [Authorize(Roles = "Staff")]
-        [HttpPut("find-donors")]
+        [HttpPost("find-donors")]
         public async Task<IActionResult> AddDonationRegistrationWithVolunteer(UrgentEventVolunteer urgentEventVolunteer)
         {
             var apiResponse = await _service.AddDonationRegistrationWithVolunteersAsync(urgentEventVolunteer);
@@ -79,24 +79,35 @@ namespace BloodDonationSystem.Controllers
             return Ok(apiResponse);
         }
 
-        [Authorize]
-        [HttpPut("{id}/date")]
-        public async Task<IActionResult> UpdateAvailableDateForVolunteer(int id, [FromBody]UpdateAvailableDateDTO request)
+        [Authorize(Roles = "Member")]
+        [HttpPut("cancel/{volunteerId}")]
+        public async Task<IActionResult> CancelOwnVolunteer(int volunteerId)
         {
-            var update = await _bloodHistory.UpdateAvailableDateVolunteerAsync(id, request);
-            if (!update)
-            {
-                return BadRequest(new
-                {
-                    IsSuccess = false,
-                    Message = "Failed to update"
-                });
-            }
-            return Ok(new
-            {
-                IsSuccess = true,
-                Message = "Update successfully"
-            });
+            var apiResponse = await _service.CancelOwnVolunteerAsync(volunteerId);
+            if (apiResponse.IsSuccess == false)
+                return BadRequest(apiResponse);
+
+            return Ok(apiResponse);
         }
+
+        //[Authorize]
+        //[HttpPut("{id}/date")]
+        //public async Task<IActionResult> UpdateAvailableDateForVolunteer(int id, [FromBody]UpdateAvailableDateDTO request)
+        //{
+        //    var update = await _bloodHistory.UpdateAvailableDateVolunteerAsync(id, request);
+        //    if (!update)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Failed to update"
+        //        });
+        //    }
+        //    return Ok(new
+        //    {
+        //        IsSuccess = true,
+        //        Message = "Update successfully"
+        //    });
+        //}
     }
 }

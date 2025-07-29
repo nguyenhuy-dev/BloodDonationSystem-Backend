@@ -11,6 +11,7 @@ using Application.Service.CommentServ;
 using Application.Service.EmailServ;
 using Application.Service.Events;
 using Application.Service.HealthProcedureServ;
+using Application.Service.ReportServ;
 using Application.Service.Users;
 using Application.Service.VolunteerServ;
 using BloodDonationSystem.BackgroundServices;
@@ -26,6 +27,7 @@ using Infrastructure.Repository.CommentRepo;
 using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
 using Infrastructure.Repository.HealthProcedureRepo;
+using Infrastructure.Repository.ReportRepository;
 using Infrastructure.Repository.Users;
 using Infrastructure.Repository.VolunteerRepo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,6 +39,24 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("LocalPolicy", policy =>
+    {
+        policy
+            .WithOrigins(
+            "https://cors-test.codehappy.dev/",
+            "http://localhost:5173",
+            "https://localhost:5173",
+            "https://Blood-Donation-Support-System.somee.com",
+            "https://blood-donation-support-system-fe.vercel.app")    // your React app
+                                                                  //.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();                     // if you send cookies/auth
+    });
+});
 
 
 //Dependency Injection (DI) for donation
@@ -63,6 +83,9 @@ builder.Services.AddScoped<IBloodInventoryService, BloodInventoryService>();
 builder.Services.AddScoped<IVolunteerRepository,VolunteerRepository>();
 builder.Services.AddScoped<IVolunteerService, VolunteerService>();
 
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportService, ReportService>();
+
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
 
 builder.Services.AddScoped<IBloodTypeRepository, BloodTypeRepository>();
@@ -83,6 +106,8 @@ builder.Services.AddScoped<IBloodCompatibilityService, BloodCompatibilityService
 builder.Services.AddHostedService<EventExpiryBackgroundService>();
 builder.Services.AddHostedService<BloodRegistrationExpiryBackgroundService>();
 builder.Services.AddHostedService<VolunteerExpiryBackgroundService>();
+builder.Services.AddHostedService<ReminderMailBackgroundService>();
+builder.Services.AddHostedService<BloodUnitsExpiryBackgroundService>();
 
 
 // Add configuration for email service
@@ -152,6 +177,8 @@ builder.Services.AddDbContext<BloodDonationSystemContext>(options =>
 
 var app = builder.Build();
 
+// In Program.cs, add this middleware before UseCors
+
 // Configure the HTTP request pipeline.
 app.UseCors("LocalPolicy");
 app.UseHttpsRedirection();
@@ -159,7 +186,7 @@ app.UseAuthentication();              // Bật middleware xác thực
 app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();                         // Bật Swagger middleware
     app.UseSwaggerUI();                       // Giao diện UI

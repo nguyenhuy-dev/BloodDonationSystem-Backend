@@ -53,7 +53,7 @@ namespace Infrastructure.Repository.VolunteerRepo
                     Volunteer = vr,
                     Distance = GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, vr.Member.Latitude, vr.Member.Longitude)
                 })
-                .Where(vr => vr.Distance <= 5 && vr.Volunteer.IsExpired == false);  //hard code 5km
+                .Where(vr => vr.Distance <= 10 && vr.Volunteer.IsExpired == false);
 
             var volunteersPaged = volunteers
                 .OrderBy(vr => vr.Distance)
@@ -76,7 +76,8 @@ namespace Infrastructure.Repository.VolunteerRepo
         public async Task<IEnumerable<Volunteer>?> GetVolunteerByMemberIdAsync(Guid memberId)
         {
             return await _dbSet
-                        .Where(v => v.MemberId == memberId)
+                        .Include(v => v.Member)
+                        .Where(v => v.MemberId == memberId && v.IsExpired == false)
                         .ToListAsync();
         }
 

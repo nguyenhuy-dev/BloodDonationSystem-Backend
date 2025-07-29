@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -88,6 +89,20 @@ namespace Infrastructure.Repository.Auth
             _context.RefreshTokens.Update(refreshToken);
             await _context.SaveChangesAsync();
             return refreshToken; // Return the updated refresh token
+        }
+
+        public async Task<bool> ResetPasswordAsync(string phone, string newPassword)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Phone == phone);
+            if (user == null)
+                return false;
+
+            var passwordHasher = new PasswordHasher<User>();
+            user.HashPass = passwordHasher.HashPassword(user, newPassword);
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

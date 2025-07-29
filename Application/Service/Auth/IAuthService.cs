@@ -17,5 +17,6 @@ namespace Application.Service.Auth
 
         Task<User> UpdateGoogleLoginAsync(UpdateGoogleLogin request);
         Task<RefreshToken> UpdateRefreshTokenAsync(RefreshToken refreshToken);
+        Task<bool> ResetPasswordAsync(string phone, string newPassword);
     }
 }

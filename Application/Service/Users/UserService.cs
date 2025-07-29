@@ -1,4 +1,5 @@
-﻿using Application.DTO.UserDTO;
+﻿using Application.DTO;
+using Application.DTO.UserDTO;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Helper;
@@ -6,11 +7,11 @@ using Infrastructure.Repository.Auth;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.Users;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Org.BouncyCastle.Crypto.Macs;
 using System.Numerics;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.Service.Users
 {
@@ -35,7 +36,7 @@ namespace Application.Service.Users
                 Phone = request.Phone,
                 Gmail = request.Gmail,
                 BloodTypeId = request.BloodTypeId,
-                CreateAt = DateTime.UtcNow,
+                CreateAt = TimeHelper.NowVietnam,
                 Status = AccountStatus.Active,
                 RoleId = 2
             };
@@ -69,8 +70,6 @@ namespace Application.Service.Users
         //    var assignedRole = await _userRepository.AssignUserRole(user);
         //    return assignedRole;
         //}
-
-
 
         public async Task<bool> BanUserAsync(Guid userId)
         {
@@ -155,18 +154,24 @@ namespace Application.Service.Users
                 return null; // User not found
             }
 
-            var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(user.BloodTypeId);
+            //var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(user.BloodTypeId);
 
             return new ProfileDTO
             {
+                Id = userId,
                 Name = $"{user.LastName} {user.FirstName}",
                 Phone = user.Phone,
                 Gmail = user.Gmail,
                 Gender = user.Gender,
                 Dob = user.Dob,
-                BloodType = bloodType.Type
+                BloodType = user.BloodType?.Type,
+                Longitude = user.Longitude,
+                Latitude = user.Latitude,
+                Role = user.Role.RoleName,
+                LastDonation = user.LastDonation
             };
         }
+
 
         public async Task<UpdateUserDTO> UpdateUserAsync(Guid userId, UpdateUserDTO update)
         {
@@ -186,7 +191,7 @@ namespace Application.Service.Users
             existingUser.LastName = update.LastName;
             existingUser.Dob = update.Dob;
             existingUser.UpdateBy = parsedUserId;
-            existingUser.UpdateAt = DateTime.Now;
+            existingUser.UpdateAt = TimeHelper.NowVietnam;
 
             var updated = await _userRepository.UpdateUserProfileAsync(existingUser);
             return new UpdateUserDTO
@@ -197,21 +202,33 @@ namespace Application.Service.Users
             };
         }
 
-        public async Task<ProfileDTO> UpdateUserProfileAsync(Guid userId, UserDTO updateUser)
+        public async Task<ApiResponse<ProfileDTO>> UpdateUserProfileAsync(Guid userId, UpdateProfileDTO updateUser)
         {
+            ApiResponse<ProfileDTO> apiResponse = new();
             var id = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (id == null || !Guid.TryParse(id, out Guid parsedUserId) || parsedUserId != userId)
             {
-                return null; // Unauthorized access or invalid user ID
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "User not valid";
+                return apiResponse; // Unauthorized access or invalid user ID
             }
 
             var existingUser = await _userRepository.GetUserByIdAsync(userId);
-            if (existingUser == null || existingUser.Phone == updateUser.Phone || existingUser.Gmail == updateUser.Gmail)
+            if (existingUser == null)
             {
-                return null; // User not found or already has the same phone or email
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "User not valid";
+                return apiResponse; // User not found
             }
-            //var bloodType = await _bloodRepository.GetBloodTypeByNameAsync(updateUser.BloodTypeId);
 
+            if (await _userRepository.IsPhoneOrEmailInUseByAnotherUserAsync(updateUser.Phone, updateUser.Gmail, userId))
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Phone or gmail already exist";
+                return apiResponse; // Phone or email already used by another user
+            }
+
+            existingUser.Id = userId;
             existingUser.FirstName = updateUser.FirstName;
             existingUser.LastName = updateUser.LastName;
             existingUser.Phone = updateUser.Phone;
@@ -219,20 +236,28 @@ namespace Application.Service.Users
             existingUser.Gender = updateUser.Gender;
             existingUser.Dob = updateUser.Dob;
             existingUser.BloodTypeId = updateUser.BloodTypeId;
+            existingUser.Longitude = updateUser.Longitude;
+            existingUser.Latitude = updateUser.Latitude;
 
             var bloodType = await _bloodRepository.GetBloodTypeByIdAsync(updateUser.BloodTypeId);
 
             var updatedUser = await _userRepository.UpdateUserProfileAsync(existingUser);
-
-            return new ProfileDTO
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "User profile updated successfully.";
+            apiResponse.Data = new ProfileDTO
             {
+                Id = existingUser.Id,
                 Name = $"{existingUser.LastName} {existingUser.FirstName}",
-                Phone = existingUser.Phone, 
+                Phone = existingUser.Phone,
                 Gmail = existingUser.Gmail,
                 Gender = existingUser.Gender,
                 Dob = existingUser.Dob,
-                BloodType = bloodType.Type
+                BloodType = bloodType?.Type,
+                Longitude = existingUser.Longitude,
+                Latitude = existingUser.Latitude
             };
+
+            return apiResponse;
         }
     }
 }

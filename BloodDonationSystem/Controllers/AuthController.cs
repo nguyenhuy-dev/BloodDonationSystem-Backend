@@ -1,9 +1,12 @@
-﻿using Application.DTO.GoogleDTO;
+﻿using Application.DTO.AuthDTO;
+using Application.DTO.GoogleDTO;
 using Application.DTO.LoginDTO;
 using Application.DTO.UserDTO;
 using Application.Service.Auth;
 using Domain.Entities;
 using Domain.Enums;
+using Infrastructure.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -37,16 +40,26 @@ namespace BloodDonationSystem.Controllers
             });
         }
 
-        [HttpPost("api/register")]
+        [HttpPost("api/auth/register")]
         public async Task<IActionResult> Register([FromBody] UserDTO request)
         {
+
             var user = await _authService.RegisterAsync(request);
             if (user == null)
             {
-                return BadRequest("User already exists or registration failed.");
+                return BadRequest(new
+                {
+                    Message = "User already exists or registration failed."
+
+                });
             }
-            return Ok("Register sucessfully");
+            return Ok(new
+            {
+                Message = "Register sucessfully"
+            });
+            
         }
+        
 
         [HttpPost("api/google")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleAuthRequest request)
@@ -68,35 +81,46 @@ namespace BloodDonationSystem.Controllers
                 var firstName = nameParts?[0] ?? "";
                 var lastName = nameParts?.Length > 1 ? nameParts[1] : "";
 
+                
+
                 user = new User
                 {
                     FirstName = firstName,
                     LastName = lastName,
                     Gmail = email,
                     Status = AccountStatus.Pending, //Cannot use yet
+                    CreateAt = DateTime.Now,
                     RoleId = 3 // Assuming 3 is the default role ID for a user
                 };
-                await _authService.RegisterWithGoogleAsync(user);
-            }
 
-            if (user != null)
-            {
-                // User already exists, generate token
-                var token = _authService.GenerateToken(user);
-                SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
-                return Ok(new
-                {
-                    Message = "Login successful",
-                    Gmail = email,
-                    Name = name,
-                    Token = token.AccessToken
-                });
+                
+                await _authService.RegisterWithGoogleAsync(user);
+                user = await _authService.GetUserByEmailAsync(email);
             }
+            var token = _authService.GenerateToken(user);
+            SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
+
+            //if (user != null)
+            //{
+            //    // User already exists, generate token
+            //    var token = _authService.GenerateToken(user);
+            //    SetRefreshTokenCookie(token.RefreshToken); // Set the refresh token in a secure cookie
+            //    return Ok(new
+            //    {
+            //        Message = "Login successful",
+            //        Gmail = email,
+            //        Name = name,
+            //        Token = token.AccessToken
+            //    });
+            //}
 
             return Ok(new
             {
+                IsSuccess = true,
+                Message = "Login successful",
                 Gmail = email,
-                Name = name
+                Name = name,
+                Token = token.AccessToken
             });
         }
 
@@ -111,10 +135,30 @@ namespace BloodDonationSystem.Controllers
             }
 
             var token = _authService.GenerateToken(user);
+            SetRefreshTokenCookie(token.RefreshToken);
             return Ok(new
             {
                 Message = "Update successfully",
-                Token = token
+                Token = token.AccessToken,
+            });
+        }
+
+        [HttpPut("api/auth/reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordDTO request)
+        {
+            var result = await _authService.ResetPasswordAsync(request.Phone, request.NewPassword);
+
+            if (!result)
+                return BadRequest(new 
+                { 
+                    IsSuccess = false,
+                    Message = "Password reset failed" 
+                });
+
+            return Ok(new 
+            { 
+                IsSuccess = true,
+                Message = "Password reset successful",
             });
         }
 
@@ -249,7 +293,7 @@ namespace BloodDonationSystem.Controllers
             {
                 HttpOnly = true, // Prevents JavaScript access to the cookie
                 Secure = true, // Use HTTPS in production
-                Expires = DateTime.UtcNow.AddDays(7), // Set expiration for the cookie
+                Expires = TimeHelper.NowVietnam.AddDays(7), // Set expiration for the cookie
                 SameSite = SameSiteMode.Strict // Prevent CSRF attacks
             };
             _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);

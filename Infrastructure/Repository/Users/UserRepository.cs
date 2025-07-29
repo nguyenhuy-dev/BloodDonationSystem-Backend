@@ -37,7 +37,10 @@ namespace Infrastructure.Repository.Users
 
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            var user = await _context.Users
+                .Include(u => u.BloodType)
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
             return user;
         }
 
@@ -60,6 +63,13 @@ namespace Infrastructure.Repository.Users
             return await _context.Users
                 .Where(u => u.Id == id && u.Status == AccountStatus.Active)
                 .ExecuteUpdateAsync(u => u.SetProperty(x => x.Status, AccountStatus.Banned));
+        }
+
+        public async Task<bool> IsPhoneOrEmailInUseByAnotherUserAsync(string phone, string gmail, Guid currentUserId)
+        {
+            return await _context.Users.AnyAsync(u =>
+                u.Id != currentUserId &&
+                (u.Phone == phone || u.Gmail == gmail));
         }
     }
 }

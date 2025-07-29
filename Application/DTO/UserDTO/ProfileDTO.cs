@@ -8,11 +8,16 @@ namespace Application.DTO.UserDTO
 {
     public class ProfileDTO
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
         public string Gmail { get; set; }
-        public string BloodType { get; set; }
+        public string? BloodType { get; set; }
+        public string Role { get; set; }
         public DateOnly? Dob { get; set; }
         public bool? Gender { get; set; }
+        public decimal? Longitude { get; set; }
+        public decimal? Latitude { get; set; }
+        public DateTime? LastDonation { get; set; }
     }
 }

@@ -6,7 +6,6 @@ using Domain.Entities;
 using Infrastructure.Helper;
 using Infrastructure.Repository.Blood;
 using Infrastructure.Repository.BloodRegistrationRepo;
-using Infrastructure.Repository.Events;
 using Infrastructure.Repository.Facilities;
 using Infrastructure.Repository.Users;
 using Infrastructure.Repository.VolunteerRepo;
@@ -16,7 +15,7 @@ namespace Application.Service.VolunteerServ
 {
     public class VolunteerService(IVolunteerRepository _repoVolun, IHttpContextAccessor _contextAccessor,
         IUserRepository _repoUser, IBloodTypeRepository _repoBloodType, IBloodRegistrationRepository _repoRegis,
-        IEmailService _servMail, IFacilityRepository _repoFacility, 
+        IEmailService _servMail, IFacilityRepository _repoFacility,
         IEventService _servEvent) : IVolunteerService
     {
         public async Task<ApiResponse<Volunteer>?> RegisterVolunteerDonationAsync(RegisterVolunteerDonation request)
@@ -29,6 +28,19 @@ namespace Application.Service.VolunteerServ
             var user = await _repoUser.GetUserByIdAsync(creatorId);
             if (user == null)
                 throw new UnauthorizedAccessException("User not found or invalid");
+
+            // Khi tồn tại đơn đăng ký hiến máu thì không được đăng ký tình nguyện
+            var bloodRegistrations = (await _repoRegis.GetAllAsync())
+                                        .Where(br => (br.IsApproved == null ||
+                                                        (br.IsApproved == true && br.BloodProcedureId == null)) &&
+                                                        br.MemberId == creatorId)
+                                        .ToList();
+            if (bloodRegistrations.Any())
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Having a registered blood registration or in pending.";
+                return apiResponse;
+            }
 
             // Khi có tồn tại đơn tình nguyện mà chưa hết hạn thì không cho đăng ký mới
             var checkedVolunteerList = await _repoVolun.GetVolunteerByMemberIdAsync(creatorId);
@@ -49,7 +61,7 @@ namespace Application.Service.VolunteerServ
             }
 
             // Kiểm tra lần cuối hiến máu có phù hợp
-            if (user.LastDonation >= DateTime.Now.AddDays(-90))
+            if (user.LastDonation >= request.StartVolunteerDate.AddDays(-90))
             {
                 apiResponse.IsSuccess = false;
                 apiResponse.Message = "Last donation not suitable.";
@@ -60,7 +72,7 @@ namespace Application.Service.VolunteerServ
 
             var volunteer = new Volunteer
             {
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 StartVolunteerDate = request.StartVolunteerDate,
                 EndVolunteerDate = request.EndVolunteerDate,
                 IsExpired = false,
@@ -94,7 +106,7 @@ namespace Application.Service.VolunteerServ
 
             existingVolunteer.StartVolunteerDate = request.StartVolunteerDate;
             existingVolunteer.EndVolunteerDate = request.EndVolunteerDate;
-            existingVolunteer.UpdateAt = DateTime.Now;
+            existingVolunteer.UpdateAt = TimeHelper.NowVietnam;
             await _repoVolun.UpdateAsync(existingVolunteer);
 
             return existingVolunteer;
@@ -129,7 +141,7 @@ namespace Application.Service.VolunteerServ
                     BloodTypeName = bloodType?.Type,
                     Distance = Math.Round((decimal)GeographyHelper.CalculateDistanceKm(facility.Latitude, facility.Longitude, member.Latitude, member.Longitude), 1),
                     Latitude = member.Latitude,
-                    Longitude = member.Longitude, 
+                    Longitude = member.Longitude,
                     StartVolunteerDate = volunteer.StartVolunteerDate,
                     EndVolunteerDate = volunteer.EndVolunteerDate,
                     FullName = member.LastName + " " + member.FirstName,
@@ -244,7 +256,7 @@ namespace Application.Service.VolunteerServ
             var member = await _repoUser.GetUserByIdAsync(existingVolunteer.MemberId);
             if (member == null)
                 throw new ArgumentNullException(nameof(member));
-            // Kiểm tra blood type của volunteer có phù hợp với blood type của Event
+            // Kiểm tra blood type của volunteer có phù hợp với blood type của urgent event
             if (existingEvent.BloodTypeId != member.BloodTypeId)
             {
                 apiResponse.IsSuccess = false;
@@ -276,7 +288,7 @@ namespace Application.Service.VolunteerServ
 
             var bloodRegis = new BloodRegistration
             {
-                CreateAt = DateTime.Now,
+                CreateAt = TimeHelper.NowVietnam,
                 VolunteerId = id,
                 MemberId = existingVolunteer.MemberId,
                 StaffId = staffIdOut,
@@ -285,7 +297,7 @@ namespace Application.Service.VolunteerServ
             //await _repoRegis.AddAsync(bloodRegis);
 
             existingVolunteer.IsExpired = true;
-            existingVolunteer.UpdateAt = DateTime.Now;
+            existingVolunteer.UpdateAt = TimeHelper.NowVietnam;
             //await _repoVolun.UpdateAsync(existingVolunteer);
 
             //await _servMail.SendEmailFindDonorsAsync(bloodRegis);
@@ -297,6 +309,41 @@ namespace Application.Service.VolunteerServ
                 BloodRegistration = bloodRegis,
                 Volunteer = existingVolunteer,
             };
+            return apiResponse;
+        }
+
+        public async Task<ApiResponse<Volunteer>> CancelOwnVolunteerAsync(int volunteerId)
+        {
+            ApiResponse<Volunteer> apiResponse = new();
+
+            // Kiểm tra volunteer có tồn tại hay không, hoặc đã quá hạn rồi
+            var volunteer = await _repoVolun.GetByIdAsync(volunteerId);
+            if (volunteer == null || volunteer.IsExpired == true)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "Volunteer not found or be expired.";
+                return apiResponse;
+            }
+
+            var userId = _contextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid memberId))
+                throw new UnauthorizedAccessException("User not found or invalid");
+
+            // Kiểm tra xem member có sở hữu volunteer hay không
+            if (volunteer.MemberId != memberId)
+            {
+                apiResponse.IsSuccess = false;
+                apiResponse.Message = "This member not own volunteer.";
+                return apiResponse;
+            }
+
+            volunteer.IsExpired = true;
+            volunteer.UpdateAt = DateTime.Now;
+            await _repoVolun.UpdateAsync(volunteer);
+
+            apiResponse.IsSuccess = true;
+            apiResponse.Message = "Cancel own volunteer successfully.";
+
             return apiResponse;
         }
 
